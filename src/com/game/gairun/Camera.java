@@ -35,7 +35,7 @@ public class Camera {
         // render //////////////////////////////
 
 //        g.drawImage(game.getPlayer().render(), )
-        game.getPlayer().render(g);
+        game.getPlayer().render(g, game);
 
         // render //////////////////////////////
         g.dispose();

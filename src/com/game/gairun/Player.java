@@ -49,8 +49,11 @@ public class Player extends EntityClass {
 //        System.out.println(onSurface);
     }
 
-    public void render(Graphics g) {
-        g.drawImage(tex, (int) x, (int) y, null);
+    public void render(Graphics g, Game game) {
+        int xRender = (int) x + (game.getWidth()/2);
+        int yRender = (int) y + (game.getHeight()/2);
+        System.out.println(xRender+ ", " + yRender);
+        g.drawImage(tex, xRender, yRender, null);
     }
 
     public double getVelX() {

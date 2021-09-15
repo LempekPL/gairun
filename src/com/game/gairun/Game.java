@@ -9,6 +9,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.Serial;
 
+// TODO: custom width (settings and external file)
 // TODO: coordinate system
 // TODO: collision system
 // TODO: map system
