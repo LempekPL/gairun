@@ -1,8 +1,5 @@
 package com.game.gairun;
 
-import com.game.gairun.interfaces.Entity;
-import com.game.gairun.interfaces.EntityClass;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 // implements Entity
@@ -51,7 +48,7 @@ public class Player {
 //            onSurface = false;
 //        }
 //        System.out.println(onSurface);
-        System.out.println("PLAYER Coords: "+x+ ", " + y);
+//        System.out.println("PLAYER Coords: "+x+ ", " + y);
     }
 
     public void render(Graphics g, Camera cam) {

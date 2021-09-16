@@ -5,8 +5,6 @@ import com.game.gairun.libs.KeyInput;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
 import java.io.Serial;
 
 // TODO: custom width (settings and external file)
@@ -15,8 +13,6 @@ import java.io.Serial;
 // TODO: map system
 
 public class Game extends Canvas implements Runnable {
-    @Serial
-    private static final long serialVersionUID = 1L;
     // game static values
     public static final int WIDTH = 1200;
     // .../ 16 * 9; for 16:9 obviously
@@ -24,19 +20,43 @@ public class Game extends Canvas implements Runnable {
     // .../ 5 * 4; for 5:4
     // .../ 12 * 9 for 12:9
     public static final int HEIGHT = WIDTH / 12 * 9;
+    @Serial
+    private static final long serialVersionUID = 1L;
     public final String TITLE = "gairun";
     // threading
     private boolean running = false;
     private Thread thread;
 
     private Player p;
+    private MapController mapCon;
     private Camera cam;
+    private int lastFrames;
+
+    public static void main(String[] args) {
+        Game game = new Game();
+
+        game.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        game.setMaximumSize(new Dimension(WIDTH, HEIGHT));
+        game.setMinimumSize(new Dimension(WIDTH, HEIGHT));
+
+        JFrame frame = new JFrame(game.TITLE);
+        frame.add(game);
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+
+        game.start();
+    }
 
     public void init() {
         requestFocus();
 
         ImageHandler ih = new ImageHandler("gairun1");
-        p = new Player(0, 0, ih.grabImage(0,0,16,32));
+        p = new Player(0, 0, ih.grabImage(0, 0, 16, 32));
+
+        mapCon = new MapController("1", this);
 
         cam = new Camera(WIDTH, HEIGHT, this);
 
@@ -69,7 +89,8 @@ public class Game extends Canvas implements Runnable {
 
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
-                System.out.println(updates + " Ticks, FPS " + frames);
+//                System.out.println(updates + " Ticks, FPS " + frames);
+                lastFrames = frames;
                 updates = 0;
                 frames = 0;
             }
@@ -82,23 +103,6 @@ public class Game extends Canvas implements Runnable {
         cam.tick();
     }
 
-    public static void main(String[] args) {
-        Game game = new Game();
-
-        game.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        game.setMaximumSize(new Dimension(WIDTH, HEIGHT));
-        game.setMinimumSize(new Dimension(WIDTH, HEIGHT));
-
-        JFrame frame = new JFrame(game.TITLE);
-        frame.add(game);
-        frame.pack();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setResizable(false);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-
-        game.start();
-    }
     private synchronized void start() {
         if (running)
             return;
@@ -107,6 +111,7 @@ public class Game extends Canvas implements Runnable {
         thread = new Thread(this);
         thread.start();
     }
+
     private synchronized void stop() {
         if (!running)
             return;
@@ -126,5 +131,13 @@ public class Game extends Canvas implements Runnable {
 
     public Camera getCamera() {
         return cam;
+    }
+
+    public MapController getMapController() {
+        return mapCon;
+    }
+
+    public int getLastFrames() {
+        return lastFrames;
     }
 }
