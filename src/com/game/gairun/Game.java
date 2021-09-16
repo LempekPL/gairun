@@ -33,14 +33,16 @@ public class Game extends Canvas implements Runnable {
     private Camera cam;
 
     public void init() {
-        ImageHandler ih = new ImageHandler("gairun1");
-
-        p = new Player(100, 100, ih.grabImage(0,0,16,32));
-
         requestFocus();
+
+        ImageHandler ih = new ImageHandler("gairun1");
+        p = new Player(0, 0, ih.grabImage(0,0,16,32));
+
+        cam = new Camera(WIDTH, HEIGHT, this);
+
         addKeyListener(new KeyInput(this));
 
-        cam = new Camera(WIDTH, HEIGHT);
+
     }
 
     public void run() {
@@ -62,7 +64,7 @@ public class Game extends Canvas implements Runnable {
                 updates++;
                 delta--;
             }
-            cam.render(this);
+            cam.render();
             frames++;
 
             if (System.currentTimeMillis() - timer > 1000) {
@@ -77,9 +79,7 @@ public class Game extends Canvas implements Runnable {
 
     private void tick() {
         p.tick();
-    }
-
-    private void render() {
+        cam.tick();
     }
 
     public static void main(String[] args) {
@@ -124,4 +124,7 @@ public class Game extends Canvas implements Runnable {
         return p;
     }
 
+    public Camera getCamera() {
+        return cam;
+    }
 }

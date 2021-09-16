@@ -7,46 +7,56 @@ import java.awt.image.BufferedImage;
 public class Camera {
     private double x, y, viewportScale;
     private int viewportWidth, viewportHeight;
-    // image to "clear" displayed data
-    private final BufferedImage image;
+    private Game game;
+    private boolean debug = false;
 
-    public Camera(int viewportWidth, int viewportHeight) {
+    public Camera(int viewportWidth, int viewportHeight, Game game) {
         this.x = 0;
         this.y = 0;
         this.viewportWidth = viewportWidth;
         this.viewportHeight = viewportHeight;
-        this.viewportScale = 5;
-        this.image = new BufferedImage(viewportWidth, viewportHeight, BufferedImage.TYPE_INT_RGB);
+        this.viewportScale = 1.5;
+        this.game = game;
     }
 
     public void tick() {
-
+        double playerX = game.getPlayer().getX();
+        double playerY = game.getPlayer().getY();
+//        x = 30;
+//        if (playerX-x-10 > x) {
+//            x = playerX;
+//        }
+//        if (playerX+x+10 < x) {
+//            x = playerX;
+//        }
+//        if (playerY-y-10 > y) {
+//            y = playerY;
+//        }
+//        if (playerY+y+10 < y) {
+//            y = playerY;
+//        }
+        System.out.println("CAMERA Coords: "+x+ ", " + y);
     }
 
-    public void render(Game game) {
+    public void render() {
         BufferStrategy bs = game.getBufferStrategy();
         if (bs == null) {
             game.createBufferStrategy(3);
             return;
         }
-        Graphics g = bs.getDrawGraphics();
-        // "clear" screen
-        g = g.create(0, 0, (int) (viewportWidth * viewportScale), (int) (viewportHeight * viewportScale));
-        g.drawImage(image, 0, 0, viewportWidth * (int) viewportScale, viewportHeight * (int) viewportScale, game);
+        Graphics bsGraphics = bs.getDrawGraphics();
+        BufferedImage screen = new BufferedImage(viewportWidth, viewportHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics g = screen.createGraphics();
         // render //////////////////////////////
 
-//        Image tmpImg = g.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
-//        BufferedImage resizedImg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
-//        Graphics2D g2d = resizedImg.createGraphics();
-//        g2d.drawImage(tmpImg, 0, 0, null);
-//        g2d.dispose();
         game.getPlayer().render(g, this);
-
-
-//        g.drawImage(game.getPlayer().render(), )
 
         // render //////////////////////////////
         g.dispose();
+        int offsetX = (int) -(viewportWidth * (viewportScale-1));
+        int offsetY = (int) -(viewportHeight * (viewportScale-1));
+        bsGraphics.drawImage(screen, offsetX, offsetY, (int) (viewportWidth * viewportScale), (int) (viewportHeight * viewportScale), 0, 0, viewportWidth, viewportHeight, null);
+        bsGraphics.dispose();
         bs.show();
     }
 
@@ -54,16 +64,8 @@ public class Camera {
         return x;
     }
 
-    public void setX(double x) {
-        this.x = x;
-    }
-
     public double getY() {
         return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
     }
 
     public double getViewportScale() {
@@ -80,5 +82,13 @@ public class Camera {
 
     public int getViewportHeight() {
         return viewportHeight;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
     }
 }

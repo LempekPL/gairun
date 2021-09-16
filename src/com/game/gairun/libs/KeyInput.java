@@ -29,7 +29,13 @@ public class KeyInput extends KeyAdapter {
             game.getPlayer().setVelY(5);
             game.getPlayer().setJumps(game.getPlayer().getJumps() - 1);
         }
-
+        if (key == KeyEvent.VK_F7) {
+            if (game.getCamera().isDebug()) {
+                game.getCamera().setDebug(false);
+            } else {
+                game.getCamera().setDebug(true);
+            }
+        }
     }
 
     public void keyReleased(KeyEvent e) {
