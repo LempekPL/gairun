@@ -26,7 +26,7 @@ public class KeyInput extends KeyAdapter {
             game.getPlayer().setSideMultiplier(-1);
         }
         if ((key == KeyEvent.VK_W || key == KeyEvent.VK_SPACE) && game.getPlayer().getJumps() > 0) {
-            game.getPlayer().setVelY(-5);
+            game.getPlayer().setVelY(5);
             game.getPlayer().setJumps(game.getPlayer().getJumps() - 1);
         }
 

@@ -15,7 +15,7 @@ public class Camera {
         this.y = 0;
         this.viewportWidth = viewportWidth;
         this.viewportHeight = viewportHeight;
-        this.viewportScale = 1;
+        this.viewportScale = 5;
         this.image = new BufferedImage(viewportWidth, viewportHeight, BufferedImage.TYPE_INT_RGB);
     }
 
@@ -31,11 +31,19 @@ public class Camera {
         }
         Graphics g = bs.getDrawGraphics();
         // "clear" screen
-        g.drawImage(image, 0, 0, 1200, 900, game);
+        g = g.create(0, 0, (int) (viewportWidth * viewportScale), (int) (viewportHeight * viewportScale));
+        g.drawImage(image, 0, 0, viewportWidth * (int) viewportScale, viewportHeight * (int) viewportScale, game);
         // render //////////////////////////////
 
+//        Image tmpImg = g.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+//        BufferedImage resizedImg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+//        Graphics2D g2d = resizedImg.createGraphics();
+//        g2d.drawImage(tmpImg, 0, 0, null);
+//        g2d.dispose();
+        game.getPlayer().render(g, this);
+
+
 //        g.drawImage(game.getPlayer().render(), )
-        game.getPlayer().render(g, game);
 
         // render //////////////////////////////
         g.dispose();
@@ -64,5 +72,13 @@ public class Camera {
 
     public void setViewportScale(double viewportScale) {
         this.viewportScale = viewportScale;
+    }
+
+    public int getViewportWidth() {
+        return viewportWidth;
+    }
+
+    public int getViewportHeight() {
+        return viewportHeight;
     }
 }

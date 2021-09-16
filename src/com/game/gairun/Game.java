@@ -18,9 +18,12 @@ public class Game extends Canvas implements Runnable {
     @Serial
     private static final long serialVersionUID = 1L;
     // game static values
-    public static final int WIDTH = 600;
+    public static final int WIDTH = 1200;
+    // .../ 16 * 9; for 16:9 obviously
+    // .../ 4 * 3; for 4:3
+    // .../ 5 * 4; for 5:4
+    // .../ 12 * 9 for 12:9
     public static final int HEIGHT = WIDTH / 12 * 9;
-    public static final int SCALE = 2;
     public final String TITLE = "gairun";
     // threading
     private boolean running = false;
@@ -30,7 +33,7 @@ public class Game extends Canvas implements Runnable {
     private Camera cam;
 
     public void init() {
-        ImageHandler ih = new ImageHandler("player");
+        ImageHandler ih = new ImageHandler("gairun1");
 
         p = new Player(100, 100, ih.grabImage(0,0,16,32));
 
@@ -82,9 +85,9 @@ public class Game extends Canvas implements Runnable {
     public static void main(String[] args) {
         Game game = new Game();
 
-        game.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
-        game.setMaximumSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
-        game.setMinimumSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
+        game.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        game.setMaximumSize(new Dimension(WIDTH, HEIGHT));
+        game.setMinimumSize(new Dimension(WIDTH, HEIGHT));
 
         JFrame frame = new JFrame(game.TITLE);
         frame.add(game);

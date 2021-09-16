@@ -21,7 +21,7 @@ public class Player extends EntityClass {
     public void tick() {
         double preY = y;
         if (!onSurface) {
-            velY += 0.1;
+            velY -= 0.1;
         }
         y += velY;
         x += velX * sideMultiplier;
@@ -34,26 +34,27 @@ public class Player extends EntityClass {
         }
 
         // temp
-        if (x < 0) x = 0;
-        if (x > 1200 - tex.getWidth()) x = 1200 - tex.getWidth();
+        if (x < -500) x = -500;
+        if (x > 500) x = 500;
         if (y < 0) y = 0;
-        if (y > 900 - tex.getHeight()) y = 900 - tex.getHeight();
+        if (y > 500) y = 500;
         // TODO: collision
 
-        if (preY == y && velY > 0) {
-            onSurface = true;
+//        if (preY == y && velY > 0) {
+//            onSurface = true;
             jumps = 2;
-        } else {
-            onSurface = false;
-        }
+//        } else {
+//            onSurface = false;
+//        }
 //        System.out.println(onSurface);
     }
 
-    public void render(Graphics g, Game game) {
-        int xRender = (int) x + (game.getWidth()/2);
-        int yRender = (int) y + (game.getHeight()/2);
-        System.out.println(xRender+ ", " + yRender);
-        g.drawImage(tex, xRender, yRender, null);
+    public void render(Graphics g, Camera cam) {
+        double xRender = (x + ((double) cam.getViewportWidth() / 2)) + cam.getX();
+        double yRender = ((y*-1) + (double) cam.getViewportHeight() / 2) + cam.getY();
+//        System.out.println("Rendered: "+xRender+ ", " + yRender);
+//        System.out.println("Coords: "+x+ ", " + y);
+        g.drawImage(tex, (int) xRender, (int) yRender, null);
     }
 
     public double getVelX() {
