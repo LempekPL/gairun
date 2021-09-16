@@ -15,26 +15,19 @@ public class Camera {
         this.y = 0;
         this.viewportWidth = viewportWidth;
         this.viewportHeight = viewportHeight;
-        this.viewportScale = 1.5;
+        this.viewportScale = 1.25;
         this.game = game;
     }
 
     public void tick() {
         double playerX = game.getPlayer().getX();
         double playerY = game.getPlayer().getY();
-//        x = 30;
-//        if (playerX-x-10 > x) {
-//            x = playerX;
-//        }
-//        if (playerX+x+10 < x) {
-//            x = playerX;
-//        }
-//        if (playerY-y-10 > y) {
-//            y = playerY;
-//        }
-//        if (playerY+y+10 < y) {
-//            y = playerY;
-//        }
+        if (x+50 < playerX || x-50 > playerX) {
+            x += (playerX - x - 48)/50;
+        }
+        if (y+50 < playerY || y-50 > playerY) {
+            y += (playerY - y - 48)/50;
+        }
         System.out.println("CAMERA Coords: "+x+ ", " + y);
     }
 

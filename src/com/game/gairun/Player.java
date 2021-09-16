@@ -55,9 +55,9 @@ public class Player {
     }
 
     public void render(Graphics g, Camera cam) {
-        double xRender = ((x - (double) tex.getWidth()/2) + ((double) cam.getViewportWidth() / 2));
-        double yRender = (((y+tex.getHeight())*-1) + (double) cam.getViewportHeight() / 2);
-        System.out.println("PLAYER Rendered: "+xRender+ ", " + yRender);
+        double xRender = ((x - (double) tex.getWidth()/2) + ((double) cam.getViewportWidth() / 2)) - cam.getX();
+        double yRender = (((y+tex.getHeight())*-1) + (double) cam.getViewportHeight() / 2) + cam.getY();
+//        System.out.println("PLAYER Rendered: "+xRender+ ", " + yRender);
         g.drawImage(tex, (int) xRender, (int) yRender, null);
         if (cam.isDebug()) {
             g.setColor(Color.red);
