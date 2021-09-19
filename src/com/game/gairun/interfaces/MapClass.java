@@ -49,7 +49,6 @@ public class MapClass {
         Graphics mapGraphics = mapImage.getGraphics();
         for (int i = 0; i < mapLayout.size() && i < 2800; i++) {
             for (int j = 0; j < mapLayout.get(i).size() && j < 2800; j++) {
-
                 if (Objects.equals(mapLayout.get(i).get(j), "P")) {
                     mapCenterX = j * 16 + 8;
                     mapCenterY = -i * 16 - 16;

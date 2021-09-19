@@ -1,21 +1,20 @@
 package com.game.gairun;
 
-import com.game.gairun.interfaces.MapClass;
-
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class Player {
+    private final Game game;
     private final BufferedImage tex;
-    protected double x, y;
-    private double acc = 1, dcc = 0.5, velX = 0, velY = 0, friction = 0;
-    private int sideMultiplier = 0;
+    protected float x, y;
+    protected float velX, velY;
+    private float acc = 0.1F, dcc = 0.05F;
     private int jumps = 1;
-    private boolean onSurface = false, collisionTop = false, collisionBottom = false, collisionLeft = false, collisionRight = false, collision = false;
-    private Game game;
+//    private boolean onSurface = false, collisionTop = false, collisionBottom = false, collisionLeft = false, collisionRight = false, collision = false;
 
-    public Player(double x, double y, BufferedImage tex, Game game) {
+    public Player(float x, float y, BufferedImage tex, Game game) {
         this.x = x;
         this.y = y;
         this.tex = tex;
@@ -24,65 +23,103 @@ public class Player {
 
     public void tick() {
         y += velY;
-        x += velX * sideMultiplier;
-        if (velX > 0) {
-            velX -= friction;
-        } else {
-            velX = 0;
-            friction = 0;
-            sideMultiplier = 0;
+        x += velX;
+        if (y > 0) {
+            velY -= 0.1;
         }
 
-        velX = clamp(velX, -5, 5);
+        List<Integer> inputs = game.getKeyListener().getKeysPressed();
+        if (inputs.contains(KeyEvent.VK_D)) {
+            velX += acc;
+        } else if (inputs.contains(KeyEvent.VK_A)) {
+            velX -= acc;
+        } else if (!inputs.contains(KeyEvent.VK_D) && !inputs.contains(KeyEvent.VK_A)) {
+            if (velX > 0) velX -= dcc;
+            else if (velX < 0) velX += dcc;
+            if (velX > -0.1 && velX < 0.1) velX = 0;
+        }
+        // temp
+        if (y < 0) y = 0;
+
+        if (game.getKeyListener().checkKey(KeyEvent.VK_W) && jumps > 0) {
+            velY = 4;
+            jumps--;
+        }
+
+        velX = clamp(velX, -3.5F, 3.5F);
         velY = clamp(velY, -5, 5);
-
-
-//        System.out.println(onSurface);
-//        System.out.println("PLAYER Coords: "+x+ ", " + y);
-
     }
 
-    public void render(Graphics g, Camera cam) {
-        double xRender = ((x - (double) tex.getWidth() / 2) + ((double) cam.getViewportWidth() / 2)) - cam.getX();
-        double yRender = (((y + tex.getHeight()) * -1) + (double) cam.getViewportHeight() / 2) + cam.getY();
-//        System.out.println("PLAYER Rendered: "+xRender+ ", " + yRender);
+    public void render(Graphics g) {
+        float xRender = x - (float) tex.getWidth() / 2 + (float) Game.WIDTH / 2 - game.getCamera().getX();
+        float yRender = -(y + tex.getHeight()) + (float) Game.HEIGHT / 2 + game.getCamera().getY();
         g.drawImage(tex, (int) xRender, (int) yRender, null);
-        if (cam.isDebug()) {
+        if (game.getCamera().isDebug()) {
             g.setColor(Color.red);
             g.drawRect((int) xRender, (int) yRender, tex.getWidth() - 1, tex.getHeight() - 1);
         }
     }
 
-    public double getVelX() {
+    public float clamp(float value, float min, float max) {
+        if (value >= max) value = max;
+        else if (value <= min) value = min;
+        return value;
+    }
+
+    public void resetPlayer() {
+        velX = 0;
+        velY = 0;
+        x = 0;
+        y = 0;
+        jumps = 1;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public float getVelX() {
         return velX;
     }
 
-    public void setVelX(double velX) {
+    public void setVelX(float velX) {
         this.velX = velX;
     }
 
-    public double getVelY() {
+    public float getVelY() {
         return velY;
     }
 
-    public void setVelY(double velY) {
+    public void setVelY(float velY) {
         this.velY = velY;
     }
 
-    public double getFriction() {
-        return friction;
+    public float getAcc() {
+        return acc;
     }
 
-    public void setFriction(double friction) {
-        this.friction = friction;
+    public void setAcc(float acc) {
+        this.acc = acc;
     }
 
-    public int getSideMultiplier() {
-        return sideMultiplier;
+    public float getDcc() {
+        return dcc;
     }
 
-    public void setSideMultiplier(int sideMultiplier) {
-        this.sideMultiplier = sideMultiplier;
+    public void setDcc(float dcc) {
+        this.dcc = dcc;
     }
 
     public int getJumps() {
@@ -91,39 +128,5 @@ public class Player {
 
     public void setJumps(int jumps) {
         this.jumps = jumps;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public void resetPlayer() {
-        velX = 0;
-        velY = 0;
-        x = 0;
-        y = 0;
-        sideMultiplier = 0;
-        friction = 0;
-        jumps = 1;
-    }
-
-    public double clamp(double number, double min, double max) {
-        if (min > max) {
-            return number;
-        }
-        if (number > max) return max;
-        return Math.max(number, min);
     }
 }

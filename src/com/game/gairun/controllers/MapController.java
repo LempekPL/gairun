@@ -1,12 +1,14 @@
-package com.game.gairun;
+package com.game.gairun.controllers;
 
+import com.game.gairun.Game;
 import com.game.gairun.interfaces.MapClass;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.Graphics;
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
 
 public class MapController {
     private Map<String, Map<String, MapClass>> mapMainSets;
@@ -20,12 +22,12 @@ public class MapController {
         loadMap("main", "1");
     }
 
-    public void render(Graphics g, Camera cam) {
+    public void render(Graphics g) {
         if (loadedMap) {
-            double xRender = (double) cam.getViewportWidth() / 2 - cam.getX() - mapMainSets.get(currentSet).get(currentMap).getMapCenterX();
-            double yRender = (double) cam.getViewportHeight() / 2 + cam.getY() + mapMainSets.get(currentSet).get(currentMap).getMapCenterY();
+            float xRender = (float) Game.WIDTH / 2 - game.getCamera().getX() - mapMainSets.get(currentSet).get(currentMap).getMapCenterX();
+            float yRender = (float) Game.HEIGHT / 2 + game.getCamera().getY() + mapMainSets.get(currentSet).get(currentMap).getMapCenterY();
             g.drawImage(mapMainSets.get(currentSet).get(currentMap).getMapImage(), (int) xRender, (int) yRender, null);
-            if (cam.isDebug()) {
+            if (game.getCamera().isDebug()) {
                 List<List<String>> listLayout = mapMainSets.get(currentSet).get(currentMap).getMapLayout();
                 for (int i = 0; i < listLayout.size(); i++) {
                     for (int j = 0; j < listLayout.get(i).size(); j++) {
