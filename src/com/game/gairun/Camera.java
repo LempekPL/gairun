@@ -31,7 +31,7 @@ public class Camera {
         } else if (y + cameraMovementLimit < playerY) {
             y += (playerY - y - cameraMovementLimit) / cameraMovementLimit;
         }
-        if (game.getPlayer().getVelX() != 0 && scale >= 1.5) {
+        if (game.getPlayer().getVelX() != 0 && scale >= 1.8) {
             scale -= 0.002;
         } else {
             if (scale < 2) {
