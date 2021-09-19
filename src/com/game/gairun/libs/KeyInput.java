@@ -38,6 +38,13 @@ public class KeyInput extends KeyAdapter {
         if (key == KeyEvent.VK_L) {
             game.getCamera().setViewportScale(game.getCamera().getViewportScale()-0.1);
         }
+        if (key == KeyEvent.VK_1) {
+            game.getMapController().loadMap("main", "1");
+        } else if (key == KeyEvent.VK_2) {
+            game.getMapController().loadMap("main", "2");
+        } else if (key == KeyEvent.VK_3) {
+            game.getMapController().loadMap("side", "3");
+        }
     }
 
     public void keyReleased(KeyEvent e) {

@@ -7,10 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.Serial;
 
-// TODO: custom width (settings and external file)
-// TODO: coordinate system
-// TODO: collision system
-// TODO: map system
+// TODO: custom screen size (settings > create file > restart game > load external file > set screen size)
 
 public class Game extends Canvas implements Runnable {
     // game static values
@@ -54,15 +51,13 @@ public class Game extends Canvas implements Runnable {
         requestFocus();
 
         ImageHandler ih = new ImageHandler("gairun1");
-        p = new Player(0, 0, ih.grabImage(0, 0, 16, 32));
+        p = new Player(0, 0, ih.grabImage(0, 0, 16, 32), this);
 
-        mapCon = new MapController("1", this);
 
         cam = new Camera(WIDTH, HEIGHT, this);
 
+        mapCon = new MapController(this);
         addKeyListener(new KeyInput(this));
-
-
     }
 
     public void run() {

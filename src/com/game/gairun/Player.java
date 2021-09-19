@@ -1,29 +1,28 @@
 package com.game.gairun;
 
+import com.game.gairun.interfaces.MapClass;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
-// implements Entity
+import java.util.List;
+
 public class Player {
-    protected double x, y, hitboxWidth, hitboxHeight;
-    private double velX = 0, velY = 0, friction = 0;
     private final BufferedImage tex;
+    protected double x, y;
+    private double acc = 1, dcc = 0.5, velX = 0, velY = 0, friction = 0;
     private int sideMultiplier = 0;
     private int jumps = 1;
-    private boolean onSurface = false;
+    private boolean onSurface = false, collisionTop = false, collisionBottom = false, collisionLeft = false, collisionRight = false, collision = false;
+    private Game game;
 
-    public Player(double x, double y, BufferedImage tex) {
+    public Player(double x, double y, BufferedImage tex, Game game) {
         this.x = x;
         this.y = y;
-        this.hitboxWidth = tex.getWidth();
-        this.hitboxHeight = tex.getHeight();
         this.tex = tex;
+        this.game = game;
     }
 
     public void tick() {
-//        double preY = y;
-        if (!onSurface) {
-            velY -= 0.1;
-        }
         y += velY;
         x += velX * sideMultiplier;
         if (velX > 0) {
@@ -34,31 +33,23 @@ public class Player {
             sideMultiplier = 0;
         }
 
-        // temp
-//        if (x < -500) x = -500;
-//        if (x > 500) x = 500;
-        if (y < 0) y = 0;
-//        if (y > 50) y = 50;
-        // TODO: collision
+        velX = clamp(velX, -5, 5);
+        velY = clamp(velY, -5, 5);
 
-//        if (preY == y && velY > 0) {
-//            onSurface = true;
-            jumps = 2;
-//        } else {
-//            onSurface = false;
-//        }
+
 //        System.out.println(onSurface);
 //        System.out.println("PLAYER Coords: "+x+ ", " + y);
+
     }
 
     public void render(Graphics g, Camera cam) {
-        double xRender = ((x - (double) tex.getWidth()/2) + ((double) cam.getViewportWidth() / 2)) - cam.getX();
-        double yRender = (((y+tex.getHeight())*-1) + (double) cam.getViewportHeight() / 2) + cam.getY();
+        double xRender = ((x - (double) tex.getWidth() / 2) + ((double) cam.getViewportWidth() / 2)) - cam.getX();
+        double yRender = (((y + tex.getHeight()) * -1) + (double) cam.getViewportHeight() / 2) + cam.getY();
 //        System.out.println("PLAYER Rendered: "+xRender+ ", " + yRender);
         g.drawImage(tex, (int) xRender, (int) yRender, null);
         if (cam.isDebug()) {
             g.setColor(Color.red);
-            g.drawRect((int) xRender, (int) yRender, tex.getWidth(), tex.getHeight());
+            g.drawRect((int) xRender, (int) yRender, tex.getWidth() - 1, tex.getHeight() - 1);
         }
     }
 
@@ -102,18 +93,6 @@ public class Player {
         this.jumps = jumps;
     }
 
-    public boolean isOnSurface() {
-        return onSurface;
-    }
-
-    public void setOnSurface(boolean onSurface) {
-        this.onSurface = onSurface;
-    }
-
-    public Rectangle getHitbox() {
-        return new Rectangle((int) x, (int) y, (int) hitboxHeight, (int) hitboxHeight);
-    }
-
     public double getX() {
         return x;
     }
@@ -130,19 +109,21 @@ public class Player {
         this.y = y;
     }
 
-    public double getHitboxWidth() {
-        return hitboxWidth;
+    public void resetPlayer() {
+        velX = 0;
+        velY = 0;
+        x = 0;
+        y = 0;
+        sideMultiplier = 0;
+        friction = 0;
+        jumps = 1;
     }
 
-    public void setHitboxWidth(double hitboxWidth) {
-        this.hitboxWidth = hitboxWidth;
-    }
-
-    public double getHitboxHeight() {
-        return hitboxHeight;
-    }
-
-    public void setHitboxHeight(double hitboxHeight) {
-        this.hitboxHeight = hitboxHeight;
+    public double clamp(double number, double min, double max) {
+        if (min > max) {
+            return number;
+        }
+        if (number > max) return max;
+        return Math.max(number, min);
     }
 }
