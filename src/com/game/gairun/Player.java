@@ -1,88 +1,165 @@
 package com.game.gairun;
 
-import com.game.gairun.interfaces.Entity;
-import com.game.gairun.interfaces.EntityClass;
+import com.game.gairun.interfaces.MapClass;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-// implements Entity
-public class Player extends EntityClass {
-    private double velX = 0, velY = 0, friction = 0;
-    private final BufferedImage tex;
-    private int sideMultiplier = 0;
-    private int jumps = 1;
-    private boolean onSurface = false;
+import java.util.List;
+import java.util.Objects;
 
-    public Player(double x, double y, BufferedImage tex) {
-        super(x, y, tex.getWidth(), tex.getHeight());
+public class Player {
+    private final Game game;
+    private final BufferedImage tex;
+    protected float x, y;
+    protected float velX, velY;
+    private float acc = 0.1F, dcc = 0.05F;
+    private int jumps = 1;
+//    private boolean onSurface = false, collisionTop = false, collisionBottom = false, collisionLeft = false, collisionRight = false, collision = false;
+
+    public Player(float x, float y, BufferedImage tex, Game game) {
+        this.x = x;
+        this.y = y;
         this.tex = tex;
+        this.game = game;
     }
 
     public void tick() {
-        double preY = y;
-        if (!onSurface) {
-            velY += 0.1;
-        }
         y += velY;
-        x += velX * sideMultiplier;
-        if (velX > 0) {
-            velX -= friction;
-        } else {
-            velX = 0;
-            friction = 0;
-            sideMultiplier = 0;
+        x += velX;
+        if (y > 0) {
+            velY -= 0.1;
         }
 
+        List<Integer> inputs = game.getKeyListener().getKeysPressed();
+        if (inputs.contains(KeyEvent.VK_D)) {
+            velX += acc;
+        } else if (inputs.contains(KeyEvent.VK_A)) {
+            velX -= acc;
+        } else if (!inputs.contains(KeyEvent.VK_D) && !inputs.contains(KeyEvent.VK_A)) {
+            if (velX > 0) velX -= dcc;
+            else if (velX < 0) velX += dcc;
+            if (velX > -0.1 && velX < 0.1) velX = 0;
+        }
         // temp
-        if (x < 0) x = 0;
-        if (x > 1200 - tex.getWidth()) x = 1200 - tex.getWidth();
         if (y < 0) y = 0;
-        if (y > 900 - tex.getHeight()) y = 900 - tex.getHeight();
-        // TODO: collision
 
-        if (preY == y && velY > 0) {
-            onSurface = true;
-            jumps = 2;
-        } else {
-            onSurface = false;
+        if (game.getKeyListener().checkKey(KeyEvent.VK_W) && jumps > 0) {
+            velY = 4;
+            jumps--;
         }
-//        System.out.println(onSurface);
+
+
+        velX = clamp(velX, -3.5F, 3.5F);
+        velY = clamp(velY, -5, 5);
+
+        Collision();
+    }
+
+    private void Collision() {
+
+        List<List<String>> mapLayout = game.getMapController().getCurrentMap().getMapLayout();
+
+        for (int i = 0; i < mapLayout.size(); i++) {
+            for (int j = 0; j < mapLayout.get(i).size(); j++) {
+                if (!Objects.equals(mapLayout.get(i).get(j), "A") && !Objects.equals(mapLayout.get(i).get(j), "P")) {
+                    Rectangle tempRect = new Rectangle(game.getMapController().getCurrentMap().getMapCenterX() + j * 16, game.getMapController().getCurrentMap().getMapCenterY() + i * 16, 16, 16);
+                    if (getBounds().intersects(tempRect)) {
+                        System.out.println("TAK");
+                    }
+                }
+            }
+        }
+    }
+
+    public Rectangle getBounds() {
+//        float xRender = x - (float) Game.WIDTH / 2 - game.getCamera().getX();
+//        float yRender = -(y) + (float) Game.HEIGHT / 2 + game.getCamera().getY();
+        float bx = x - (float) Game.WIDTH / 2 - game.getCamera().getX();
+        float by = -(y) + (float) Game.HEIGHT / 2 + game.getCamera().getY();
+        float bw = 16 + velX / 2;
+        float bh = 16;
+        System.out.println(bx);
+        System.out.println(by);
+        System.out.println(bw);
+        System.out.println(bh);
+        return new Rectangle((int) bx, (int) by, (int) bw, (int) bh);
     }
 
     public void render(Graphics g) {
-        g.drawImage(tex, (int) x, (int) y, null);
+        float xRender = x - (float) tex.getWidth() / 2 + (float) Game.WIDTH / 2 - game.getCamera().getX();
+        float yRender = -(y + tex.getHeight()) + (float) Game.HEIGHT / 2 + game.getCamera().getY();
+        g.drawImage(tex, (int) xRender, (int) yRender, null);
+        if (game.getCamera().isDebug()) {
+            g.setColor(Color.red);
+            g.drawRect((int) xRender, (int) yRender, tex.getWidth() - 1, tex.getHeight() - 1);
+            g.setColor(Color.green);
+            Rectangle a = getBounds();
+            g.drawRect((int) xRender + a.x, (int) yRender + a.y, a.width, a.height);
+            g.setColor(Color.red);
+        }
     }
 
-    public double getVelX() {
+    public float clamp(float value, float min, float max) {
+        if (value >= max) value = max;
+        else if (value <= min) value = min;
+        return value;
+    }
+
+    public void resetPlayer() {
+        velX = 0;
+        velY = 0;
+        x = 0;
+        y = 0;
+        jumps = 1;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public float getVelX() {
         return velX;
     }
 
-    public void setVelX(double velX) {
+    public void setVelX(float velX) {
         this.velX = velX;
     }
 
-    public double getVelY() {
+    public float getVelY() {
         return velY;
     }
 
-    public void setVelY(double velY) {
+    public void setVelY(float velY) {
         this.velY = velY;
     }
 
-    public double getFriction() {
-        return friction;
+    public float getAcc() {
+        return acc;
     }
 
-    public void setFriction(double friction) {
-        this.friction = friction;
+    public void setAcc(float acc) {
+        this.acc = acc;
     }
 
-    public int getSideMultiplier() {
-        return sideMultiplier;
+    public float getDcc() {
+        return dcc;
     }
 
-    public void setSideMultiplier(int sideMultiplier) {
-        this.sideMultiplier = sideMultiplier;
+    public void setDcc(float dcc) {
+        this.dcc = dcc;
     }
 
     public int getJumps() {
@@ -91,13 +168,5 @@ public class Player extends EntityClass {
 
     public void setJumps(int jumps) {
         this.jumps = jumps;
-    }
-
-    public boolean isOnSurface() {
-        return onSurface;
-    }
-
-    public void setOnSurface(boolean onSurface) {
-        this.onSurface = onSurface;
     }
 }
