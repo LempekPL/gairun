@@ -1,9 +1,12 @@
 package com.game.gairun;
 
+import com.game.gairun.interfaces.MapClass;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Objects;
 
 public class Player {
     private final Game game;
@@ -46,8 +49,41 @@ public class Player {
             jumps--;
         }
 
+
         velX = clamp(velX, -3.5F, 3.5F);
         velY = clamp(velY, -5, 5);
+
+        Collision();
+    }
+
+    private void Collision() {
+
+        List<List<String>> mapLayout = game.getMapController().getCurrentMap().getMapLayout();
+
+        for (int i = 0; i < mapLayout.size(); i++) {
+            for (int j = 0; j < mapLayout.get(i).size(); j++) {
+                if (!Objects.equals(mapLayout.get(i).get(j), "A") && !Objects.equals(mapLayout.get(i).get(j), "P")) {
+                    Rectangle tempRect = new Rectangle(game.getMapController().getCurrentMap().getMapCenterX() + j * 16, game.getMapController().getCurrentMap().getMapCenterY() + i * 16, 16, 16);
+                    if (getBounds().intersects(tempRect)) {
+                        System.out.println("TAK");
+                    }
+                }
+            }
+        }
+    }
+
+    public Rectangle getBounds() {
+//        float xRender = x - (float) Game.WIDTH / 2 - game.getCamera().getX();
+//        float yRender = -(y) + (float) Game.HEIGHT / 2 + game.getCamera().getY();
+        float bx = x - (float) Game.WIDTH / 2 - game.getCamera().getX();
+        float by = -(y) + (float) Game.HEIGHT / 2 + game.getCamera().getY();
+        float bw = 16 + velX / 2;
+        float bh = 16;
+        System.out.println(bx);
+        System.out.println(by);
+        System.out.println(bw);
+        System.out.println(bh);
+        return new Rectangle((int) bx, (int) by, (int) bw, (int) bh);
     }
 
     public void render(Graphics g) {
@@ -57,6 +93,10 @@ public class Player {
         if (game.getCamera().isDebug()) {
             g.setColor(Color.red);
             g.drawRect((int) xRender, (int) yRender, tex.getWidth() - 1, tex.getHeight() - 1);
+            g.setColor(Color.green);
+            Rectangle a = getBounds();
+            g.drawRect((int) xRender + a.x, (int) yRender + a.y, a.width, a.height);
+            g.setColor(Color.red);
         }
     }
 
