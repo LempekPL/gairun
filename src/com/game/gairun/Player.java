@@ -43,7 +43,7 @@ public class Player {
 
         if (game.getKeyListener().checkKey(KeyEvent.VK_W) && jumps > 0) {
             velY = 4;
-            jumps--;
+//            jumps--;
         }
 
         velX = clamp(velX, -3.5F, 3.5F);

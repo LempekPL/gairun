@@ -2,7 +2,7 @@ package com.game.gairun;
 
 import com.game.gairun.libs.ImageHandler;
 import com.game.gairun.controllers.KeyInput;
-import com.game.gairun.controllers.MapController;
+import com.game.gairun.controllers.MapControllerer;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -28,7 +28,7 @@ public class Game extends Canvas implements Runnable {
     // instances
     private Player p;
     private Camera cam;
-    private MapController mapController;
+    private MapControllerer mapControllerer;
     private KeyInput keyListener;
     BufferedImage screen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
     // frame rate
@@ -50,7 +50,7 @@ public class Game extends Canvas implements Runnable {
         ImageHandler ih = new ImageHandler("gairun1");
         p = new Player(0, 0, ih.grabImage(0, 0, 16, 32), this);
         cam = new Camera(0, 0, this);
-        mapController = new MapController(this);
+        mapControllerer = new MapControllerer(this);
         keyListener = new KeyInput();
         addKeyListener(keyListener);
     }
@@ -89,11 +89,11 @@ public class Game extends Canvas implements Runnable {
         cam.tick();
         p.tick();
         if (keyListener.checkKey(KeyEvent.VK_1)) {
-            mapController.loadMap("main", "1");
+            mapControllerer.loadMap("main", "1");
         } else if (keyListener.checkKey(KeyEvent.VK_2)) {
-            mapController.loadMap("main", "2");
+            mapControllerer.loadMap("main", "2");
         } else if (keyListener.checkKey(KeyEvent.VK_3)) {
-            mapController.loadMap("side", "3");
+            mapControllerer.loadMap("side", "3");
         }
     }
 
@@ -111,7 +111,7 @@ public class Game extends Canvas implements Runnable {
         g.clearRect(0, 0, WIDTH, HEIGHT);
         // rendering
         p.render(g);
-        mapController.render(g);
+        mapControllerer.render(g);
         // debug camera
         if (cam.isDebug()) {
             // camera move to limit
@@ -154,8 +154,8 @@ public class Game extends Canvas implements Runnable {
         return cam;
     }
 
-    public MapController getMapController() {
-        return mapController;
+    public MapControllerer getMapController() {
+        return mapControllerer;
     }
 
     public KeyInput getKeyListener() {
