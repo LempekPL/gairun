@@ -15,6 +15,7 @@ public class Player {
     private float acc = 0.1F, dcc = 0.05F;
     private int jumps = 1;
     private boolean flying = false;
+    List<Integer> inputs;
 
     public Player(float x, float y, BufferedImage tex, Game game) {
         this.x = x;
@@ -28,7 +29,7 @@ public class Player {
         y += velY;
         x += velX;
 
-        List<Integer> inputs = game.getKeyListener().getKeysPressed();
+        inputs = game.getKeyListener().getKeysPressed();
         if (inputs.contains(KeyEvent.VK_D)) {
             velX += acc;
         } else if (inputs.contains(KeyEvent.VK_A)) {
@@ -49,9 +50,9 @@ public class Player {
                 if (velY > -0.1 && velY < 0.1) velY = 0;
             }
         } else {
-            if (game.getKeyListener().checkKey(KeyEvent.VK_W) && jumps > 0) {
+            if (jumps > 0 && game.getKeyListener().checkKey(KeyEvent.VK_W)) {
                 velY = 4;
-//                jumps--;
+                jumps--;
             }
             velY -= 0.1;
         }
@@ -65,19 +66,8 @@ public class Player {
         float yRender = -(y + tex.getHeight()) + (float) Game.HEIGHT / 2 + game.getCamera().getY();
         g.drawImage(tex, (int) xRender, (int) yRender, null);
         if (game.getCamera().isDebug()) {
-            g.drawString("Ax: %s, Ay: %s".formatted(x, y), (int) xRender, (int) yRender - 30);
-            g.drawString("x: %s, y: %s".formatted(x - tex.getWidth() / 2, y + tex.getHeight()), (int) xRender, (int) yRender - 20);
-            g.drawString("%s".formatted(velY), (int) xRender, (int) yRender - 10);
             g.setColor(Color.red);
             g.drawRect((int) xRender, (int) yRender, tex.getWidth() - 1, tex.getHeight() - 1);
-            g.setColor(Color.cyan);
-            float xRenderA = getHitboxX().x + (float) Game.WIDTH / 2 - game.getCamera().getX();
-            float yRenderA = -getHitboxX().y + (float) Game.HEIGHT / 2 + game.getCamera().getY();
-            g.drawRect((int) xRenderA, (int) yRenderA, getHitboxX().width, getHitboxX().height);
-            g.setColor(Color.orange);
-            float xRenderB = getHitboxY().x + (float) Game.WIDTH / 2 - game.getCamera().getX();
-            float yRenderB = -getHitboxY().y + (float) Game.HEIGHT / 2 + game.getCamera().getY();
-            g.drawRect((int) xRenderB, (int) yRenderB, getHitboxX().width, getHitboxX().height);
         }
     }
 
@@ -98,6 +88,10 @@ public class Player {
                         velX = 0;
                         x = block.getX() + block.getHitbox().width;
                     }
+                    if (velY < 0) {
+                        velY += 0.5;
+                        velY = clamp(velY, -5, -2);
+                    }
                 }
                 if (getHitboxY().intersects(block.getHitbox())) {
                     if (velY > 0) {
@@ -106,6 +100,19 @@ public class Player {
                     } else if (velY < 0) {
                         velY = 0;
                         y = block.getY();
+                        jumps = 1;
+                    }
+                }
+                if (getWallRight().intersects(block.getHitbox()) && !flying && jumps <= 0) {
+                    if (game.getKeyListener().checkKey(KeyEvent.VK_W)) {
+                        velY = 3.5f;
+                        velX = -2;
+                    }
+                }
+                if (getWallLeft().intersects(block.getHitbox()) && !flying && jumps <= 0) {
+                    if (game.getKeyListener().checkKey(KeyEvent.VK_W)) {
+                        velY = 3.5f;
+                        velX = 2;
                     }
                 }
             }
@@ -134,6 +141,14 @@ public class Player {
 
     public Rectangle getHitboxY() {
         return new Rectangle((int) x, (int) (y + tex.getHeight() + velY), tex.getWidth(), tex.getHeight() + (int) (velY / 2));
+    }
+
+    private Rectangle getWallLeft() {
+        return new Rectangle((int) x - 4, (int) y + tex.getHeight(), tex.getWidth(), tex.getHeight());
+    }
+
+    private Rectangle getWallRight() {
+        return new Rectangle((int) x, (int) y + tex.getHeight(), tex.getWidth() + 4, tex.getHeight());
     }
 
     public float getX() {

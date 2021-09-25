@@ -38,7 +38,7 @@ public class Blocks {
 
     public Rectangle getHitbox() {
         // TODO: custom hitbox size
-        return new Rectangle((int) x, (int) y+tex.getTexture().getHeight(), tex.getTexture().getWidth(), tex.getTexture().getHeight());
+        return new Rectangle((int) x, (int) y + tex.getTexture().getHeight(), tex.getTexture().getWidth(), tex.getTexture().getHeight());
     }
 
     public BlockType getBlockType() {

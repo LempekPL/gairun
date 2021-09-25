@@ -19,12 +19,12 @@ public class Camera {
 
     public void tick() {
         if (game.getKeyListener().checkKey(KeyEvent.VK_F7)) debug = !debug;
-        float playerX = game.getPlayer().getX();
+        float playerX = game.getPlayer().getX() + 8;
         float playerY = game.getPlayer().getY();
         if (x - cameraMovementLimit > playerX) {
             x += (playerX - x + cameraMovementLimit) / cameraMovementLimit;
         } else if (x + cameraMovementLimit < playerX) {
-            x += (playerX - x - cameraMovementLimit) / cameraMovementLimit;
+            x += (playerX- x - cameraMovementLimit) / cameraMovementLimit;
         }
         if (y - cameraMovementLimit > playerY) {
             y += (playerY - y + cameraMovementLimit) / cameraMovementLimit;
@@ -33,9 +33,10 @@ public class Camera {
         }
         if (game.getPlayer().getVelX() != 0 && scale >= 1.8) {
             scale -= 0.002;
-        }
-        if (scale < 2) {
-            scale += 0.005;
+        } else {
+            if (scale < 2) {
+                scale += 0.005;
+            }
         }
     }
 
