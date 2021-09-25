@@ -1,16 +1,19 @@
 package com.game.gairun;
 
+import com.game.gairun.controllers.MapController;
 import com.game.gairun.libs.ImageHandler;
 import com.game.gairun.controllers.KeyInput;
-import com.game.gairun.controllers.MapControllerer;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.List;
 
 // TODO: custom screen size (settings > create file > restart game > load external file > set screen size)
-// TODO: collision
 
 public class Game extends Canvas implements Runnable {
     // game static values
@@ -28,7 +31,7 @@ public class Game extends Canvas implements Runnable {
     // instances
     private Player p;
     private Camera cam;
-    private MapControllerer mapControllerer;
+    private MapController mapController;
     private KeyInput keyListener;
     BufferedImage screen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
     // frame rate
@@ -36,8 +39,8 @@ public class Game extends Canvas implements Runnable {
 
     public Game() {
         new Window(WIDTH, HEIGHT, TITLE, this);
-        start();
         init();
+        start();
     }
 
     public static void main(String[] args) {
@@ -50,13 +53,13 @@ public class Game extends Canvas implements Runnable {
         ImageHandler ih = new ImageHandler("gairun1");
         p = new Player(0, 0, ih.grabImage(0, 0, 16, 32), this);
         cam = new Camera(0, 0, this);
-        mapControllerer = new MapControllerer(this);
+        mapController = new MapController(this);
         keyListener = new KeyInput();
         addKeyListener(keyListener);
+        mapController.loadMap("main", "1");
     }
 
     public void run() {
-        init();
         long lastTime = System.nanoTime();
         final double amountOfTicks = 60.0;
         double ns = 1000000000 / amountOfTicks;
@@ -88,12 +91,15 @@ public class Game extends Canvas implements Runnable {
     private void tick() {
         cam.tick();
         p.tick();
+        mapController.tick();
         if (keyListener.checkKey(KeyEvent.VK_1)) {
-            mapControllerer.loadMap("main", "1");
+            mapController.loadMap("main", "1");
         } else if (keyListener.checkKey(KeyEvent.VK_2)) {
-            mapControllerer.loadMap("main", "2");
+            mapController.loadMap("main", "2");
         } else if (keyListener.checkKey(KeyEvent.VK_3)) {
-            mapControllerer.loadMap("side", "3");
+            mapController.loadMap("side", "3");
+        } else if (keyListener.checkKey(KeyEvent.VK_F8)) {
+            p.setFlying(!p.isFlying());
         }
     }
 
@@ -111,7 +117,7 @@ public class Game extends Canvas implements Runnable {
         g.clearRect(0, 0, WIDTH, HEIGHT);
         // rendering
         p.render(g);
-        mapControllerer.render(g);
+        mapController.render(g);
         // debug camera
         if (cam.isDebug()) {
             // camera move to limit
@@ -154,8 +160,8 @@ public class Game extends Canvas implements Runnable {
         return cam;
     }
 
-    public MapControllerer getMapController() {
-        return mapControllerer;
+    public MapController getMapController() {
+        return mapController;
     }
 
     public KeyInput getKeyListener() {

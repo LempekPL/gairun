@@ -33,10 +33,9 @@ public class Camera {
         }
         if (game.getPlayer().getVelX() != 0 && scale >= 1.8) {
             scale -= 0.002;
-        } else {
-            if (scale < 2) {
-                scale += 0.005;
-            }
+        }
+        if (scale < 2) {
+            scale += 0.005;
         }
     }
 

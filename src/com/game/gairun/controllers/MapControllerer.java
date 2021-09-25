@@ -44,7 +44,7 @@ public class MapControllerer {
         loadedMap = false;
         currentSet = mapSet;
         currentMap = mapId;
-        game.getPlayer().resetPlayer();
+        game.getPlayer().spawnPlayer();
         game.getCamera().centerOnPlayer();
         loadedMap = true;
     }

@@ -1,0 +1,12 @@
+{
+  "width": 16,
+  "height": 16,
+  "animation": {
+    "speed": 1,
+    "frames": 2,
+    "frameOrder": [
+      0,
+      1
+    ]
+  }
+}
