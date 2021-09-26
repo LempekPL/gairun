@@ -88,6 +88,7 @@ public class MapController {
 
         JSONArray playerPos = mapJSON.getJSONArray("playerSpawn");
         game.getPlayer().spawnPlayer((int) playerPos.get(0) * 16, (int) playerPos.get(1) * 16);
+        game.getCamera().centerOnPlayer();
         loading = false;
     }
 

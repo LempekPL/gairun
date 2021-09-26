@@ -1,0 +1,11 @@
+{
+  "playerSpawn": [
+    4,
+    4
+  ],
+  "usedBlocks": {
+    "B": "res/block",
+    "C": "res/test"
+  },
+  "requiredResourcePacks": []
+}

@@ -12,7 +12,7 @@ public class Player {
     private final BufferedImage tex;
     private float x, y;
     private float velX, velY;
-    private float acc = 0.1F, dcc = 0.05F;
+    private float acc = 0.15F, dcc = 0.05F;
     private int jumps = 1;
     private boolean flying = false;
     List<Integer> inputs;
@@ -57,8 +57,8 @@ public class Player {
             velY -= 0.1;
         }
 
-        velX = clamp(velX, -3.5F, 3.5F);
-        velY = clamp(velY, -5, 5);
+        velX = clamp(velX, -4, 4);
+        velY = clamp(velY, -8, 5);
     }
 
     public void render(Graphics g) {
@@ -90,7 +90,7 @@ public class Player {
                     }
                     if (velY < 0) {
                         velY += 0.5;
-                        velY = clamp(velY, -5, -2);
+                        velY = clamp(velY, -8, -2);
                     }
                 }
                 if (getHitboxY().intersects(block.getHitbox())) {
@@ -144,11 +144,11 @@ public class Player {
     }
 
     private Rectangle getWallLeft() {
-        return new Rectangle((int) x - 4, (int) y + tex.getHeight(), tex.getWidth(), tex.getHeight());
+        return new Rectangle((int) x - 2, (int) y + tex.getHeight(), tex.getWidth(), tex.getHeight());
     }
 
     private Rectangle getWallRight() {
-        return new Rectangle((int) x, (int) y + tex.getHeight(), tex.getWidth() + 4, tex.getHeight());
+        return new Rectangle((int) x, (int) y + tex.getHeight(), tex.getWidth() + 2, tex.getHeight());
     }
 
     public float getX() {
