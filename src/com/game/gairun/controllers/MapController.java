@@ -3,6 +3,7 @@ package com.game.gairun.controllers;
 import com.game.gairun.Game;
 import com.game.gairun.interfaces.BlockType;
 import com.game.gairun.interfaces.Blocks;
+import com.game.gairun.interfaces.Texture;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -72,7 +73,11 @@ public class MapController {
             List<Blocks> tempBlocksList = new ArrayList<>();
             for (int j = 0; j < tempMapLayout.get(i).size(); j++) {
                 if (!Objects.equals(tempMapLayout.get(i).get(j), "-")) {
-                    tempBlocksList.add(new Blocks(j * 16, -i * 16 + tempMapLayout.size() * 16, textureController.getTextureMap().get(tempMapLayout.get(i).get(j)), BlockType.BLOCK, game));
+                    if (textureController.getTextureMap().containsKey(tempMapLayout.get(i).get(j))) {
+                        tempBlocksList.add(new Blocks(j * 16, -i * 16 + tempMapLayout.size() * 16, textureController.getTextureMap().get(tempMapLayout.get(i).get(j)), BlockType.BLOCK, game));
+                    } else {
+                        tempBlocksList.add(new Blocks(j * 16, -i * 16 + tempMapLayout.size() * 16, textureController.getTextureMap().get("error"), BlockType.BLOCK, game));
+                    }
                 }
             }
             tempBlocks.add(tempBlocksList);

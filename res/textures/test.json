@@ -2,7 +2,7 @@
   "width": 16,
   "height": 16,
   "animation": {
-    "speed": 1,
+    "speed": 60,
     "frames": 2,
     "frameOrder": [
       0,
