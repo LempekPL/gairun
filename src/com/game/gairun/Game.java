@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 // TODO: custom screen size (settings > create file > restart game > load external file > set screen size)
+// TODO: rendering useing Graphics2D's transform and scale
 
 public class Game extends Canvas implements Runnable {
     // game static values
@@ -56,7 +57,7 @@ public class Game extends Canvas implements Runnable {
         mapController = new MapController(this);
         keyListener = new KeyInput();
         addKeyListener(keyListener);
-        mapController.loadMap("main", "1");
+        mapController.loadMap("menu", "start");
     }
 
     public void run() {
@@ -112,7 +113,7 @@ public class Game extends Canvas implements Runnable {
         Graphics bsGraphics = bs.getDrawGraphics();
         // clearing screen
         bsGraphics.setColor(Color.black);
-        bsGraphics.clearRect(0, 0, WIDTH, HEIGHT);
+        bsGraphics.fillRect(0, 0, WIDTH, HEIGHT);
         Graphics g = screen.createGraphics();
         g.clearRect(0, 0, WIDTH, HEIGHT);
         // rendering

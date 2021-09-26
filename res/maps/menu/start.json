@@ -1,0 +1,10 @@
+{
+  "playerSpawn": [
+    5,
+    16
+  ],
+  "usedBlocks": {
+    "L": "res/lightPads"
+  },
+  "requiredResourcePacks": []
+}
