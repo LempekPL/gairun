@@ -1,15 +1,14 @@
 package com.game.gairun;
 
+import com.game.gairun.controllers.KeyInput;
 import com.game.gairun.controllers.MapController;
 import com.game.gairun.libs.ImageHandler;
-import com.game.gairun.controllers.KeyInput;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,18 +24,21 @@ public class Game extends Canvas implements Runnable {
     // .../ 12 * 9 for 12:9
     public static final int HEIGHT = WIDTH / 12 * 9;
     public final String TITLE = "gairun";
+    private final List<String> consoleHistory = new ArrayList<>();
+    BufferedImage screen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
     // threading
     private boolean isRunning = false;
     private Thread thread;
-
     // instances
     private Player p;
     private Camera cam;
     private MapController mapController;
     private KeyInput keyListener;
-    BufferedImage screen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
     // frame rate
     private int lastFrames;
+    // console
+    private boolean consoleOpened;
+    private String consoleCommand = "";
 
     public Game() {
         new Window(WIDTH, HEIGHT, TITLE, this);
@@ -55,7 +57,7 @@ public class Game extends Canvas implements Runnable {
         p = new Player(0, 0, ih.grabImage(0, 0, 16, 32), this);
         cam = new Camera(0, 0, this);
         mapController = new MapController(this);
-        keyListener = new KeyInput();
+        keyListener = new KeyInput(this);
         addKeyListener(keyListener);
         mapController.loadMap("menu", "start");
     }
@@ -93,14 +95,30 @@ public class Game extends Canvas implements Runnable {
         cam.tick();
         p.tick();
         mapController.tick();
-        if (keyListener.checkKey(KeyEvent.VK_1)) {
-            mapController.loadMap("main", "1");
-        } else if (keyListener.checkKey(KeyEvent.VK_2)) {
-            mapController.loadMap("main", "2");
-        } else if (keyListener.checkKey(KeyEvent.VK_3)) {
-            mapController.loadMap("side", "3");
-        } else if (keyListener.checkKey(KeyEvent.VK_F8)) {
-            p.setFlying(!p.isFlying());
+        if (keyListener.checkKey(KeyEvent.VK_SLASH)) {
+            consoleOpened = !consoleOpened;
+        }
+        if (consoleOpened && keyListener.checkKey(KeyEvent.VK_ENTER) && consoleCommand.length() > 0) {
+            String[] commandString = consoleCommand.split(" ");
+            switch (commandString[0]) {
+                case "loadmap" -> {
+                    consoleHistory.add(consoleCommand);
+                    if (commandString[1] == null || commandString[2] == null) {
+                        System.out.println("SOMETHING IS MISSING");
+                    } else {
+                        mapController.loadMap(commandString[1], commandString[2]);
+                    }
+                }
+                case "fly" -> {
+                    consoleHistory.add(consoleCommand);
+                    p.setFlying(!p.isFlying());
+                }
+                case "debug" -> {
+                    consoleHistory.add(consoleCommand);
+                    cam.setDebug(!cam.isDebug());
+                }
+            }
+            consoleCommand = "";
         }
     }
 
@@ -127,9 +145,23 @@ public class Game extends Canvas implements Runnable {
         }
         // draw virtual image to camera
         bsGraphics.drawImage(screen, (int) -(WIDTH * (cam.getScale() - 1)), (int) -(HEIGHT * (cam.getScale() - 1)), (int) (WIDTH * cam.getScale()), (int) (HEIGHT * cam.getScale()), 0, 0, WIDTH, HEIGHT, null);
+//        bsGraphics.drawImage(screen, 0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, null);
         // fps counter
         bsGraphics.setColor(Color.green);
-        bsGraphics.drawString(lastFrames+"FPS",0,10);
+        bsGraphics.drawString(lastFrames + "FPS", 0, 10);
+        // console
+        if (consoleOpened) {
+//            g.dispose();
+//            Graphics console = screen.createGraphics();
+            bsGraphics.setColor(Color.gray);
+            bsGraphics.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
+            bsGraphics.setColor(Color.black);
+            bsGraphics.drawString(">"+consoleCommand, 100, 90);
+            for (int i = 0; i < consoleHistory.size(); i++) {
+                bsGraphics.drawString(consoleHistory.get(i), 110, i*11+100);
+            }
+//            console.drawImage(screen, -WIDTH, -HEIGHT, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, null);
+        }
         // freeing data and displaying it
         g.dispose();
         bsGraphics.dispose();
@@ -171,5 +203,21 @@ public class Game extends Canvas implements Runnable {
 
     public int getLastFrames() {
         return lastFrames;
+    }
+
+    public boolean isConsoleOpened() {
+        return consoleOpened;
+    }
+
+    public String getTITLE() {
+        return TITLE;
+    }
+
+    public String getConsoleCommand() {
+        return consoleCommand;
+    }
+
+    public void setConsoleCommand(String consoleCommand) {
+        this.consoleCommand = consoleCommand;
     }
 }

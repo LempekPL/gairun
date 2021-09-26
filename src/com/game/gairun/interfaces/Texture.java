@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Texture {
-    private BufferedImage image, currentImage;
+    private final BufferedImage image;
+    private BufferedImage currentImage;
     private List<BufferedImage> imageFrames;
-    private JSONObject imageData;
+    private final JSONObject imageData;
     private boolean animated = false, paused = false;
     private List<Object> frames;
     private int index = 0, speed = 0, imageFrame = 0;

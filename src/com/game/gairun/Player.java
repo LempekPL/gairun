@@ -12,7 +12,8 @@ public class Player {
     private final BufferedImage tex;
     private float x, y;
     private float velX, velY;
-    private float acc = 0.15F, dcc = 0.05F;
+    private final float acc = 0.15F;
+    private final float dcc = 0.05F;
     private int jumps = 1;
     private boolean flying = false;
     List<Integer> inputs;
@@ -30,9 +31,9 @@ public class Player {
         x += velX;
 
         inputs = game.getKeyListener().getKeysPressed();
-        if (inputs.contains(KeyEvent.VK_D)) {
+        if (inputs.contains(KeyEvent.VK_D) && !game.isConsoleOpened()) {
             velX += acc;
-        } else if (inputs.contains(KeyEvent.VK_A)) {
+        } else if (inputs.contains(KeyEvent.VK_A) && !game.isConsoleOpened()) {
             velX -= acc;
         } else if (!inputs.contains(KeyEvent.VK_D) && !inputs.contains(KeyEvent.VK_A)) {
             if (velX > 0) velX -= dcc;
@@ -40,9 +41,9 @@ public class Player {
             if (velX > -0.1 && velX < 0.1) velX = 0;
         }
         if (flying) {
-            if (inputs.contains(KeyEvent.VK_W)) {
+            if (inputs.contains(KeyEvent.VK_W) && !game.isConsoleOpened()) {
                 velY += acc;
-            } else if (inputs.contains(KeyEvent.VK_S)) {
+            } else if (inputs.contains(KeyEvent.VK_S) && !game.isConsoleOpened()) {
                 velY -= acc;
             } else if (!inputs.contains(KeyEvent.VK_W) && !inputs.contains(KeyEvent.VK_S)) {
                 if (velY > 0) velY -= dcc;

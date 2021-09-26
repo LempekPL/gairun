@@ -20,7 +20,7 @@ public class MapController {
     private List<List<Blocks>> blocks;
     private String currentSet, currentMap;
     private boolean loading = true;
-    private Game game;
+    private final Game game;
 
     public MapController(Game game) {
         this.game = game;

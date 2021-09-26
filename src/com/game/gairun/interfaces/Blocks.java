@@ -5,10 +5,10 @@ import com.game.gairun.Game;
 import java.awt.*;
 
 public class Blocks {
-    private Texture tex;
+    private final Texture tex;
     private BlockType blockType;
     private float x, y;
-    private Game game;
+    private final Game game;
 
 //    public Blocks(BlockType blockType) {
 //        this.blockType = blockType;
