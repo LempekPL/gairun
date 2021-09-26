@@ -6,18 +6,17 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.Objects;
 
 public class Player {
     private final Game game;
     private final BufferedImage tex;
-    private float x, y;
-    private float velX, velY;
     private final float acc = 0.15F;
     private final float dcc = 0.05F;
+    List<Integer> inputs;
+    private float x, y;
+    private float velX, velY;
     private int jumps = 1;
     private boolean flying = false;
-    List<Integer> inputs;
 
     public Player(float x, float y, BufferedImage tex, Game game) {
         this.x = x;
@@ -52,11 +51,11 @@ public class Player {
                 if (velY > -0.1 && velY < 0.1) velY = 0;
             }
         } else {
-            if (jumps > 0 && game.getKeyListener().checkKey(KeyEvent.VK_W)) {
+            if (jumps > 0 && game.getKeyListener().checkKey(KeyEvent.VK_W) && !game.isConsoleOpened()) {
                 velY = 4;
                 jumps--;
             }
-            velY -= 0.1;
+            velY -= 0.11;
         }
 
         velX = clamp(velX, -4, 4);
@@ -64,25 +63,25 @@ public class Player {
     }
 
     public void render(Graphics g) {
-        float xRender = x + (float) Game.WIDTH / 2 - game.getCamera().getX();
-        float yRender = -(y + tex.getHeight()) + (float) Game.HEIGHT / 2 + game.getCamera().getY();
+        float xRender = x + (float) Game.WIDTH / 2;
+        float yRender = -(y + tex.getHeight()) + (float) Game.HEIGHT / 2;
         g.drawImage(tex, (int) xRender, (int) yRender, null);
         if (game.getCamera().isDebug()) {
             g.setColor(Color.red);
-            g.drawRect((int) xRender, (int) yRender, tex.getWidth() - 1, tex.getHeight() - 1);
+            g.drawRect((int) xRender, (int) yRender, tex.getWidth(), tex.getHeight());
         }
     }
 
     private float clamp(float value, float min, float max) {
-        if (value >= max) value = max;
-        else if (value <= min) value = min;
+        if (value >= max) return max;
+        else if (value <= min) return min;
         return value;
     }
 
     private void collision() {
         for (List<Blocks> blockRow : game.getMapController().getMapBlocks()) {
             for (Blocks block : blockRow) {
-                if (getHitboxX().intersects(block.getHitbox())) {
+                if (getHitboxWidth().intersects(block.getHitbox())) {
                     if (velX > 0) {
                         velX = 0;
                         x = block.getX() - tex.getWidth();
@@ -90,12 +89,12 @@ public class Player {
                         velX = 0;
                         x = block.getX() + block.getHitbox().width;
                     }
-                    if (velY < 0) {
+                    if (velY < 0 && !flying) {
                         velY += 0.5;
-                        velY = clamp(velY, -8, -2);
+                        velY = clamp(velY, -8, -1);
                     }
                 }
-                if (getHitboxY().intersects(block.getHitbox())) {
+                if (getHitboxHeight().intersects(block.getHitbox())) {
                     if (velY > 0) {
                         velY = 0;
                         y = block.getY() - 16 - tex.getHeight();
@@ -105,16 +104,18 @@ public class Player {
                         jumps = 1;
                     }
                 }
-                if (getWallRight().intersects(block.getHitbox()) && !flying && jumps <= 0) {
-                    if (game.getKeyListener().checkKey(KeyEvent.VK_W)) {
-                        velY = 3.5f;
-                        velX = -2;
+                if (!flying && jumps <= 0 && !game.isConsoleOpened()) {
+                    if (getWallRight().intersects(block.getHitbox())) {
+                        if (game.getKeyListener().checkKey(KeyEvent.VK_W)) {
+                            velY = 3.5f;
+                            velX = -2;
+                        }
                     }
-                }
-                if (getWallLeft().intersects(block.getHitbox()) && !flying && jumps <= 0) {
-                    if (game.getKeyListener().checkKey(KeyEvent.VK_W)) {
-                        velY = 3.5f;
-                        velX = 2;
+                    if (getWallLeft().intersects(block.getHitbox())) {
+                        if (game.getKeyListener().checkKey(KeyEvent.VK_W)) {
+                            velY = 3.5f;
+                            velX = 2;
+                        }
                     }
                 }
             }
@@ -137,12 +138,12 @@ public class Player {
         jumps = 1;
     }
 
-    public Rectangle getHitboxX() {
-        return new Rectangle((int) (x + velX), (int) y + tex.getHeight(), tex.getWidth() + (int) (velX / 2), tex.getHeight());
+    public Rectangle getHitboxWidth() {
+        return new Rectangle((int) (x + velX), (int) y + tex.getHeight(), tex.getWidth(), tex.getHeight());
     }
 
-    public Rectangle getHitboxY() {
-        return new Rectangle((int) x, (int) (y + tex.getHeight() + velY), tex.getWidth(), tex.getHeight() + (int) (velY / 2));
+    public Rectangle getHitboxHeight() {
+        return new Rectangle((int) x, (int) (y + velY + tex.getHeight()), tex.getWidth(), tex.getHeight());
     }
 
     private Rectangle getWallLeft() {

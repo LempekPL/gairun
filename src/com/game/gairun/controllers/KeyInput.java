@@ -6,15 +6,16 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class KeyInput extends KeyAdapter {
     List<Integer> keysPressed = new ArrayList<>();
-    private Game game;
+    private final Game game;
+    private final Set<Integer> ignoreKeys = Set.of(KeyEvent.VK_SLASH, KeyEvent.VK_ENTER);
 
     public KeyInput (Game game) {
         this.game = game;
     }
-
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         if (!keysPressed.contains(key)) {
@@ -26,8 +27,9 @@ public class KeyInput extends KeyAdapter {
                     game.setConsoleCommand(game.getConsoleCommand().substring(0, game.getConsoleCommand().length() - 1));
                 }
             } else {
-                if (!(e.getKeyCode() == KeyEvent.VK_SLASH || e.getKeyCode() == KeyEvent.VK_ENTER)) {
-                    game.setConsoleCommand(game.getConsoleCommand() + e.getKeyChar());
+                if (!ignoreKeys.contains(e.getKeyCode())) {
+                    String tempString = game.getConsoleCommand() + e.getKeyChar();
+                    game.setConsoleCommand(tempString.replaceAll("[^a-zA-Z0-9\s.]", ""));
                 }
             }
         }

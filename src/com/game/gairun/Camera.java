@@ -1,15 +1,10 @@
 package com.game.gairun;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
-
 public class Camera {
-    private float x, y, scale = 2;
     private final Game game;
-    private boolean debug = false;
     private final int cameraMovementLimit = 30;
+    private float x, y, scale = 2;
+    private boolean debug = false;
 
     public Camera(int x, int y, Game game) {
         this.x = x;
@@ -23,15 +18,17 @@ public class Camera {
         if (x - cameraMovementLimit > playerX) {
             x += (playerX - x + cameraMovementLimit) / cameraMovementLimit;
         } else if (x + cameraMovementLimit < playerX) {
-            x += (playerX- x - cameraMovementLimit) / cameraMovementLimit;
+            x += (playerX - x - cameraMovementLimit) / cameraMovementLimit;
         }
         if (y - cameraMovementLimit > playerY) {
             y += (playerY - y + cameraMovementLimit) / cameraMovementLimit;
         } else if (y + cameraMovementLimit < playerY) {
             y += (playerY - y - cameraMovementLimit) / cameraMovementLimit;
         }
-        if (game.getPlayer().getVelX() != 0 && scale >= 1.5) {
-            scale -= 0.002;
+        if (game.getPlayer().getVelX() != 0) {
+            if (scale >= 1.5) {
+                scale -= 0.002;
+            }
         } else {
             if (scale < 2) {
                 scale += 0.005;

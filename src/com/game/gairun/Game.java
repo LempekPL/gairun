@@ -9,11 +9,9 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 // TODO: custom screen size (settings > create file > restart game > load external file > set screen size)
-// TODO: rendering useing Graphics2D's transform and scale
 
 public class Game extends Canvas implements Runnable {
     // game static values
@@ -80,10 +78,8 @@ public class Game extends Canvas implements Runnable {
             }
             render();
             frames++;
-
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
-//                System.out.println(updates + " Ticks, FPS " + frames);
                 lastFrames = frames;
                 frames = 0;
             }
@@ -117,8 +113,13 @@ public class Game extends Canvas implements Runnable {
                     consoleHistory.add(consoleCommand);
                     cam.setDebug(!cam.isDebug());
                 }
+                case "teleport", "tp" -> {
+                    consoleHistory.add(consoleCommand);
+                    p.spawnPlayer(Float.parseFloat(commandString[1])*16, Float.parseFloat(commandString[2])*16);
+                }
             }
             consoleCommand = "";
+            consoleOpened = false;
         }
     }
 
@@ -128,43 +129,46 @@ public class Game extends Canvas implements Runnable {
             createBufferStrategy(3);
             return;
         }
-        Graphics bsGraphics = bs.getDrawGraphics();
+        Graphics g = bs.getDrawGraphics();
         // clearing screen
-        bsGraphics.setColor(Color.black);
-        bsGraphics.fillRect(0, 0, WIDTH, HEIGHT);
-        Graphics g = screen.createGraphics();
-        g.clearRect(0, 0, WIDTH, HEIGHT);
+        g.setColor(Color.black);
+        g.fillRect(0, 0, WIDTH, HEIGHT);
+        // creating copies
+        Graphics gCopy = g.create();
+        // moving and scaling screen
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.translate(WIDTH * (1 - cam.getScale()) / 2, HEIGHT * (1 - cam.getScale()) / 2);
+        g2d.scale(cam.getScale(), cam.getScale());
+        g2d.translate((int) -cam.getX(), (int) cam.getY());
         // rendering
         p.render(g);
         mapController.render(g);
-        // debug camera
         if (cam.isDebug()) {
             // camera move to limit
             g.setColor(Color.yellow);
-            g.drawRect(WIDTH / 2 - cam.getCameraMovementLimit(), HEIGHT / 2 - cam.getCameraMovementLimit(), cam.getCameraMovementLimit() * 2, cam.getCameraMovementLimit() * 2);
+            float xRender = cam.getX() + (float) Game.WIDTH / 2 - cam.getCameraMovementLimit();
+            float yRender = -cam.getY() + (float) Game.HEIGHT / 2 - cam.getCameraMovementLimit();
+            g.drawRect((int) xRender, (int) yRender, cam.getCameraMovementLimit() * 2, cam.getCameraMovementLimit() * 2);
+            gCopy.setColor(Color.white);
+            gCopy.drawString("XY: %s, %s".formatted(p.getX()/16, p.getY()/16), 0, 20);
         }
-        // draw virtual image to camera
-        bsGraphics.drawImage(screen, (int) -(WIDTH * (cam.getScale() - 1)), (int) -(HEIGHT * (cam.getScale() - 1)), (int) (WIDTH * cam.getScale()), (int) (HEIGHT * cam.getScale()), 0, 0, WIDTH, HEIGHT, null);
-//        bsGraphics.drawImage(screen, 0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, null);
-        // fps counter
-        bsGraphics.setColor(Color.green);
-        bsGraphics.drawString(lastFrames + "FPS", 0, 10);
         // console
         if (consoleOpened) {
-//            g.dispose();
-//            Graphics console = screen.createGraphics();
-            bsGraphics.setColor(Color.gray);
-            bsGraphics.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
-            bsGraphics.setColor(Color.black);
-            bsGraphics.drawString(">"+consoleCommand, 100, 90);
+            gCopy.setColor(new Color(50, 50, 50, 127));
+            gCopy.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
+            gCopy.setColor(Color.white);
+            gCopy.drawString(">" + consoleCommand, 40, 40);
             for (int i = 0; i < consoleHistory.size(); i++) {
-                bsGraphics.drawString(consoleHistory.get(i), 110, i*11+100);
+                gCopy.drawString(consoleHistory.get(i), 50, (consoleHistory.size() - i) * 11 + 50);
             }
-//            console.drawImage(screen, -WIDTH, -HEIGHT, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, null);
         }
+        // fps counter
+        gCopy.setColor(Color.green);
+        gCopy.drawString(lastFrames + "FPS", 0, 10);
         // freeing data and displaying it
+        g2d.dispose();
+        gCopy.dispose();
         g.dispose();
-        bsGraphics.dispose();
         bs.show();
     }
 
