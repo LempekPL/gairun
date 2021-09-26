@@ -23,12 +23,14 @@ public class Blocks {
     }
 
     public void render(Graphics g) {
-        float xRender = x + (float) Game.WIDTH / 2;
-        float yRender = -y + (float) Game.HEIGHT / 2;
-        g.drawImage(tex.getTexture(), (int) xRender, (int) yRender, null);
-        if (game.getCamera().isDebug()) {
-            g.setColor(Color.red);
-            g.drawRect((int) xRender, (int) yRender, tex.getTexture().getWidth(), tex.getTexture().getHeight());
+        if (x < game.getCamera().getX() + (float) (Game.WIDTH/2) && x > game.getCamera().getX() - (float) (Game.WIDTH/2) && y < game.getCamera().getY() + (float) (Game.HEIGHT/2) && y > game.getCamera().getY() - (float) (Game.HEIGHT/2)) {
+            float xRender = x + (float) Game.WIDTH / 2;
+            float yRender = -y + (float) Game.HEIGHT / 2;
+            g.drawImage(tex.getTexture(), (int) xRender, (int) yRender, null);
+            if (game.getCamera().isDebug()) {
+                g.setColor(Color.red);
+                g.drawRect((int) xRender, (int) yRender, tex.getTexture().getWidth(), tex.getTexture().getHeight());
+            }
         }
     }
 
