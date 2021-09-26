@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Objects;
 
 public class Player {
     private final Game game;
@@ -68,6 +69,10 @@ public class Player {
         if (game.getCamera().isDebug()) {
             g.setColor(Color.red);
             g.drawRect((int) xRender, (int) yRender, tex.getWidth() - 1, tex.getHeight() - 1);
+            g.setColor(Color.green);
+            Rectangle a = getBounds();
+            g.drawRect((int) xRender + a.x, (int) yRender + a.y, a.width, a.height);
+            g.setColor(Color.red);
         }
     }
 
