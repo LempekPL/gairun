@@ -18,7 +18,6 @@ public class Camera {
     }
 
     public void tick() {
-        if (game.getKeyListener().checkKey(KeyEvent.VK_F7)) debug = !debug;
         float playerX = game.getPlayer().getX() + 8;
         float playerY = game.getPlayer().getY();
         if (x - cameraMovementLimit > playerX) {
