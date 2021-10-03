@@ -33,8 +33,9 @@ public class Game extends Canvas implements Runnable {
     private Camera cam;
     private MapController mapController;
     private KeyInput keyListener;
-    // frame rate
+    // values
     private int lastFrames;
+    private double gameSpeed = 1;
     // console
     private boolean consoleOpened;
     private String consoleCommand = "";
@@ -64,30 +65,30 @@ public class Game extends Canvas implements Runnable {
     public void run() {
         long lastTime = System.nanoTime();
         final double amountOfTicks = 60.0;
-        double ns = 1000000000 / amountOfTicks;
         double delta = 0;
         int frames = 0;
         long timer = System.currentTimeMillis();
-//        float tiker = 0;
+        float tiker = 0;
 
         while (isRunning) {
+            double ns = 1000000000 / (amountOfTicks * gameSpeed);
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
             while (delta >= 1) {
                 tick();
                 delta--;
-//                tiker++;
+                tiker = 0;
             }
-            render();
-            frames++;
-//            if (tiker % 10 == 0) {
-//            }
+            if (tiker > 1) {
+                render();
+                frames++;
+            }
+            tiker++;
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
                 lastFrames = frames;
                 frames = 0;
-//                tiker = 0;
             }
         }
         stop();
@@ -123,8 +124,9 @@ public class Game extends Canvas implements Runnable {
                     consoleHistory.add(consoleCommand);
                     p.spawnPlayer(Float.parseFloat(commandString[1]) * 16, Float.parseFloat(commandString[2]) * 16);
                 }
-                case "a" -> {
-                    a = !a;
+                case "gamespeed" -> {
+                    consoleHistory.add(consoleCommand);
+                    gameSpeed = Double.parseDouble(commandString[1]);
                 }
             }
             consoleCommand = "";
@@ -232,5 +234,13 @@ public class Game extends Canvas implements Runnable {
 
     public void setConsoleCommand(String consoleCommand) {
         this.consoleCommand = consoleCommand;
+    }
+
+    public double getGameSpeed() {
+        return gameSpeed;
+    }
+
+    public void setGameSpeed(double gameSpeed) {
+        this.gameSpeed = gameSpeed;
     }
 }
