@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // TODO: custom screen size (settings > create file > restart game > load external file > set screen size)
+// TODO: check why when player walks in diagonal (press W and D) and collides with blocks above and is "outside" rendered map then he "glitches" and moves fast in left, tempfix: just make additional 2 rows of "-" at the bottom
 
 public class Game extends Canvas implements Runnable {
     // game static values

@@ -11,9 +11,12 @@ public class Texture {
     private BufferedImage currentImage;
     private List<BufferedImage> imageFrames;
     private final JSONObject imageData;
-    private boolean animated = false, paused = false;
+    private boolean animated = false;
+    private boolean paused = false;
     private List<Object> frames;
-    private int index = 0, speed = 0, imageFrame = 0;
+    private int index = 0;
+    private int speed = 0;
+    private int imageFrame = 0;
 
     public Texture(BufferedImage image, JSONObject imageData) {
         this.image = image;

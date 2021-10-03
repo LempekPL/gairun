@@ -1,6 +1,5 @@
 package com.game.gairun.controllers;
 
-import com.game.gairun.Game;
 import com.game.gairun.interfaces.Texture;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -8,7 +7,6 @@ import org.json.JSONTokener;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;

@@ -3,14 +3,12 @@ package com.game.gairun.controllers;
 import com.game.gairun.Game;
 import com.game.gairun.interfaces.BlockType;
 import com.game.gairun.interfaces.Blocks;
-import com.game.gairun.interfaces.Texture;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.awt.*;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -18,7 +16,8 @@ import java.util.List;
 
 public class MapController {
     private List<List<Blocks>> blocks;
-    private String currentSet, currentMap;
+    private String currentSet;
+    private String currentMap;
     private boolean loading = true;
     private final Game game;
 

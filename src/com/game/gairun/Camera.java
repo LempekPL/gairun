@@ -3,7 +3,9 @@ package com.game.gairun;
 public class Camera {
     private final Game game;
     private final int cameraMovementLimit = 30;
-    private float x, y, scale = 2;
+    private float x;
+    private float y;
+    private float scale = 2;
     private boolean debug = false;
 
     public Camera(int x, int y, Game game) {

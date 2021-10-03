@@ -7,7 +7,8 @@ import java.awt.*;
 public class Blocks {
     private final Texture tex;
     private BlockType blockType;
-    private float x, y;
+    private float x;
+    private float y;
     private final Game game;
 
 //    public Blocks(BlockType blockType) {
