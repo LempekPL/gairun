@@ -68,21 +68,26 @@ public class Game extends Canvas implements Runnable {
         double delta = 0;
         int frames = 0;
         long timer = System.currentTimeMillis();
+//        float tiker = 0;
 
         while (isRunning) {
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
-            if (delta >= 1) {
+            while (delta >= 1) {
                 tick();
                 delta--;
+//                tiker++;
             }
             render();
             frames++;
+//            if (tiker % 10 == 0) {
+//            }
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
                 lastFrames = frames;
                 frames = 0;
+//                tiker = 0;
             }
         }
         stop();
@@ -116,7 +121,10 @@ public class Game extends Canvas implements Runnable {
                 }
                 case "teleport", "tp" -> {
                     consoleHistory.add(consoleCommand);
-                    p.spawnPlayer(Float.parseFloat(commandString[1])*16, Float.parseFloat(commandString[2])*16);
+                    p.spawnPlayer(Float.parseFloat(commandString[1]) * 16, Float.parseFloat(commandString[2]) * 16);
+                }
+                case "a" -> {
+                    a = !a;
                 }
             }
             consoleCommand = "";
@@ -151,7 +159,7 @@ public class Game extends Canvas implements Runnable {
             float yRender = -cam.getY() + (float) Game.HEIGHT / 2 - cam.getCameraMovementLimit();
             g.drawRect((int) xRender, (int) yRender, cam.getCameraMovementLimit() * 2, cam.getCameraMovementLimit() * 2);
             gCopy.setColor(Color.white);
-            gCopy.drawString("XY: %s, %s".formatted(p.getX()/16, p.getY()/16), 0, 20);
+            gCopy.drawString("XY: %s, %s".formatted(p.getX() / 16, p.getY() / 16), 0, 20);
         }
         // console
         if (consoleOpened) {
