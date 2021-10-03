@@ -1,4 +1,4 @@
-package com.game.gairun;
+package com.gairun;
 
 public class Camera {
     private final Game game;

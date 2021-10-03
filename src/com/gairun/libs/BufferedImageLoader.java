@@ -1,4 +1,4 @@
-package com.game.gairun.libs;
+package com.gairun.libs;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

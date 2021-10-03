@@ -1,6 +1,6 @@
-package com.game.gairun.controllers;
+package com.gairun.controllers;
 
-import com.game.gairun.interfaces.Texture;
+import com.gairun.interfaces.Texture;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 

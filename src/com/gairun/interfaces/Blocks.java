@@ -1,6 +1,6 @@
-package com.game.gairun.interfaces;
+package com.gairun.interfaces;
 
-import com.game.gairun.Game;
+import com.gairun.Game;
 
 import java.awt.*;
 

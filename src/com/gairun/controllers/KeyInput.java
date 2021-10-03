@@ -1,6 +1,6 @@
-package com.game.gairun.controllers;
+package com.gairun.controllers;
 
-import com.game.gairun.Game;
+import com.gairun.Game;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -29,7 +29,7 @@ public class KeyInput extends KeyAdapter {
             } else {
                 if (!ignoreKeys.contains(e.getKeyCode())) {
                     String tempString = game.getConsoleCommand() + e.getKeyChar();
-                    game.setConsoleCommand(tempString.replaceAll("[^a-zA-Z0-9\s.]", ""));
+                    game.setConsoleCommand(tempString.replaceAll("[^a-zA-Z0-9\s.-]", ""));
                 }
             }
         }

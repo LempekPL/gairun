@@ -1,4 +1,4 @@
-package com.game.gairun.interfaces;
+package com.gairun.interfaces;
 
 import org.json.JSONObject;
 

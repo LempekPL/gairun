@@ -1,4 +1,4 @@
-package com.game.gairun;
+package com.gairun;
 
 import javax.swing.*;
 import java.awt.*;

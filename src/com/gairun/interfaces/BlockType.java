@@ -1,4 +1,4 @@
-package com.game.gairun.interfaces;
+package com.gairun.interfaces;
 
 public enum BlockType {
     BLOCK(),

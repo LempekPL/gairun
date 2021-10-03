@@ -1,8 +1,8 @@
-package com.game.gairun.controllers;
+package com.gairun.controllers;
 
-import com.game.gairun.Game;
-import com.game.gairun.interfaces.BlockType;
-import com.game.gairun.interfaces.Blocks;
+import com.gairun.Game;
+import com.gairun.interfaces.BlockType;
+import com.gairun.interfaces.Blocks;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;

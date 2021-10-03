@@ -1,4 +1,4 @@
-package com.game.gairun.libs;
+package com.gairun.libs;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

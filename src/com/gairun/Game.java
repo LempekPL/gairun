@@ -1,8 +1,8 @@
-package com.game.gairun;
+package com.gairun;
 
-import com.game.gairun.controllers.KeyInput;
-import com.game.gairun.controllers.MapController;
-import com.game.gairun.libs.ImageHandler;
+import com.gairun.controllers.KeyInput;
+import com.gairun.controllers.MapController;
+import com.gairun.libs.ImageHandler;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -78,17 +78,17 @@ public class Game extends Canvas implements Runnable {
             while (delta >= 1) {
                 tick();
                 delta--;
-                tiker = 0;
+                tiker++;
             }
-            if (tiker > 1) {
+            if (tiker < 30) {
                 render();
                 frames++;
             }
-            tiker++;
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
                 lastFrames = frames;
                 frames = 0;
+                tiker = 0;
             }
         }
         stop();
@@ -127,6 +127,9 @@ public class Game extends Canvas implements Runnable {
                 case "gamespeed" -> {
                     consoleHistory.add(consoleCommand);
                     gameSpeed = Double.parseDouble(commandString[1]);
+                    if (gameSpeed < 0) {
+                        gameSpeed = 1;
+                    }
                 }
             }
             consoleCommand = "";

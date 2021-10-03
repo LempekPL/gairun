@@ -1,6 +1,6 @@
-package com.game.gairun;
+package com.gairun;
 
-import com.game.gairun.interfaces.Blocks;
+import com.gairun.interfaces.Blocks;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
