@@ -7,7 +7,6 @@ import com.gairun.libs.ImageHandler;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +26,7 @@ public class Game extends Canvas implements Runnable {
     private double framerate = 60.0;
     private int lastFrames;
     private int lastTicks;
+    private boolean limitedFrames = false;
     // threading
     private boolean isRunning = false;
     private Thread thread;
@@ -74,22 +74,26 @@ public class Game extends Canvas implements Runnable {
         long timer = System.currentTimeMillis();
 
         while (isRunning) {
-            ns = ns / gameSpeed;
             long now = System.nanoTime();
-            delta += (now - lastTime) / ns;
+            delta += (now - lastTime) / (ns / gameSpeed);
             lastTime = now;
             while (delta >= 1) {
                 tick();
                 delta--;
                 ticks++;
             }
-            double nr = 1000000000 / framerate;
-            long nowR = System.nanoTime();
-            deltaR += (nowR - lastTimeR) / nr;
-            lastTimeR = nowR;
-            if (deltaR >= 1) {
+            if (limitedFrames) {
+                double nr = 1000000000 / framerate;
+                long nowR = System.nanoTime();
+                deltaR += (nowR - lastTimeR) / nr;
+                lastTimeR = nowR;
+                while (deltaR >= 1) {
+                    render();
+                    deltaR--;
+                    frames++;
+                }
+            } else {
                 render();
-                deltaR--;
                 frames++;
             }
             if (System.currentTimeMillis() - timer > 1000) {
@@ -142,9 +146,12 @@ public class Game extends Canvas implements Runnable {
                 }
                 case "framerate" -> {
                     consoleHistory.add(consoleCommand);
-                    framerate = Double.parseDouble(commandString[1]);
-                    if (framerate < 0) {
-                        framerate = 1;
+                    double parsedFramerate = Double.parseDouble(commandString[1]);
+                    if (parsedFramerate > 0 && parsedFramerate <= 500) {
+                        framerate = parsedFramerate;
+                        limitedFrames = true;
+                    } else {
+                        limitedFrames = false;
                     }
                 }
             }
