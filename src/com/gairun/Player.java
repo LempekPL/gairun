@@ -41,6 +41,10 @@ public class Player {
             keyCheck();
         }
 
+        if (flying) {
+            velX = clamp(velX, -4, 4);
+            velY = clamp(velY, -4, 4);
+        }
         velX = clamp(velX, -4, 4);
         velY = clamp(velY, -8, 5);
     }
