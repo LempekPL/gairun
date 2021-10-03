@@ -15,7 +15,7 @@ import java.util.List;
 // TODO: check why when player walks in diagonal (press W and D) and collides with blocks above and is "outside" rendered map then he "glitches" and moves fast in left, tempfix: just make additional 2 rows of "-" at the bottom
 
 public class Game extends Canvas implements Runnable {
-    // game static values
+    // game values
     public static final int WIDTH = 1200;
     // .../ 16 * 9; for 16:9 obviously
     // .../ 4 * 3; for 4:3
@@ -23,8 +23,10 @@ public class Game extends Canvas implements Runnable {
     // .../ 12 * 9 for 12:9
     public static final int HEIGHT = WIDTH / 12 * 9;
     public final String TITLE = "gairun";
-    private final List<String> consoleHistory = new ArrayList<>();
-    BufferedImage screen = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
+    private double gameSpeed = 1;
+    private double framerate = 60.0;
+    private int lastFrames;
+    private int lastTicks;
     // threading
     private boolean isRunning = false;
     private Thread thread;
@@ -33,12 +35,10 @@ public class Game extends Canvas implements Runnable {
     private Camera cam;
     private MapController mapController;
     private KeyInput keyListener;
-    // values
-    private int lastFrames;
-    private double gameSpeed = 1;
     // console
     private boolean consoleOpened;
     private String consoleCommand = "";
+    private final List<String> consoleHistory = new ArrayList<>();
 
     public Game() {
         new Window(WIDTH, HEIGHT, TITLE, this);
@@ -64,31 +64,40 @@ public class Game extends Canvas implements Runnable {
 
     public void run() {
         long lastTime = System.nanoTime();
+        long lastTimeR = System.nanoTime();
         final double amountOfTicks = 60.0;
+        double ns = 1000000000 / amountOfTicks;
         double delta = 0;
+        double deltaR = 0;
         int frames = 0;
+        int ticks = 0;
         long timer = System.currentTimeMillis();
-        float tiker = 0;
 
         while (isRunning) {
-            double ns = 1000000000 / (amountOfTicks * gameSpeed);
+            ns = ns / gameSpeed;
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
             while (delta >= 1) {
                 tick();
                 delta--;
-                tiker++;
+                ticks++;
             }
-            if (tiker < 30) {
+            double nr = 1000000000 / framerate;
+            long nowR = System.nanoTime();
+            deltaR += (nowR - lastTimeR) / nr;
+            lastTimeR = nowR;
+            if (deltaR >= 1) {
                 render();
+                deltaR--;
                 frames++;
             }
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
                 lastFrames = frames;
+                lastTicks = ticks;
                 frames = 0;
-                tiker = 0;
+                ticks = 0;
             }
         }
         stop();
@@ -131,6 +140,13 @@ public class Game extends Canvas implements Runnable {
                         gameSpeed = 1;
                     }
                 }
+                case "framerate" -> {
+                    consoleHistory.add(consoleCommand);
+                    framerate = Double.parseDouble(commandString[1]);
+                    if (framerate < 0) {
+                        framerate = 1;
+                    }
+                }
             }
             consoleCommand = "";
             consoleOpened = false;
@@ -157,15 +173,6 @@ public class Game extends Canvas implements Runnable {
         // rendering
         p.render(g);
         mapController.render(g);
-        if (cam.isDebug()) {
-            // camera move to limit
-            g.setColor(Color.yellow);
-            float xRender = cam.getX() + (float) Game.WIDTH / 2 - cam.getCameraMovementLimit();
-            float yRender = -cam.getY() + (float) Game.HEIGHT / 2 - cam.getCameraMovementLimit();
-            g.drawRect((int) xRender, (int) yRender, cam.getCameraMovementLimit() * 2, cam.getCameraMovementLimit() * 2);
-            gCopy.setColor(Color.white);
-            gCopy.drawString("XY: %s, %s".formatted(p.getX() / 16, p.getY() / 16), 0, 20);
-        }
         // console
         if (consoleOpened) {
             gCopy.setColor(new Color(50, 50, 50, 127));
@@ -176,9 +183,23 @@ public class Game extends Canvas implements Runnable {
                 gCopy.drawString(consoleHistory.get(i), 50, (consoleHistory.size() - i) * 11 + 50);
             }
         }
-        // fps counter
-        gCopy.setColor(Color.green);
-        gCopy.drawString(lastFrames + "FPS", 0, 10);
+        // debug camera
+        if (cam.isDebug()) {
+            // camera move to limit
+            g.setColor(Color.yellow);
+            float xRender = cam.getX() + (float) Game.WIDTH / 2 - cam.getCameraMovementLimit();
+            float yRender = -cam.getY() + (float) Game.HEIGHT / 2 - cam.getCameraMovementLimit();
+            g.drawRect((int) xRender, (int) yRender, cam.getCameraMovementLimit() * 2, cam.getCameraMovementLimit() * 2);
+            gCopy.setColor(Color.white);
+            gCopy.drawString("XY: %s, %s".formatted(p.getX() / 16, p.getY() / 16), 5, 21);
+            // fps and ticks counter
+            gCopy.setColor(Color.green);
+            gCopy.drawString(lastFrames + "FPS, " + lastTicks + " ticks", 5, 10);
+        } else {
+            // fps counter
+            gCopy.setColor(Color.green);
+            gCopy.drawString(lastFrames + "FPS", 0, 10);
+        }
         // freeing data and displaying it
         g2d.dispose();
         gCopy.dispose();
