@@ -7,6 +7,7 @@ public class Camera {
     private float y;
     private float scale = 2;
     private boolean debug = false;
+    private boolean scaling = true;
 
     public Camera(int x, int y, Game game) {
         this.x = x;
@@ -15,7 +16,7 @@ public class Camera {
     }
 
     public void tick() {
-        float playerX = game.getPlayer().getX() + 8;
+        float playerX = game.getPlayer().getX();
         float playerY = game.getPlayer().getY();
         if (x - cameraMovementLimit > playerX) {
             x += (playerX - x + cameraMovementLimit) / cameraMovementLimit;
@@ -27,13 +28,15 @@ public class Camera {
         } else if (y + cameraMovementLimit < playerY) {
             y += (playerY - y - cameraMovementLimit) / cameraMovementLimit;
         }
-        if (game.getPlayer().getVelX() != 0 || game.getPlayer().getVelY() > 2 || game.getPlayer().getVelY() < -2) {
-            if (scale >= 1.5) {
-                scale -= 0.002;
-            }
-        } else {
-            if (scale < 2) {
-                scale += 0.005;
+        if (scaling) {
+            if (game.getPlayer().getVelX() != 0 || game.getPlayer().getVelY() > 2 || game.getPlayer().getVelY() < -2) {
+                if (scale >= 1.5) {
+                    scale -= 0.002;
+                }
+            } else {
+                if (scale < 2) {
+                    scale += 0.005;
+                }
             }
         }
     }
@@ -69,6 +72,14 @@ public class Camera {
 
     public int getCameraMovementLimit() {
         return cameraMovementLimit;
+    }
+
+    public boolean isScaling() {
+        return scaling;
+    }
+
+    public void setScaling(boolean scaling) {
+        this.scaling = scaling;
     }
 }
 

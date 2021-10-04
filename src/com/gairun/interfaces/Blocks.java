@@ -3,12 +3,14 @@ package com.gairun.interfaces;
 import com.gairun.Game;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 public class Blocks {
     private final Texture tex;
     private BlockType blockType;
     private float x;
     private float y;
+    private int[] blockHitbox;
     private final Game game;
 
 //    public Blocks(BlockType blockType) {
@@ -20,6 +22,7 @@ public class Blocks {
         this.y = y;
         this.tex = tex;
         this.blockType = blockType;
+        this.blockHitbox = new int[]{0, tex.getTexture().getWidth(), 0, tex.getTexture().getHeight()};
         this.game = game;
     }
 
@@ -30,7 +33,9 @@ public class Blocks {
             g.drawImage(tex.getTexture(), (int) xRender, (int) yRender, null);
             if (game.getCamera().isDebug()) {
                 g.setColor(Color.red);
-                g.drawRect((int) xRender, (int) yRender, tex.getTexture().getWidth(), tex.getTexture().getHeight());
+                Rectangle2D mainHitbox = getHitbox();
+                g.drawRect((int) mainHitbox.getX() + Game.WIDTH / 2, (int) -mainHitbox.getY() + Game.HEIGHT / 2, (int) mainHitbox.getWidth(), (int) mainHitbox.getHeight());
+//                g.drawRect((int) xRender, (int) yRender, tex.getTexture().getWidth(), tex.getTexture().getHeight());
             }
         }
     }
@@ -39,9 +44,8 @@ public class Blocks {
         tex.runAnimation();
     }
 
-    public Rectangle getHitbox() {
-        // TODO: custom hitbox size
-        return new Rectangle((int) x, (int) y + tex.getTexture().getHeight(), tex.getTexture().getWidth(), tex.getTexture().getHeight());
+    public Rectangle2D getHitbox() {
+        return new Rectangle2D.Float(x - blockHitbox[2], y + blockHitbox[0], blockHitbox[2] + blockHitbox[3], blockHitbox[0] + blockHitbox[1]);
     }
 
     public BlockType getBlockType() {

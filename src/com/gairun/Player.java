@@ -4,6 +4,7 @@ import com.gairun.interfaces.Blocks;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -12,13 +13,14 @@ public class Player {
     private final BufferedImage tex;
     private final float acc = 0.15F;
     private final float dcc = 0.05F;
+    private final int[] playerHitbox = new int[]{32, 20, 7, 7};
     List<Integer> inputs;
     private float x;
     private float y;
     private float velX;
     private float velY;
     private int jumps = 1;
-    private boolean flying = false;
+    private boolean flying = true;
     private boolean invisible = false;
     private boolean blockedKeys = false;
     private boolean noclip = false;
@@ -50,15 +52,26 @@ public class Player {
     }
 
     public void render(Graphics g) {
-        float xRender = x + (float) Game.WIDTH / 2;
+        float xRender = x - (float) tex.getWidth()/2 + (float) Game.WIDTH / 2;
         float yRender = -(y + tex.getHeight()) + (float) Game.HEIGHT / 2;
         if (!invisible) {
             g.drawImage(tex, (int) xRender, (int) yRender, null);
         }
-        if (game.getCamera().isDebug()) {
-            g.setColor(Color.red);
-            g.drawRect((int) xRender, (int) yRender, tex.getWidth(), tex.getHeight());
-        }
+//        if (game.getCamera().isDebug()) {
+        g.setColor(Color.red);
+        Rectangle2D mainHitbox = getHitbox();
+        g.drawRect((int) mainHitbox.getX() + Game.WIDTH / 2, (int) -mainHitbox.getY() + Game.HEIGHT / 2, (int) mainHitbox.getWidth(), (int) mainHitbox.getHeight());
+//        }
+        g.setColor(Color.MAGENTA);
+        drawRectangle(g, getHitboxHeight());
+        g.setColor(Color.cyan);
+        g.fillRect((int) x + Game.WIDTH / 2-1, (int) -y + Game.HEIGHT / 2, 3, 1);
+    }
+
+    private void drawRectangle(Graphics g, Rectangle2D rect) {
+        float xRender = (float) (rect.getX() + Game.WIDTH / 2);
+        float yRender = (float) (-rect.getY() + Game.HEIGHT / 2);
+        g.drawRect((int) xRender, (int) yRender, (int) rect.getWidth(), (int) rect.getHeight());
     }
 
     // this handles player collision in separate functions
@@ -66,21 +79,27 @@ public class Player {
         for (List<Blocks> blockRow : game.getMapController().getMapBlocks()) {
             for (Blocks block : blockRow) {
                 // TODO: check if block is withing distance to remove unnecessary checks
-                verticalCollision(block);
                 horizontalCollision(block);
+//                verticalCollision(block);
                 wallJump(block);
             }
         }
     }
 
     private void horizontalCollision(Blocks block) {
+        Rectangle2D a =getHitboxWidth().createIntersection(block.getHitbox());
+        System.out.println(a.getX());
+        System.out.println(a.getY());
+        System.out.println(a.getWidth());
+        System.out.println(a.getHeight());
+
         if (getHitboxWidth().intersects(block.getHitbox())) {
             if (velX > 0) {
                 velX = 0;
-                x = block.getX() - tex.getWidth();
+                x = block.getX() - (float) getHitbox().getWidth()/2;
             } else if (velX < 0) {
                 velX = 0;
-                x = block.getX() + block.getHitbox().width;
+                x = (float) (block.getX() + block.getHitbox().getWidth() + getHitbox().getWidth()/2);
             }
             if (velY < 0 && !flying) {
                 velY += 0.5;
@@ -91,14 +110,19 @@ public class Player {
 
     private void verticalCollision(Blocks block) {
         if (getHitboxHeight().intersects(block.getHitbox())) {
+            System.out.println("A");
             if (velY > 0) {
                 velY = 0;
-                y = block.getY() - 16 - tex.getHeight();
+                y = block.getY() - (float) getHitbox().getHeight();
+//                y = block.getY() - getHitbox().height;
             } else if (velY < 0) {
                 velY = 0;
-                y = block.getY();
+                System.out.println("B");
+//                y = block.getY() + playerHitbox[3];
+//                y = block.getY();
                 jumps = 1;
             }
+            System.out.println("C");
         }
     }
 
@@ -171,7 +195,7 @@ public class Player {
     public void spawnPlayer() {
         velX = 0;
         velY = 0;
-        x = 0;
+        x = 8;
         y = 0;
         jumps = 1;
     }
@@ -179,25 +203,42 @@ public class Player {
     public void spawnPlayer(float x, float y) {
         velX = 0;
         velY = 0;
-        this.x = x;
+        this.x = x+8;
         this.y = y;
         jumps = 1;
     }
 
-    public Rectangle getHitboxWidth() {
-        return new Rectangle((int) (x + velX), (int) y + tex.getHeight(), tex.getWidth(), tex.getHeight());
+//    public Rectangle getHitbox() {
+//        return new Rectangle((int) x - playerHitboxOffset[2], (int) y + tex.getHeight() + playerHitboxOffset[0], tex.getWidth() + playerHitboxOffset[2] + playerHitboxOffset[3], tex.getHeight() + playerHitboxOffset[0] + playerHitboxOffset[1]);
+//    }
+
+    public Rectangle2D getHitbox() {
+        return new Rectangle2D.Float(x - playerHitbox[2],y + playerHitbox[0], playerHitbox[2] + playerHitbox[3], playerHitbox[0] + playerHitbox[1]);
     }
 
-    public Rectangle getHitboxHeight() {
-        return new Rectangle((int) x, (int) (y + velY + tex.getHeight()), tex.getWidth(), tex.getHeight());
+    public Rectangle2D getHitboxWidth() {
+        Rectangle2D hitbox = getHitbox();
+        return new Rectangle2D.Float((float) hitbox.getX() + velX, (float) hitbox.getY(), (float) hitbox.getWidth(), (float) hitbox.getHeight());
     }
 
-    private Rectangle getWallLeft() {
-        return new Rectangle((int) x - 2, (int) y + tex.getHeight(), tex.getWidth(), tex.getHeight());
+    public Rectangle2D getHitboxHeight() {
+        Rectangle2D hitbox = getHitbox();
+        return new Rectangle2D.Float((float) hitbox.getX(), (float) hitbox.getY() + velY, (float) hitbox.getWidth(), (float) hitbox.getHeight());
     }
 
-    private Rectangle getWallRight() {
-        return new Rectangle((int) x, (int) y + tex.getHeight(), tex.getWidth() + 2, tex.getHeight());
+    private Rectangle2D getWallLeft() {
+        Rectangle2D hitbox = getHitbox();
+        return new Rectangle2D.Float((float) hitbox.getX() - 2, (float) hitbox.getY(), 2, (float) hitbox.getHeight());
+    }
+
+    private Rectangle2D getWallRight() {
+        Rectangle2D hitbox = getHitbox();
+        return new Rectangle2D.Float((float) (hitbox.getX() + hitbox.getWidth()), (float) hitbox.getY(), 2, (float) hitbox.getHeight());
+    }
+
+    private Rectangle2D getStanding() {
+        Rectangle2D hitbox = getHitbox();
+        return new Rectangle2D.Float((float) hitbox.getX(), (float) (hitbox.getY() - hitbox.getHeight()), (float) hitbox.getWidth(), 2);
     }
 
     public float getX() {

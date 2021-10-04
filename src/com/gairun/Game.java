@@ -9,9 +9,11 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 // TODO: custom screen size (settings > create file > restart game > load external file > set screen size)
-// TODO: check why when player walks in diagonal (press W and D) and collides with blocks above and is "outside" rendered map then he "glitches" and moves fast in left, tempfix: just make additional 2 rows of "-" at the bottom
+// TODO: check why when player walks in diagonal (press W and D) and collides with blocks above and is "outside" rendered map
+//  then he "glitches" and moves fast in left or when player is in blocks (only happenes when fly is enabled), tempfix: just make additional 2 rows of "-" at the bottom
 
 public class Game extends Canvas implements Runnable {
     // game values
@@ -22,6 +24,7 @@ public class Game extends Canvas implements Runnable {
     // .../ 12 * 9 for 12:9
     public static final int HEIGHT = WIDTH / 12 * 9;
     public final String TITLE = "gairun";
+    private final List<String> consoleHistory = new ArrayList<>();
     private double gameSpeed = 1;
     private double framerate = 60.0;
     private int lastFrames;
@@ -38,7 +41,6 @@ public class Game extends Canvas implements Runnable {
     // console
     private boolean consoleOpened;
     private String consoleCommand = "";
-    private final List<String> consoleHistory = new ArrayList<>();
 
     public Game() {
         new Window(WIDTH, HEIGHT, TITLE, this);
@@ -135,7 +137,11 @@ public class Game extends Canvas implements Runnable {
                 }
                 case "teleport", "tp" -> {
                     consoleHistory.add(consoleCommand);
-                    p.spawnPlayer(Float.parseFloat(commandString[1]) * 16, Float.parseFloat(commandString[2]) * 16);
+                    float toSpawnX = (int) Float.parseFloat(commandString[1]);
+                    if (Float.parseFloat(commandString[1]) != toSpawnX) {
+                        toSpawnX = Float.parseFloat(commandString[1]) - 0.5F;
+                    }
+                    p.spawnPlayer(toSpawnX * 16, Float.parseFloat(commandString[2]) * 16);
                 }
                 case "gamespeed" -> {
                     consoleHistory.add(consoleCommand);
@@ -143,6 +149,14 @@ public class Game extends Canvas implements Runnable {
                     if (gameSpeed < 0) {
                         gameSpeed = 1;
                     }
+                }
+                case "noclip" -> {
+                    consoleHistory.add(consoleCommand);
+                    p.setNoclip(!p.isNoclip());
+                }
+                case "invisible" -> {
+                    consoleHistory.add(consoleCommand);
+                    p.setInvisible(!p.isInvisible());
                 }
                 case "framerate" -> {
                     consoleHistory.add(consoleCommand);
@@ -152,6 +166,17 @@ public class Game extends Canvas implements Runnable {
                         limitedFrames = true;
                     } else {
                         limitedFrames = false;
+                    }
+                }
+                case "scale" -> {
+                    consoleHistory.add(consoleCommand);
+                    if (Objects.equals(commandString[1], "off")) {
+                        cam.setScale(2);
+                        cam.setScaling(true);
+                    } else if (Objects.equals(commandString[1], "set")) {
+                        float parsedScale = Float.parseFloat(commandString[2]);
+                        cam.setScale(parsedScale);
+                        cam.setScaling(false);
                     }
                 }
             }
@@ -192,16 +217,17 @@ public class Game extends Canvas implements Runnable {
         }
         // debug camera
         if (cam.isDebug()) {
+            // fps and ticks counter
+            gCopy.setColor(Color.green);
+            gCopy.drawString(lastFrames + "FPS, " + lastTicks + " ticks", 0, 10);
             // camera move to limit
             g.setColor(Color.yellow);
             float xRender = cam.getX() + (float) Game.WIDTH / 2 - cam.getCameraMovementLimit();
             float yRender = -cam.getY() + (float) Game.HEIGHT / 2 - cam.getCameraMovementLimit();
             g.drawRect((int) xRender, (int) yRender, cam.getCameraMovementLimit() * 2, cam.getCameraMovementLimit() * 2);
             gCopy.setColor(Color.white);
-            gCopy.drawString("XY: %s, %s".formatted(p.getX() / 16, p.getY() / 16), 5, 21);
-            // fps and ticks counter
-            gCopy.setColor(Color.green);
-            gCopy.drawString(lastFrames + "FPS, " + lastTicks + " ticks", 5, 10);
+            gCopy.drawString("XY: %s, %s".formatted((float) Math.round(p.getX() / 16 * 1000) / 1000, (float) Math.round(p.getY() / 16 * 1000) / 1000), 5, 25);
+            gCopy.drawString("XY: %s, %s".formatted(p.getX(), p.getY()), 5, 40);
         } else {
             // fps counter
             gCopy.setColor(Color.green);
