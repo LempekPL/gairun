@@ -35,7 +35,6 @@ public class Blocks {
                 g.setColor(Color.red);
                 Rectangle2D mainHitbox = getHitbox();
                 g.drawRect((int) mainHitbox.getX() + Game.WIDTH / 2, (int) -mainHitbox.getY() + Game.HEIGHT / 2, (int) mainHitbox.getWidth(), (int) mainHitbox.getHeight());
-//                g.drawRect((int) xRender, (int) yRender, tex.getTexture().getWidth(), tex.getTexture().getHeight());
             }
         }
     }

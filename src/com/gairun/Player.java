@@ -1,41 +1,63 @@
 package com.gairun;
 
 import com.gairun.interfaces.Blocks;
+import com.gairun.interfaces.Texture;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Player {
     private final Game game;
-    private final BufferedImage tex;
-    private final float acc = 0.15F;
-    private final float dcc = 0.05F;
-    // top, bottom, left, right
-    private final int[] playerHitbox = new int[]{32, 0, 7, 7};
     List<Integer> inputs;
+    private Map<String, Texture> textureMap;
+    private String currentTexture;
+    private boolean lookingLeft = false;
     private float x;
     private float y;
     private float velX;
     private float velY;
+//    private float acc = 0.15F;
+//    private float dcc = 0.05F;
+    private float acc = 0.55F;
+    private float dcc = 1.05F;
     private int jumps = 1;
     private boolean flying = false;
     private boolean invisible = false;
     private boolean blockedKeys = false;
     private boolean noclip = false;
 
-    public Player(float x, float y, BufferedImage tex, Game game) {
+    public Player(float x, float y, Game game) {
         this.x = x;
         this.y = y;
-        this.tex = tex;
         this.game = game;
+        pullTextures();
+        currentTexture = "idle";
     }
 
     public void tick() {
         if (!noclip) {
             collisionCheck();
+        }
+        if (velX > 0.1) {
+            lookingLeft = false;
+            currentTexture = "walk";
+        } else if (velX < -0.1) {
+            lookingLeft = true;
+            currentTexture = "walk";
+        } else {
+            currentTexture = "idle";
         }
         y += velY;
         x += velX;
@@ -47,35 +69,31 @@ public class Player {
         if (flying) {
             velX = clamp(velX, -4, 4);
             velY = clamp(velY, -4, 4);
+        } else {
+            velX = clamp(velX, -4, 4);
+            velY = clamp(velY, -8, 5);
         }
-        velX = clamp(velX, -4, 4);
-        velY = clamp(velY, -8, 5);
+        textureMap.get(currentTexture).runAnimation();
     }
 
     public void render(Graphics g) {
-        float xRender = x - (float) tex.getWidth() / 2 + (float) Game.WIDTH / 2;
-        float yRender = -(y + tex.getHeight()) + (float) Game.HEIGHT / 2;
+        float xRender = x - (float) textureMap.get(currentTexture).getTexture().getWidth() / 2 + (float) Game.WIDTH / 2;
+        float yRender = -(y + textureMap.get(currentTexture).getTexture().getHeight()) + (float) Game.HEIGHT / 2;
         if (!invisible) {
-            g.drawImage(tex, (int) xRender, (int) yRender, null);
+            g.drawImage(flipper(textureMap.get(currentTexture).getTexture()), (int) xRender, (int) yRender, null);
         }
+        g.setColor(Color.red);
         if (game.getCamera().isDebug()) {
             g.setColor(Color.red);
             Rectangle2D mainHitbox = getHitbox();
-            g.drawRect((int) (x - mainHitbox.getWidth() / 2) + Game.WIDTH / 2, (int) (-y - mainHitbox.getHeight() + playerHitbox[1]) + Game.HEIGHT / 2, (int) mainHitbox.getWidth(), (int) mainHitbox.getHeight());
+            g.drawRect((int) (x - (float) textureMap.get(currentTexture).getTexture().getWidth() / 2) + Game.WIDTH / 2, (int) (-y - textureMap.get(currentTexture).getTexture().getHeight()) + Game.HEIGHT / 2, (int) mainHitbox.getWidth(), (int) mainHitbox.getHeight());
         }
-    }
-
-    private void drawRectangle(Graphics g, Rectangle2D rect) {
-        float xRender = (float) (rect.getX() + Game.WIDTH / 2);
-        float yRender = (float) (-rect.getY() + Game.HEIGHT / 2);
-        g.drawRect((int) xRender, (int) yRender, (int) rect.getWidth(), (int) rect.getHeight());
     }
 
     // this handles player collision in separate functions
     private void collisionCheck() {
         for (List<Blocks> blockRow : game.getMapController().getMapBlocks()) {
             for (Blocks block : blockRow) {
-                // TODO: check if block is withing distance to remove unnecessary checks
                 horizontalCollision(block);
                 verticalCollision(block);
                 wallJump(block);
@@ -125,6 +143,10 @@ public class Player {
         }
     }
 
+    private void standingOn(Blocks block) {
+
+    }
+
     // this handles player movement in separate functions
     private void keyCheck() {
         inputs = game.getKeyListener().getKeysPressed();
@@ -145,7 +167,7 @@ public class Player {
         } else if (!inputs.contains(KeyEvent.VK_D) && !inputs.contains(KeyEvent.VK_A)) {
             if (velX > 0) velX -= dcc;
             else if (velX < 0) velX += dcc;
-            if (velX > -0.1 && velX < 0.1) velX = 0;
+            if (velX > -dcc*2 && velX < dcc*2) velX = 0;
         }
     }
 
@@ -194,37 +216,34 @@ public class Player {
         jumps = 1;
     }
 
-//    public Rectangle getHitbox() {
-//        return new Rectangle((int) x - playerHitboxOffset[2], (int) y + tex.getHeight() + playerHitboxOffset[0], tex.getWidth() + playerHitboxOffset[2] + playerHitboxOffset[3], tex.getHeight() + playerHitboxOffset[0] + playerHitboxOffset[1]);
-//    }
 
     public Rectangle2D getHitbox() {
-        return new Rectangle2D.Float(x - playerHitbox[2], y + (float) playerHitbox[0] / 2, playerHitbox[2] + playerHitbox[3], playerHitbox[0] + playerHitbox[1]);
+        return new Rectangle2D.Float(x - 8, y + 16, 16, 32);
     }
 
     public Rectangle2D getHitboxWidth() {
         Rectangle2D hitbox = getHitbox();
-        return new Rectangle2D.Float((float) hitbox.getX() + velX, (float) hitbox.getY() + playerHitbox[1], (float) hitbox.getWidth(), (float) hitbox.getHeight());
+        return new Rectangle2D.Float((float) hitbox.getX() + velX, (float) hitbox.getY(), (float) hitbox.getWidth(), (float) hitbox.getHeight());
     }
 
     public Rectangle2D getHitboxHeight() {
         Rectangle2D hitbox = getHitbox();
-        return new Rectangle2D.Float((float) hitbox.getX(), (float) hitbox.getY() + velY + playerHitbox[1], (float) hitbox.getWidth(), (float) hitbox.getHeight());
+        return new Rectangle2D.Float((float) hitbox.getX(), (float) hitbox.getY() + velY, (float) hitbox.getWidth(), (float) hitbox.getHeight());
     }
 
     private Rectangle2D getWallLeft() {
         Rectangle2D hitbox = getHitbox();
-        return new Rectangle2D.Float((float) hitbox.getX() - 2, (float) hitbox.getY() + playerHitbox[1], 2, (float) hitbox.getHeight());
+        return new Rectangle2D.Float((float) hitbox.getX() - 2, (float) hitbox.getY(), 2, (float) hitbox.getHeight());
     }
 
     private Rectangle2D getWallRight() {
         Rectangle2D hitbox = getHitbox();
-        return new Rectangle2D.Float((float) (hitbox.getX() + hitbox.getWidth()), (float) hitbox.getY() + playerHitbox[1], 2, (float) hitbox.getHeight());
+        return new Rectangle2D.Float((float) (hitbox.getX() + hitbox.getWidth()), (float) hitbox.getY(), 2, (float) hitbox.getHeight());
     }
 
     private Rectangle2D getStanding() {
         Rectangle2D hitbox = getHitbox();
-        return new Rectangle2D.Float((float) hitbox.getX(), (float) (hitbox.getY() - hitbox.getHeight()) + playerHitbox[1], (float) hitbox.getWidth(), 2);
+        return new Rectangle2D.Float((float) hitbox.getX(), (float) (hitbox.getY() - hitbox.getHeight()), (float) hitbox.getWidth(), 2);
     }
 
     public float getX() {
@@ -273,5 +292,39 @@ public class Player {
 
     public void setNoclip(boolean noclip) {
         this.noclip = noclip;
+    }
+
+    private void pullTextures() {
+        String[] animationName = new String[]{"idle", "walk"};
+        textureMap = new HashMap<>();
+        for (String anName : animationName) {
+            try {
+                Texture tempTex;
+                File imageFile = new File("res/textures/player/%s.png".formatted(anName));
+                FileReader textureJSONfile = new FileReader("res/textures/player/%s.json".formatted(anName));
+                BufferedImage tempImage = ImageIO.read(imageFile);
+                JSONObject textureJSON = new JSONObject(new JSONTokener(textureJSONfile));
+                tempTex = new Texture(tempImage, textureJSON);
+                textureMap.put(anName, tempTex);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private BufferedImage flipper(BufferedImage image) {
+        if (lookingLeft) {
+            AffineTransform at = new AffineTransform();
+            at.concatenate(AffineTransform.getScaleInstance(-1, 1));
+            at.concatenate(AffineTransform.getTranslateInstance(-image.getWidth(), 0));
+            BufferedImage flippedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = flippedImage.createGraphics();
+            g.transform(at);
+            g.drawImage(image, 0, 0, null);
+            g.dispose();
+            return flippedImage;
+        } else {
+            return image;
+        }
     }
 }

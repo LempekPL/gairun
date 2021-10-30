@@ -2,7 +2,7 @@ package com.gairun;
 
 import com.gairun.controllers.KeyInput;
 import com.gairun.controllers.MapController;
-import com.gairun.libs.ImageHandler;
+import com.gairun.interfaces.Blocks;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -54,9 +54,7 @@ public class Game extends Canvas implements Runnable {
 
     public void init() {
         requestFocus();
-        // find otherplace :/
-        ImageHandler ih = new ImageHandler("gairun1");
-        p = new Player(0, 0, ih.grabImage(0, 0, 16, 32), this);
+        p = new Player(0, 0, this);
         cam = new Camera(0, 0, this);
         mapController = new MapController(this);
         keyListener = new KeyInput(this);
@@ -205,6 +203,14 @@ public class Game extends Canvas implements Runnable {
         // rendering
         p.render(g);
         mapController.render(g);
+        g.setColor(Color.green);
+        g.setFont(new Font("TimesRoman", Font.PLAIN, 5));
+        for (List<Blocks> blockList : mapController.getMapBlocks()) {
+            for (Blocks block : blockList) {
+                g.drawString("x: %s".formatted((int) block.getX()), (int) block.getX() + Game.WIDTH/2, (int) -block.getY() + Game.HEIGHT / 2 + 5);
+                g.drawString("y: %s".formatted((int) block.getY()), (int) block.getX() + Game.WIDTH/2, (int) -block.getY() + Game.HEIGHT / 2 + 10);
+            }
+        }
         // console
         if (consoleOpened) {
             gCopy.setColor(new Color(50, 50, 50, 127));
