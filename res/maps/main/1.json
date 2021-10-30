@@ -5,7 +5,9 @@
   ],
   "usedBlocks": {
     "B": "res/block",
-    "C": "res/blokiv1"
+    "C": "res/blokiv1",
+    "U": "res/glue",
+    "I": "res/ice"
   },
   "requiredResourcePacks": []
 }
