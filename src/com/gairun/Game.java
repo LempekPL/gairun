@@ -3,14 +3,10 @@ package com.gairun;
 import com.gairun.controllers.BackgroundController;
 import com.gairun.controllers.KeyInput;
 import com.gairun.controllers.MapController;
-import com.gairun.interfaces.Blocks;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 // TODO: custom screen size (settings > create file > restart game > load external file > set screen size)
 // TODO: check why when player walks in diagonal (press W and D) and collides with data above and is "outside" rendered map
@@ -138,11 +134,14 @@ public class Game extends Canvas implements Runnable {
         bgController.render(g);
         p.render(g);
         mapController.render(g);
-        console.render(gCopy);
 
         // debug camera
         gCopy.setFont(new Font("Default", Font.PLAIN, 12));
         if (cam.isDebug()) {
+            // player hitbox debug
+            g.setColor(Color.red);
+            Rectangle2D mainHitbox = p.getHitbox();
+            g.drawRect((int) (p.getX() - (float) p.getCurrentTexture().getWidth() / 2) + Game.WIDTH / 2, (int) (-p.getY() - p.getCurrentTexture().getHeight()) + Game.HEIGHT / 2, (int) mainHitbox.getWidth(), (int) mainHitbox.getHeight());
             // fps and ticks counter
             gCopy.setColor(Color.green);
             gCopy.drawString(lastFrames + "FPS, " + lastTicks + " ticks", 0, 10);
@@ -151,6 +150,10 @@ public class Game extends Canvas implements Runnable {
             float xRender = cam.getX() + (float) Game.WIDTH / 2 - cam.getCameraMovementLimit();
             float yRender = -cam.getY() + (float) Game.HEIGHT / 2 - cam.getCameraMovementLimit();
             g.drawRect((int) xRender, (int) yRender, cam.getCameraMovementLimit() * 2, cam.getCameraMovementLimit() * 2);
+            // camera rendering
+            g.setColor(Color.green);
+            g.drawRect((int) cam.getX(), (int) -cam.getY(), Game.WIDTH-1, Game.HEIGHT-1);
+            // cords
             gCopy.setColor(Color.white);
             gCopy.drawString("XY: %s, %s".formatted((float) Math.round(p.getX() / 16 * 1000) / 1000, (float) Math.round(p.getY() / 16 * 1000) / 1000), 5, 25);
             gCopy.drawString("px XY: %s, %s".formatted(p.getX(), p.getY()), 5, 40);
@@ -159,6 +162,8 @@ public class Game extends Canvas implements Runnable {
             gCopy.setColor(Color.green);
             gCopy.drawString(lastFrames + "FPS", 0, 10);
         }
+        // console
+        console.render(gCopy);
         // freeing data and displaying it
         g2d.dispose();
         gCopy.dispose();

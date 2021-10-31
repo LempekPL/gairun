@@ -2,6 +2,7 @@ package com.gairun;
 
 import com.gairun.interfaces.Blocks;
 import com.gairun.interfaces.Texture;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -47,7 +48,6 @@ public class Player {
     }
 
     public void tick() {
-        blockedKeys = game.getConsole().isOpened();
         if (!noclip) {
             collisionCheck();
         }
@@ -80,12 +80,6 @@ public class Player {
         float yRender = -(y + textureMap.get(currentTexture).getTexture().getHeight()) + (float) Game.HEIGHT / 2;
         if (!invisible) {
             g.drawImage(flipper(textureMap.get(currentTexture).getTexture()), (int) xRender, (int) yRender, null);
-        }
-        g.setColor(Color.red);
-        if (game.getCamera().isDebug()) {
-            g.setColor(Color.red);
-            Rectangle2D mainHitbox = getHitbox();
-            g.drawRect((int) (x - (float) textureMap.get(currentTexture).getTexture().getWidth() / 2) + Game.WIDTH / 2, (int) (-y - textureMap.get(currentTexture).getTexture().getHeight()) + Game.HEIGHT / 2, (int) mainHitbox.getWidth(), (int) mainHitbox.getHeight());
         }
     }
 
@@ -159,9 +153,9 @@ public class Player {
 
     // horizontal movement
     private void horizontalMove(List<Integer> inputs) {
-        if (inputs.contains(KeyEvent.VK_D) && !blockedKeys) {
+        if (inputs.contains(KeyEvent.VK_D) && !blockedKeys && !game.getConsole().isOpened()) {
             velX += acc;
-        } else if (inputs.contains(KeyEvent.VK_A) && !blockedKeys) {
+        } else if (inputs.contains(KeyEvent.VK_A) && !blockedKeys && !game.getConsole().isOpened()) {
             velX -= acc;
         } else if (!inputs.contains(KeyEvent.VK_D) && !inputs.contains(KeyEvent.VK_A)) {
             if (velX > 0) velX -= dcc;
@@ -172,9 +166,9 @@ public class Player {
 
     // vertical movement, if flying is set to true
     private void verticalMove(List<Integer> inputs) {
-        if (inputs.contains(KeyEvent.VK_W) && !blockedKeys) {
+        if (inputs.contains(KeyEvent.VK_W) && !blockedKeys && !game.getConsole().isOpened()) {
             velY += acc;
-        } else if (inputs.contains(KeyEvent.VK_S) && !blockedKeys) {
+        } else if (inputs.contains(KeyEvent.VK_S) && !blockedKeys && !game.getConsole().isOpened()) {
             velY -= acc;
         } else if (!inputs.contains(KeyEvent.VK_W) && !inputs.contains(KeyEvent.VK_S)) {
             if (velY > 0) velY -= dcc;
@@ -185,7 +179,7 @@ public class Player {
 
     // jumping with gravitational pull
     private void jumping() {
-        if (!blockedKeys && jumps > 0 && game.getKeyListener().checkKey(KeyEvent.VK_W)) {
+        if (!blockedKeys && !game.getConsole().isOpened() && jumps > 0 && game.getKeyListener().checkKey(KeyEvent.VK_W)) {
             velY = 4;
             jumps--;
         }
@@ -215,6 +209,18 @@ public class Player {
         jumps = 1;
     }
 
+    public void spawnPlayer(JSONObject settings) {
+        JSONArray pos = settings.getJSONArray("spawn");
+        flying = settings.has("fly") && settings.getBoolean("fly");
+        invisible = settings.has("invisible") && settings.getBoolean("invisible");
+        blockedKeys = settings.has("blockedKeys") && settings.getBoolean("blockedKeys");
+        noclip = settings.has("noclip") && settings.getBoolean("noclip");
+        velX = 0;
+        velY = 0;
+        x = pos.getInt(0) * 16 + 8;
+        y = pos.getInt(1) * 16;
+        jumps = 1;
+    }
 
     public Rectangle2D getHitbox() {
         return new Rectangle2D.Float(x - 8, y + 16, 16, 32);
@@ -307,6 +313,10 @@ public class Player {
 
     public void setDcc(float dcc) {
         this.dcc = dcc;
+    }
+
+    public BufferedImage getCurrentTexture() {
+        return textureMap.get(currentTexture).getTexture();
     }
 
     private void pullTextures() {

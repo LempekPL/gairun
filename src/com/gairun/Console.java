@@ -11,7 +11,7 @@ import java.util.Objects;
 public class Console {
     private final Game game;
     private final String[] commands = new String[]{
-            "teleport", "fly", "noclip",
+            "teleport", "fly", "noclip", "blockKeys",
             "invisible", "loadmap", "gamespeed",
             "framerate", "debug", "scale",
             "teleportCamera", "clear", "help",
@@ -125,6 +125,14 @@ public class Console {
                             game.getPlayer().setInvisible(!game.getPlayer().isInvisible());
                         }
                     }
+                    case "blockKeys" -> {
+                        if (commandString.length >= 2) {
+                            if (Objects.equals(commandString[1], "true")) game.getPlayer().setBlockedKeys(true);
+                            else if (Objects.equals(commandString[1], "false")) game.getPlayer().setBlockedKeys(false);
+                        } else {
+                            game.getPlayer().setBlockedKeys(!game.getPlayer().isBlockedKeys());
+                        }
+                    }
                     case "gamespeed" -> {
                         if (commandString.length >= 2) {
                             if (Objects.equals(commandString[1], "set") && commandString.length >= 3) {
@@ -146,21 +154,21 @@ public class Console {
                         if (commandString.length >= 2) {
                             if (Objects.equals(commandString[1], "set") && commandString.length >= 3) {
                                 double old = game.getFramerate();
-                                game.setFramerate(Double.parseDouble(commandString[1]));
+                                game.setFramerate(Double.parseDouble(commandString[2]));
                                 if (game.getFramerate() < 0 || game.getFramerate() > 500) {
-                                    game.setGameSpeed(old);
+                                    game.setFramerate(old);
                                 }
                                 game.setLimitedFrames(true);
                             } else if (Objects.equals(commandString[1], "off")) {
                                 game.setLimitedFrames(false);
                             } else if (Objects.equals(commandString[1], "default")) {
-                                game.setGameSpeed(60);
+                                game.setFramerate(60);
                                 game.setLimitedFrames(true);
                             } else {
-                                commandLine.add("&Q Current frame limit: %s".formatted(game.getGameSpeed()));
+                                commandLine.add("&Q Current frame limit: %s".formatted(game.getFramerate()));
                             }
                         } else {
-                            commandLine.add("&Q Current frame limit: %s".formatted(game.getGameSpeed()));
+                            commandLine.add("&Q Current frame limit: %s".formatted(game.getFramerate()));
                         }
                     }
                     case "debug" -> {
@@ -294,7 +302,7 @@ public class Console {
         if (commandString.length == 1 || commandString[1] == null) {
             commandLine.add("&Q Use \"help <command>\" to get help about command");
             commandLine.add("&Q Avaiable commands:");
-            commandLine.add("&Q     teleport, fly, noclip, invisible, (WIP) playerMaxSpeed,");
+            commandLine.add("&Q     teleport, fly, noclip, invisible, blockKeys, (WIP) playerMaxSpeed,");
             commandLine.add("&Q     map, gamespeed, framerate,");
             commandLine.add("&Q     debug, scale, (WIP) teleportCamera, (WIP) stopCamera, (WIP) cameraFollowSpeed");
             commandLine.add("&Q     clear");
@@ -321,6 +329,10 @@ public class Console {
                 case "invisible" -> {
                     commandLine.add("&Q Makes player invisible");
                     commandLine.add("&Q Example: 'invisible' or 'invisible <boolean state>'");
+                }
+                case "blockKeys" -> {
+                    commandLine.add("&Q Blocks player movement");
+                    commandLine.add("&Q Example: 'blockKeys' or 'blockKeys <boolean state>'");
                 }
                 case "loadmap", "map" -> {
                     commandLine.add("&Q Changes map");

@@ -1,8 +1,10 @@
 {
-  "playerSpawn": [
-    4,
-    4
-  ],
+  "playerSettings": {
+    "spawn": [
+      4,
+      4
+    ]
+  },
   "usedBlocks": {
     "L": "res/lightPads",
     "B": "res/block"

@@ -1,8 +1,10 @@
 {
-  "playerSpawn": [
-    1,
-    1
-  ],
+  "playerSettings": {
+    "spawn": [
+      1,
+      1
+    ]
+  },
   "usedBlocks": {
     "B": "res/default_block",
     "C": "res/brick",

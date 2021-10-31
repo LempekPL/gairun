@@ -22,18 +22,16 @@ public class BackgroundController {
         this.game = game;
     }
 
-    public void render(Graphics g) {
-        if (loading || backgroundMap == null || currentBackground == null) return;
-        float xRender = game.getCamera().getX();
-        float yRender = -game.getCamera().getY();
-        g.drawImage(backgroundMap.get(currentBackground).getTexture(), (int) xRender, (int) yRender, null);
-    }
-
     public void tick() {
         if (loading || backgroundMap == null) return;
         if (currentBackground == null) {
             currentBackground = "main";
         }
+    }
+
+    public void render(Graphics g) {
+        if (loading || backgroundMap == null || currentBackground == null) return;
+        g.drawImage(backgroundMap.get(currentBackground).getTexture(), (int) game.getCamera().getX(), (int) -game.getCamera().getY(), null);
     }
 
     public void loadNewBackgrounds(JSONObject backgroundsJSON) {

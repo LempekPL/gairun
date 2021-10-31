@@ -1,17 +1,18 @@
 {
   "playerSettings": {
     "spawn": [
-      5,
-      16
+      0,
+      0
     ],
     "invisible": true,
     "blockedKeys": true,
-    "noclip": true,
-    "fly": true
+    "noclip": true
   },
   "usedBlocks": {
-    "L": "res/light_pad",
-    "C": "res/glue"
+    "L": "res/light_pad"
+  },
+  "buttons": {
+    
   },
   "requiredResourcePacks": []
 }

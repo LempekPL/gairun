@@ -27,6 +27,14 @@ public class MapController {
         this.game = game;
     }
 
+    public void tick() {
+        if (!loading) {
+            textureController.getTextureMap().forEach((key, tex) -> {
+                tex.runAnimation();
+            });
+        }
+    }
+
     public void render(Graphics g) {
         if (!loading && blocks.size() > 0) {
             for (List<Blocks> blockList : blocks) {
@@ -34,14 +42,6 @@ public class MapController {
                     block.render(g);
                 }
             }
-        }
-    }
-
-    public void tick() {
-        if (!loading) {
-            textureController.getTextureMap().forEach((key, tex) -> {
-                tex.runAnimation();
-            });
         }
     }
 
@@ -80,8 +80,8 @@ public class MapController {
         currentSet = mapSet;
         currentMap = mapId;
 
-        JSONArray playerPos = mapJSON.getJSONArray("playerSpawn");
-        game.getPlayer().spawnPlayer((int) playerPos.get(0) * 16, (int) playerPos.get(1) * 16);
+        JSONObject playerSettings = mapJSON.getJSONObject("playerSettings");
+        game.getPlayer().spawnPlayer(playerSettings);
         game.getCamera().centerOnPlayer();
 
         if (mapJSON.has("backgrounds")) {
