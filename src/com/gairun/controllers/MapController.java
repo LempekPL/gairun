@@ -39,8 +39,6 @@ public class MapController {
     public void tick() {
         if (!loading) {
             textureController.getTextureMap().forEach((key, tex) -> {
-                System.out.println(key);
-                System.out.println(tex);
                 tex.runAnimation();
             });
         }

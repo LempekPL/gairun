@@ -20,8 +20,7 @@ public class Texture {
 
     public Texture(BufferedImage image, JSONObject imageData) {
         this.image = image;
-        this.imageData = imageData;
-        System.out.println(imageData);
+        this.imageData = imageData;s
         loadTexture();
     }
 
