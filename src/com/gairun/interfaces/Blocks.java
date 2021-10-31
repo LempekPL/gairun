@@ -27,7 +27,7 @@ public class Blocks {
     }
 
     public void render(Graphics g) {
-        if (x < game.getCamera().getX() + (float) (Game.WIDTH/2) && x > game.getCamera().getX() - (float) (Game.WIDTH/2) && y < game.getCamera().getY() + (float) (Game.HEIGHT/2) && y > game.getCamera().getY() - (float) (Game.HEIGHT/2)) {
+        if (x < game.getCamera().getX() + (float) (Game.WIDTH/2) && x > game.getCamera().getX() - (float) (Game.WIDTH/2) - 16 && y < game.getCamera().getY() + (float) (Game.HEIGHT/2) + 16 && y > game.getCamera().getY() - (float) (Game.HEIGHT/2)) {
             float xRender = x + (float) Game.WIDTH / 2;
             float yRender = -y + (float) Game.HEIGHT / 2;
             g.drawImage(tex.getTexture(), (int) xRender, (int) yRender, null);
@@ -37,10 +37,6 @@ public class Blocks {
                 g.drawRect((int) mainHitbox.getX() + Game.WIDTH / 2, (int) -mainHitbox.getY() + Game.HEIGHT / 2, (int) mainHitbox.getWidth(), (int) mainHitbox.getHeight());
             }
         }
-    }
-
-    public void tick() {
-        tex.runAnimation();
     }
 
     public Rectangle2D getHitbox() {
