@@ -23,7 +23,7 @@ public class TextureController {
             FileReader errorJSONfile = new FileReader("res/data/block/error.json");
             errorJSON = new JSONObject(new JSONTokener(errorJSONfile));
             errorJSON = errorJSON.getJSONObject("texture");
-            String errorPATH = errorJSON.get("path").toString();
+            String errorPATH = errorJSON.getString("path");
             textureMap.put("error", new Texture(ImageIO.read(new File("res/textures/block/%s.png".formatted(errorPATH.split("/")[1]))), errorJSON));
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,7 +37,7 @@ public class TextureController {
                         FileReader textureJSONfile = new FileReader("res/data/block/%s.json".formatted(place[1]));
                         JSONObject textureJSON = new JSONObject(new JSONTokener(textureJSONfile));
                         textureJSON = textureJSON.getJSONObject("texture");
-                        String texturePATH = textureJSON.get("path").toString();
+                        String texturePATH = textureJSON.getString("path");
                         // TODO: add custom pack/resPackName/block.png texture ability
                         File imageFile = new File("res/textures/block/%s.png".formatted(texturePATH.split("/")[1]));
                         BufferedImage tempImage = ImageIO.read(imageFile);

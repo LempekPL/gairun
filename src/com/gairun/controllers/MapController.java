@@ -21,6 +21,7 @@ public class MapController {
     private String currentSet;
     private String currentMap;
     private boolean loading = true;
+    private JSONObject backgroundsJSON;
 
     public MapController(Game game) {
         this.game = game;
@@ -48,6 +49,7 @@ public class MapController {
         loading = true;
         List<List<String>> tempMapLayout = new ArrayList<>();
         List<List<Blocks>> tempBlocks = new ArrayList<>();
+        backgroundsJSON = null;
         JSONObject mapJSON = null;
         try (BufferedReader br = new BufferedReader(new FileReader("res/maps/%s/%s.csv".formatted(mapSet, mapId)))) {
             String line;
@@ -81,6 +83,11 @@ public class MapController {
         JSONArray playerPos = mapJSON.getJSONArray("playerSpawn");
         game.getPlayer().spawnPlayer((int) playerPos.get(0) * 16, (int) playerPos.get(1) * 16);
         game.getCamera().centerOnPlayer();
+
+        if (mapJSON.has("backgrounds")) {
+            backgroundsJSON = mapJSON.getJSONObject("backgrounds");
+            game.getBackgroundController().loadNewBackgrounds(backgroundsJSON);
+        }
         loading = false;
     }
 
@@ -115,6 +122,10 @@ public class MapController {
 
     public String getCurrentMapId() {
         return currentMap;
+    }
+
+    public JSONObject getBackgroundsJSON() {
+        return backgroundsJSON;
     }
 
     //    public void loadMap(String resourcePackName, String mapSet, String mapId) {

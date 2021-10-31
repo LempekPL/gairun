@@ -1,5 +1,6 @@
 package com.gairun;
 
+import com.gairun.controllers.BackgroundController;
 import com.gairun.controllers.KeyInput;
 import com.gairun.controllers.MapController;
 import com.gairun.interfaces.Blocks;
@@ -36,6 +37,7 @@ public class Game extends Canvas implements Runnable {
     private Player p;
     private Camera cam;
     private MapController mapController;
+    private BackgroundController bgController;
     private KeyInput keyListener;
     private Console console;
 
@@ -54,6 +56,7 @@ public class Game extends Canvas implements Runnable {
         p = new Player(0, 0, this);
         cam = new Camera(0, 0, this);
         mapController = new MapController(this);
+        bgController = new BackgroundController(this);
         console = new Console(this);
         keyListener = new KeyInput(this);
         addKeyListener(keyListener);
@@ -109,6 +112,7 @@ public class Game extends Canvas implements Runnable {
         cam.tick();
         p.tick();
         mapController.tick();
+        bgController.tick();
         console.tick();
     }
 
@@ -131,6 +135,7 @@ public class Game extends Canvas implements Runnable {
         g2d.translate((int) -cam.getX(), (int) cam.getY());
 
         // rendering
+        bgController.render(g);
         p.render(g);
         mapController.render(g);
         console.render(gCopy);
@@ -192,6 +197,10 @@ public class Game extends Canvas implements Runnable {
 
     public MapController getMapController() {
         return mapController;
+    }
+
+    public BackgroundController getBackgroundController() {
+        return bgController;
     }
 
     public KeyInput getKeyListener() {

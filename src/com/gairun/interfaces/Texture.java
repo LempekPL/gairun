@@ -20,7 +20,7 @@ public class Texture {
 
     public Texture(BufferedImage image, JSONObject imageData) {
         this.image = image;
-        this.imageData = imageData;s
+        this.imageData = imageData;
         loadTexture();
     }
 
@@ -53,7 +53,11 @@ public class Texture {
             }
             animated = true;
         }
-        currentImage = image.getSubimage(0, 0, imageData.getInt("width"), imageData.getInt("height"));
+        if (imageData.has("width") && imageData.has("height")) {
+            currentImage = image.getSubimage(0, 0, imageData.getInt("width"), imageData.getInt("height"));
+        } else {
+            currentImage = image.getSubimage(0, 0, image.getWidth(), image.getHeight());
+        }
     }
 
     public BufferedImage getTexture() {
