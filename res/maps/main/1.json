@@ -9,5 +9,16 @@
     "U": "res/glue",
     "I": "res/ice"
   },
+  "backgrounds": {
+    "main": {
+      "type": "static",
+      "color": {
+        "R": 66,
+        "G": 166,
+        "B": 194,
+        "A": 255
+      }
+    }
+  },
   "requiredResourcePacks": []
 }
