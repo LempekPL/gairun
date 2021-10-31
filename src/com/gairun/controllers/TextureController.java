@@ -20,9 +20,11 @@ public class TextureController {
         textureMap = new HashMap<>();
         JSONObject errorJSON = null;
         try {
-            FileReader errorJSONfile = new FileReader("res/textures/error.json");
+            FileReader errorJSONfile = new FileReader("res/data/block/error.json");
             errorJSON = new JSONObject(new JSONTokener(errorJSONfile));
-            textureMap.put("error", new Texture(ImageIO.read(new File("res/textures/error.png")), errorJSON));
+            errorJSON = errorJSON.getJSONObject("texture");
+            String errorPATH = errorJSON.get("path").toString();
+            textureMap.put("error", new Texture(ImageIO.read(new File("res/textures/block/%s.png".formatted(errorPATH.split("/")[1]))), errorJSON));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -31,14 +33,17 @@ public class TextureController {
             if (Objects.equals(place[0], "res")) {
                 try {
                     Texture tempTex;
-                    File imageFile = new File("res/textures/%s.png".formatted(place[1]));
-                    if (imageFile.isFile() && new File("res/textures/%s.json".formatted(place[1])).isFile()) {
-                        FileReader textureJSONfile = new FileReader("res/textures/%s.json".formatted(place[1]));
-                        BufferedImage tempImage = ImageIO.read(imageFile);
+                    if (new File("res/data/block/%s.json".formatted(place[1])).isFile()) {
+                        FileReader textureJSONfile = new FileReader("res/data/block/%s.json".formatted(place[1]));
                         JSONObject textureJSON = new JSONObject(new JSONTokener(textureJSONfile));
+                        textureJSON = textureJSON.getJSONObject("texture");
+                        String texturePATH = textureJSON.get("path").toString();
+                        // TODO: add custom pack/resPackName/block.png texture ability
+                        File imageFile = new File("res/textures/block/%s.png".formatted(texturePATH.split("/")[1]));
+                        BufferedImage tempImage = ImageIO.read(imageFile);
                         tempTex = new Texture(tempImage, textureJSON);
                     } else {
-                        tempTex = new Texture(ImageIO.read(new File("res/textures/error.png")), errorJSON);
+                        tempTex = new Texture(ImageIO.read(new File("res/textures/block/error.png")), errorJSON);
                     }
                     textureMap.put(texture.getKey(), tempTex);
                 } catch (IOException e) {

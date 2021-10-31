@@ -1,0 +1,25 @@
+{
+  "hitbox": {
+    "width": 16,
+    "height": 16
+  },
+  "texture": {
+    "path": "res/light_pad",
+    "width": 16,
+    "height": 16,
+    "animation": {
+      "speed": 8,
+      "frames": 8,
+      "frameOrder": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    }
+  }
+}

@@ -315,10 +315,12 @@ public class Player {
         for (String anName : animationName) {
             try {
                 Texture tempTex;
-                File imageFile = new File("res/textures/player/%s.png".formatted(anName));
-                FileReader textureJSONfile = new FileReader("res/textures/player/%s.json".formatted(anName));
-                BufferedImage tempImage = ImageIO.read(imageFile);
+                FileReader textureJSONfile = new FileReader("res/data/player/%s.json".formatted(anName));
                 JSONObject textureJSON = new JSONObject(new JSONTokener(textureJSONfile));
+                textureJSON = textureJSON.getJSONObject("texture");
+                String texturePATH = textureJSON.get("path").toString();
+                File imageFile = new File("res/textures/player/%s.png".formatted(texturePATH.split("/")[1]));
+                BufferedImage tempImage = ImageIO.read(imageFile);
                 tempTex = new Texture(tempImage, textureJSON);
                 textureMap.put(anName, tempTex);
             } catch (IOException e) {

@@ -4,8 +4,8 @@
     1
   ],
   "usedBlocks": {
-    "B": "res/block",
-    "C": "res/blokiv1",
+    "B": "res/default_block",
+    "C": "res/brick",
     "U": "res/glue",
     "I": "res/ice"
   },

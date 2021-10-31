@@ -1,0 +1,11 @@
+{
+  "hitbox": {
+    "width": 16,
+    "height": 16
+  },
+  "texture": {
+    "path": "res/glue",
+    "width": 16,
+    "height": 16
+  }
+}

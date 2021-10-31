@@ -59,7 +59,7 @@ public class Console {
                 consoleCommand = commandHistory.get(commandHistory.size() - lastSelected);
             }
         }
-        if (commandHistory.size() > 40) {
+        if (commandHistory.size() > 100) {
             commandHistory.remove(0);
         }
         if (Objects.equals(consoleCommand, "")) {
@@ -233,7 +233,7 @@ public class Console {
         g.setColor(Color.white);
         g.drawString(consoleCommand + blinker, 22, Game.HEIGHT - 50);
         for (int i = 0; i < commandLine.size(); i++) {
-            if ((commandLine.size() - i) > 40) commandLine.remove(0);
+            if ((commandLine.size() - i) > 60) commandLine.remove(0);
             String renderText = commandLine.get(i);
             if (renderText.startsWith("&")) {
                 switch (renderText.charAt(1)) {

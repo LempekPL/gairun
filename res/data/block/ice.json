@@ -1,0 +1,12 @@
+{
+  "hitbox": {
+    "width": 16,
+    "height": 16
+  },
+  "texture": {
+    "path": "res/error",
+    "width": 16,
+    "height": 16
+  },
+  "minscript": "ice"
+}

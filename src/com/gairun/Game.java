@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Objects;
 
 // TODO: custom screen size (settings > create file > restart game > load external file > set screen size)
-// TODO: check why when player walks in diagonal (press W and D) and collides with blocks above and is "outside" rendered map
-//  then he "glitches" and moves fast in left or when player is in blocks (only happenes when fly is enabled), tempfix: just make additional 2 rows of "-" at the bottom
+// TODO: check why when player walks in diagonal (press W and D) and collides with data above and is "outside" rendered map
+//  then he "glitches" and moves fast in left or when player is in data (only happenes when fly is enabled), tempfix: just make additional 2 rows of "-" at the bottom
 
 public class Game extends Canvas implements Runnable {
     // game values
@@ -148,7 +148,7 @@ public class Game extends Canvas implements Runnable {
             g.drawRect((int) xRender, (int) yRender, cam.getCameraMovementLimit() * 2, cam.getCameraMovementLimit() * 2);
             gCopy.setColor(Color.white);
             gCopy.drawString("XY: %s, %s".formatted((float) Math.round(p.getX() / 16 * 1000) / 1000, (float) Math.round(p.getY() / 16 * 1000) / 1000), 5, 25);
-            gCopy.drawString("XY: %s, %s".formatted(p.getX(), p.getY()), 5, 40);
+            gCopy.drawString("px XY: %s, %s".formatted(p.getX(), p.getY()), 5, 40);
         } else {
             // fps counter
             gCopy.setColor(Color.green);
