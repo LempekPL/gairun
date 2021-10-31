@@ -24,7 +24,6 @@ public class Game extends Canvas implements Runnable {
     // .../ 12 * 9 for 12:9
     public static final int HEIGHT = WIDTH / 12 * 9;
     public final String TITLE = "gairun";
-    private final List<String> consoleHistory = new ArrayList<>();
     private double gameSpeed = 1;
     private double framerate = 60.0;
     private int lastFrames;
@@ -38,9 +37,7 @@ public class Game extends Canvas implements Runnable {
     private Camera cam;
     private MapController mapController;
     private KeyInput keyListener;
-    // console
-    private boolean consoleOpened;
-    private String consoleCommand = "";
+    private Console console;
 
     public Game() {
         new Window(WIDTH, HEIGHT, TITLE, this);
@@ -57,6 +54,7 @@ public class Game extends Canvas implements Runnable {
         p = new Player(0, 0, this);
         cam = new Camera(0, 0, this);
         mapController = new MapController(this);
+        console = new Console(this);
         keyListener = new KeyInput(this);
         addKeyListener(keyListener);
         mapController.loadMap("menu", "start");
@@ -111,76 +109,7 @@ public class Game extends Canvas implements Runnable {
         cam.tick();
         p.tick();
         mapController.tick();
-        if (keyListener.checkKey(KeyEvent.VK_SLASH)) {
-            consoleOpened = !consoleOpened;
-        }
-        if (consoleOpened && keyListener.checkKey(KeyEvent.VK_ENTER) && consoleCommand.length() > 0) {
-            String[] commandString = consoleCommand.split(" ");
-            switch (commandString[0]) {
-                case "loadmap" -> {
-                    consoleHistory.add(consoleCommand);
-                    if (commandString[1] == null || commandString[2] == null) {
-                        System.out.println("SOMETHING IS MISSING");
-                    } else {
-                        mapController.loadMap(commandString[1], commandString[2]);
-                    }
-                }
-                case "fly" -> {
-                    consoleHistory.add(consoleCommand);
-                    p.setFlying(!p.isFlying());
-                }
-                case "debug" -> {
-                    consoleHistory.add(consoleCommand);
-                    cam.setDebug(!cam.isDebug());
-                }
-                case "teleport", "tp" -> {
-                    consoleHistory.add(consoleCommand);
-                    float toSpawnX = (int) Float.parseFloat(commandString[1]);
-                    if (Float.parseFloat(commandString[1]) != toSpawnX) {
-                        toSpawnX = Float.parseFloat(commandString[1]) - 0.5F;
-                    }
-                    p.spawnPlayer(toSpawnX * 16, Float.parseFloat(commandString[2]) * 16);
-                }
-                case "gamespeed" -> {
-                    consoleHistory.add(consoleCommand);
-                    gameSpeed = Double.parseDouble(commandString[1]);
-                    if (gameSpeed < 0) {
-                        gameSpeed = 1;
-                    }
-                }
-                case "noclip" -> {
-                    consoleHistory.add(consoleCommand);
-                    p.setNoclip(!p.isNoclip());
-                }
-                case "invisible" -> {
-                    consoleHistory.add(consoleCommand);
-                    p.setInvisible(!p.isInvisible());
-                }
-                case "framerate" -> {
-                    consoleHistory.add(consoleCommand);
-                    double parsedFramerate = Double.parseDouble(commandString[1]);
-                    if (parsedFramerate > 0 && parsedFramerate <= 500) {
-                        framerate = parsedFramerate;
-                        limitedFrames = true;
-                    } else {
-                        limitedFrames = false;
-                    }
-                }
-                case "scale" -> {
-                    consoleHistory.add(consoleCommand);
-                    if (Objects.equals(commandString[1], "off")) {
-                        cam.setScale(2);
-                        cam.setScaling(true);
-                    } else if (Objects.equals(commandString[1], "set")) {
-                        float parsedScale = Float.parseFloat(commandString[2]);
-                        cam.setScale(parsedScale);
-                        cam.setScaling(false);
-                    }
-                }
-            }
-            consoleCommand = "";
-            consoleOpened = false;
-        }
+        console.tick();
     }
 
     private void render() {
@@ -200,28 +129,14 @@ public class Game extends Canvas implements Runnable {
         g2d.translate(WIDTH * (1 - cam.getScale()) / 2, HEIGHT * (1 - cam.getScale()) / 2);
         g2d.scale(cam.getScale(), cam.getScale());
         g2d.translate((int) -cam.getX(), (int) cam.getY());
+
         // rendering
         p.render(g);
         mapController.render(g);
-        g.setColor(Color.green);
-        g.setFont(new Font("TimesRoman", Font.PLAIN, 5));
-        for (List<Blocks> blockList : mapController.getMapBlocks()) {
-            for (Blocks block : blockList) {
-                g.drawString("x: %s".formatted((int) block.getX()), (int) block.getX() + Game.WIDTH/2, (int) -block.getY() + Game.HEIGHT / 2 + 5);
-                g.drawString("y: %s".formatted((int) block.getY()), (int) block.getX() + Game.WIDTH/2, (int) -block.getY() + Game.HEIGHT / 2 + 10);
-            }
-        }
-        // console
-        if (consoleOpened) {
-            gCopy.setColor(new Color(50, 50, 50, 127));
-            gCopy.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
-            gCopy.setColor(Color.white);
-            gCopy.drawString(">" + consoleCommand, 40, 40);
-            for (int i = 0; i < consoleHistory.size(); i++) {
-                gCopy.drawString(consoleHistory.get(i), 50, (consoleHistory.size() - i) * 11 + 50);
-            }
-        }
+        console.render(gCopy);
+
         // debug camera
+        gCopy.setFont(new Font("Default", Font.PLAIN, 12));
         if (cam.isDebug()) {
             // fps and ticks counter
             gCopy.setColor(Color.green);
@@ -271,6 +186,10 @@ public class Game extends Canvas implements Runnable {
         return cam;
     }
 
+    public Console getConsole() {
+        return console;
+    }
+
     public MapController getMapController() {
         return mapController;
     }
@@ -283,20 +202,8 @@ public class Game extends Canvas implements Runnable {
         return lastFrames;
     }
 
-    public boolean isConsoleOpened() {
-        return consoleOpened;
-    }
-
     public String getTITLE() {
         return TITLE;
-    }
-
-    public String getConsoleCommand() {
-        return consoleCommand;
-    }
-
-    public void setConsoleCommand(String consoleCommand) {
-        this.consoleCommand = consoleCommand;
     }
 
     public double getGameSpeed() {
@@ -305,5 +212,21 @@ public class Game extends Canvas implements Runnable {
 
     public void setGameSpeed(double gameSpeed) {
         this.gameSpeed = gameSpeed;
+    }
+
+    public double getFramerate() {
+        return framerate;
+    }
+
+    public void setFramerate(double framerate) {
+        this.framerate = framerate;
+    }
+
+    public boolean isLimitedFrames() {
+        return limitedFrames;
+    }
+
+    public void setLimitedFrames(boolean limitedFrames) {
+        this.limitedFrames = limitedFrames;
     }
 }

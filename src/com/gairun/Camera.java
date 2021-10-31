@@ -8,6 +8,7 @@ public class Camera {
     private float scale = 2;
     private boolean debug = false;
     private boolean scaling = true;
+    private boolean followingPlayer = true;
 
     public Camera(int x, int y, Game game) {
         this.x = x;
@@ -16,17 +17,19 @@ public class Camera {
     }
 
     public void tick() {
-        float playerX = game.getPlayer().getX();
-        float playerY = game.getPlayer().getY();
-        if (x - cameraMovementLimit > playerX) {
-            x += (playerX - x + cameraMovementLimit) / cameraMovementLimit;
-        } else if (x + cameraMovementLimit < playerX) {
-            x += (playerX - x - cameraMovementLimit) / cameraMovementLimit;
-        }
-        if (y - cameraMovementLimit > playerY) {
-            y += (playerY - y + cameraMovementLimit) / cameraMovementLimit;
-        } else if (y + cameraMovementLimit < playerY) {
-            y += (playerY - y - cameraMovementLimit) / cameraMovementLimit;
+        if (followingPlayer) {
+            float playerX = game.getPlayer().getX();
+            float playerY = game.getPlayer().getY();
+            if (x - cameraMovementLimit > playerX) {
+                x += (playerX - x + cameraMovementLimit) / cameraMovementLimit;
+            } else if (x + cameraMovementLimit < playerX) {
+                x += (playerX - x - cameraMovementLimit) / cameraMovementLimit;
+            }
+            if (y - cameraMovementLimit > playerY) {
+                y += (playerY - y + cameraMovementLimit) / cameraMovementLimit;
+            } else if (y + cameraMovementLimit < playerY) {
+                y += (playerY - y - cameraMovementLimit) / cameraMovementLimit;
+            }
         }
         if (scaling) {
             if (game.getPlayer().getVelX() != 0 || game.getPlayer().getVelY() > 2 || game.getPlayer().getVelY() < -2) {
@@ -50,8 +53,16 @@ public class Camera {
         return x;
     }
 
+    public void setX(float x) {
+        this.x = x;
+    }
+
     public float getY() {
         return y;
+    }
+
+    public void setY(float y) {
+        this.y = y;
     }
 
     public float getScale() {
@@ -80,6 +91,14 @@ public class Camera {
 
     public void setScaling(boolean scaling) {
         this.scaling = scaling;
+    }
+
+    public boolean isFollowingPlayer() {
+        return followingPlayer;
+    }
+
+    public void setFollowingPlayer(boolean followingPlayer) {
+        this.followingPlayer = followingPlayer;
     }
 }
 

@@ -28,10 +28,10 @@ public class Player {
     private float y;
     private float velX;
     private float velY;
-//    private float acc = 0.15F;
-//    private float dcc = 0.05F;
-    private float acc = 0.55F;
-    private float dcc = 1.05F;
+    private float acc = 0.15F;
+    private float dcc = 0.05F;
+    //    private float acc = 0.55F;
+//    private float dcc = 1.05F;
     private int jumps = 1;
     private boolean flying = false;
     private boolean invisible = false;
@@ -47,6 +47,7 @@ public class Player {
     }
 
     public void tick() {
+        blockedKeys = game.getConsole().isOpened();
         if (!noclip) {
             collisionCheck();
         }
@@ -62,9 +63,7 @@ public class Player {
         y += velY;
         x += velX;
 
-        if (!blockedKeys) {
-            keyCheck();
-        }
+        keyCheck();
 
         if (flying) {
             velX = clamp(velX, -4, 4);
@@ -131,7 +130,7 @@ public class Player {
     }
 
     private void wallJump(Blocks block) {
-        if (!flying && jumps <= 0 && !game.isConsoleOpened()) {
+        if (!flying && jumps <= 0) {
             if (getWallRight().intersects(block.getHitbox()) && game.getKeyListener().checkKey(KeyEvent.VK_W)) {
                 velY = 3.5f;
                 velX = -2;
@@ -160,33 +159,33 @@ public class Player {
 
     // horizontal movement
     private void horizontalMove(List<Integer> inputs) {
-        if (inputs.contains(KeyEvent.VK_D) && !game.isConsoleOpened()) {
+        if (inputs.contains(KeyEvent.VK_D) && !blockedKeys) {
             velX += acc;
-        } else if (inputs.contains(KeyEvent.VK_A) && !game.isConsoleOpened()) {
+        } else if (inputs.contains(KeyEvent.VK_A) && !blockedKeys) {
             velX -= acc;
         } else if (!inputs.contains(KeyEvent.VK_D) && !inputs.contains(KeyEvent.VK_A)) {
             if (velX > 0) velX -= dcc;
             else if (velX < 0) velX += dcc;
-            if (velX > -dcc*2 && velX < dcc*2) velX = 0;
+            if (velX > -dcc * 2 && velX < dcc * 2) velX = 0;
         }
     }
 
     // vertical movement, if flying is set to true
     private void verticalMove(List<Integer> inputs) {
-        if (inputs.contains(KeyEvent.VK_W) && !game.isConsoleOpened()) {
+        if (inputs.contains(KeyEvent.VK_W) && !blockedKeys) {
             velY += acc;
-        } else if (inputs.contains(KeyEvent.VK_S) && !game.isConsoleOpened()) {
+        } else if (inputs.contains(KeyEvent.VK_S) && !blockedKeys) {
             velY -= acc;
         } else if (!inputs.contains(KeyEvent.VK_W) && !inputs.contains(KeyEvent.VK_S)) {
             if (velY > 0) velY -= dcc;
             else if (velY < 0) velY += dcc;
-            if (velY > -0.1 && velY < 0.1) velY = 0;
+            if (velY > -dcc * 2 && velY < dcc * 2) velY = 0;
         }
     }
 
     // jumping with gravitational pull
     private void jumping() {
-        if (jumps > 0 && game.getKeyListener().checkKey(KeyEvent.VK_W) && !game.isConsoleOpened()) {
+        if (!blockedKeys && jumps > 0 && game.getKeyListener().checkKey(KeyEvent.VK_W)) {
             velY = 4;
             jumps--;
         }
@@ -292,6 +291,22 @@ public class Player {
 
     public void setNoclip(boolean noclip) {
         this.noclip = noclip;
+    }
+
+    public float getAcc() {
+        return acc;
+    }
+
+    public void setAcc(float acc) {
+        this.acc = acc;
+    }
+
+    public float getDcc() {
+        return dcc;
+    }
+
+    public void setDcc(float dcc) {
+        this.dcc = dcc;
     }
 
     private void pullTextures() {
