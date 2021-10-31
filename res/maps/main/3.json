@@ -4,11 +4,8 @@
     4
   ],
   "usedBlocks": {
-    "B": "res/block",
-    "C": "res/blockiv1",
     "L": "res/lightPads",
-    "U": "res/glue",
-    "E": "res/ice"
+    "B": "res/block"
   },
   "requiredResourcePacks": []
 }

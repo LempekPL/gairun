@@ -11,15 +11,16 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class MapController {
+    private final Game game;
+    private TextureController textureController;
     private List<List<Blocks>> blocks;
     private String currentSet;
     private String currentMap;
     private boolean loading = true;
-    private final Game game;
 
     public MapController(Game game) {
         this.game = game;
@@ -36,12 +37,12 @@ public class MapController {
     }
 
     public void tick() {
-        if (!loading && blocks.size() > 0) {
-            for (List<Blocks> blockList : blocks) {
-                for (Blocks block : blockList) {
-                    block.tick();
-                }
-            }
+        if (!loading) {
+            textureController.getTextureMap().forEach((key, tex) -> {
+                System.out.println(key);
+                System.out.println(tex);
+                tex.runAnimation();
+            });
         }
     }
 
@@ -64,7 +65,7 @@ public class MapController {
         if (mapJSON == null) return;
         // TODO: add resource pack textures
 
-        TextureController textureController = new TextureController();
+        textureController = new TextureController();
         Map<String, Object> mapOfBlocks = mapJSON.getJSONObject("usedBlocks").toMap();
         textureController.loadTextureList(mapOfBlocks);
 
@@ -89,7 +90,7 @@ public class MapController {
         if (!Objects.equals(tempMapLayout.get(i).get(j), "-")) {
             if (tempMapLayout.get(i).get(j).contains("|")) {
                 String[] tempOneBlockList = tempMapLayout.get(i).get(j).split("\\|");
-                for (String block: tempOneBlockList) {
+                for (String block : tempOneBlockList) {
                     createBlock(block, tempMapLayout, tempBlocksList, textureController, i, j);
                 }
             } else {
