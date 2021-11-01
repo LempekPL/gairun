@@ -1,0 +1,11 @@
+{
+  "hitbox": {
+    "width": 8,
+    "height": 8
+  },
+  "texture": {
+    "path": "res/brick_right",
+    "width": 16,
+    "height": 16
+  }
+}

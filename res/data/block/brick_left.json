@@ -1,0 +1,12 @@
+{
+  "hitbox": {
+    "width": 8,
+    "height": 8,
+    "offset": [8, 0]
+  },
+  "texture": {
+    "path": "res/brick_left",
+    "width": 16,
+    "height": 16
+  }
+}

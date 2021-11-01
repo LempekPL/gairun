@@ -15,16 +15,24 @@ import java.util.Objects;
 
 public class TextureController {
     private Map<String, Texture> textureMap;
+    private Map<String, int[]> hitboxMap;
 
     public void loadTextureList(Map<String, Object> textureList) {
         textureMap = new HashMap<>();
+        hitboxMap = new HashMap<>();
         JSONObject errorJSON = null;
+        JSONObject errorJSONtex = null;
         try {
             FileReader errorJSONfile = new FileReader("res/data/block/error.json");
             errorJSON = new JSONObject(new JSONTokener(errorJSONfile));
-            errorJSON = errorJSON.getJSONObject("texture");
-            String errorPATH = errorJSON.getString("path");
-            textureMap.put("error", new Texture(ImageIO.read(new File("res/textures/block/%s.png".formatted(errorPATH.split("/")[1]))), errorJSON));
+            errorJSONtex = errorJSON.getJSONObject("texture");
+            String errorPATH = errorJSONtex.getString("path");
+            textureMap.put("error", new Texture(ImageIO.read(new File("res/textures/block/%s.png".formatted(errorPATH.split("/")[1]))), errorJSONtex));
+            if (errorJSON.has("hitbox")) {
+                hitboxMap.put("error", new int[]{errorJSON.getJSONObject("hitbox").getInt("width"), errorJSON.getJSONObject("hitbox").getInt("height")});
+            } else {
+                hitboxMap.put("error", new int[]{0, 0});
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -33,19 +41,32 @@ public class TextureController {
             if (Objects.equals(place[0], "res")) {
                 try {
                     Texture tempTex;
+                    int[] tempHitbox;
                     if (new File("res/data/block/%s.json".formatted(place[1])).isFile()) {
                         FileReader textureJSONfile = new FileReader("res/data/block/%s.json".formatted(place[1]));
                         JSONObject textureJSON = new JSONObject(new JSONTokener(textureJSONfile));
-                        textureJSON = textureJSON.getJSONObject("texture");
-                        String texturePATH = textureJSON.getString("path");
+                        JSONObject textureJSONtex = textureJSON.getJSONObject("texture");
+                        String texturePATH = textureJSONtex.getString("path");
                         // TODO: add custom pack/resPackName/block.png texture ability
                         File imageFile = new File("res/textures/block/%s.png".formatted(texturePATH.split("/")[1]));
                         BufferedImage tempImage = ImageIO.read(imageFile);
-                        tempTex = new Texture(tempImage, textureJSON);
+                        tempTex = new Texture(tempImage, textureJSONtex);
+                        if (textureJSON.has("hitbox")) {
+                            tempHitbox = new int[]{textureJSON.getJSONObject("hitbox").getInt("width"), textureJSON.getJSONObject("hitbox").getInt("height")};
+                        } else {
+                            tempHitbox = new int[]{0, 0};
+                        }
                     } else {
-                        tempTex = new Texture(ImageIO.read(new File("res/textures/block/error.png")), errorJSON);
+                        tempTex = new Texture(ImageIO.read(new File("res/textures/block/error.png")), errorJSONtex);
+                        assert errorJSON != null;
+                        if (errorJSON.has("hitbox")) {
+                            tempHitbox = new int[]{errorJSON.getJSONObject("hitbox").getInt("width"), errorJSON.getJSONObject("hitbox").getInt("height")};
+                        } else {
+                            tempHitbox = new int[]{0, 0};
+                        }
                     }
                     textureMap.put(texture.getKey(), tempTex);
+                    hitboxMap.put(texture.getKey(), tempHitbox);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -55,5 +76,9 @@ public class TextureController {
 
     public Map<String, Texture> getTextureMap() {
         return textureMap;
+    }
+
+    public Map<String, int[]> getHitboxMap() {
+        return hitboxMap;
     }
 }

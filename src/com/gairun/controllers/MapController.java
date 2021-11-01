@@ -3,7 +3,6 @@ package com.gairun.controllers;
 import com.gairun.Game;
 import com.gairun.interfaces.BlockType;
 import com.gairun.interfaces.Blocks;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -72,7 +71,9 @@ public class MapController {
         for (int i = 0; i < tempMapLayout.size(); i++) {
             List<Blocks> tempBlocksList = new ArrayList<>();
             for (int j = 0; j < tempMapLayout.get(i).size(); j++) {
-                addBlocks(tempMapLayout, tempBlocksList, textureController, i, j);
+                if (!Objects.equals(tempMapLayout.get(i).get(j), "-")) {
+                    addBlocks(i, j, textureController, tempMapLayout, tempBlocksList);
+                }
             }
             tempBlocks.add(tempBlocksList);
         }
@@ -91,24 +92,22 @@ public class MapController {
         loading = false;
     }
 
-    private void addBlocks(List<List<String>> tempMapLayout, List<Blocks> tempBlocksList, TextureController textureController, int i, int j) {
-        if (!Objects.equals(tempMapLayout.get(i).get(j), "-")) {
-            if (tempMapLayout.get(i).get(j).contains("|")) {
-                String[] tempOneBlockList = tempMapLayout.get(i).get(j).split("\\|");
-                for (String block : tempOneBlockList) {
-                    createBlock(block, tempMapLayout, tempBlocksList, textureController, i, j);
-                }
-            } else {
-                createBlock(tempMapLayout.get(i).get(j), tempMapLayout, tempBlocksList, textureController, i, j);
+    private void addBlocks(int i, int j, TextureController textureController, List<List<String>> tempMapLayout, List<Blocks> tempBlocksList) {
+        if (tempMapLayout.get(i).get(j).contains("|")) {
+            String[] tempOneBlockList = tempMapLayout.get(i).get(j).split("\\|");
+            for (String block : tempOneBlockList) {
+                tempBlocksList.add(createBlock(i, j, block, textureController, tempMapLayout));
             }
+        } else {
+            tempBlocksList.add(createBlock(i, j, tempMapLayout.get(i).get(j), textureController, tempMapLayout));
         }
     }
 
-    private void createBlock(String block, List<List<String>> tempMapLayout, List<Blocks> tempBlocksList, TextureController textureController, int i, int j) {
+    private Blocks createBlock(int i, int j, String block, TextureController textureController, List<List<String>> tempMapLayout) {
         if (textureController.getTextureMap().containsKey(block)) {
-            tempBlocksList.add(new Blocks(j * 16, -i * 16 + tempMapLayout.size() * 16, textureController.getTextureMap().get(block), BlockType.BLOCK, game));
+            return new Blocks(j * 16, -i * 16 + tempMapLayout.size() * 16, textureController.getHitboxMap().get(block)[0], textureController.getHitboxMap().get(block)[1], textureController.getTextureMap().get(block), BlockType.BLOCK, game);
         } else {
-            tempBlocksList.add(new Blocks(j * 16, -i * 16 + tempMapLayout.size() * 16, textureController.getTextureMap().get("error"), BlockType.BLOCK, game));
+            return new Blocks(j * 16, -i * 16 + tempMapLayout.size() * 16, textureController.getHitboxMap().get("error")[0], textureController.getHitboxMap().get("error")[1], textureController.getTextureMap().get("error"), BlockType.BLOCK, game);
         }
     }
 

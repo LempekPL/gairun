@@ -17,12 +17,12 @@ public class Blocks {
 //        this.blockType = blockType;
 //    }
 
-    public Blocks(float x, float y, Texture tex, BlockType blockType, Game game) {
+    public Blocks(float x, float y, int width, int height, Texture tex, BlockType blockType, Game game) {
         this.x = x;
         this.y = y;
         this.tex = tex;
         this.blockType = blockType;
-        this.blockHitbox = new int[]{0, tex.getTexture().getWidth(), 0, tex.getTexture().getHeight()};
+        this.blockHitbox = new int[]{0, width, 0, height};
         this.game = game;
     }
 

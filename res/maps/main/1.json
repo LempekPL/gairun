@@ -9,7 +9,10 @@
     "B": "res/default_block",
     "C": "res/brick",
     "U": "res/glue",
-    "I": "res/ice"
+    "I": "res/ice",
+    "L": "res/brick_left",
+    "R": "res/brick_right",
+    "K": "res/brick"
   },
   "backgrounds": {
     "main": {
