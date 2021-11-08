@@ -29,9 +29,14 @@ public class TextureController {
             String errorPATH = errorJSONtex.getString("path");
             textureMap.put("error", new Texture(ImageIO.read(new File("res/textures/block/%s.png".formatted(errorPATH.split("/")[1]))), errorJSONtex));
             if (errorJSON.has("hitbox")) {
-                hitboxMap.put("error", new int[]{errorJSON.getJSONObject("hitbox").getInt("width"), errorJSON.getJSONObject("hitbox").getInt("height")});
+                JSONObject errorJSONhitbox = errorJSON.getJSONObject("hitbox");
+                if (errorJSONhitbox.has("offset")) {
+                    hitboxMap.put("error", new int[]{errorJSONhitbox.getJSONArray("offset").getInt(0), errorJSONhitbox.getJSONArray("offset").getInt(1), errorJSONhitbox.getInt("width"), errorJSONhitbox.getInt("height")});
+                } else {
+                    hitboxMap.put("error", new int[]{0, 0, errorJSONhitbox.getInt("width"), errorJSONhitbox.getInt("height")});
+                }
             } else {
-                hitboxMap.put("error", new int[]{0, 0});
+                hitboxMap.put("error", new int[]{0, 0, 16, 16});
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -52,17 +57,27 @@ public class TextureController {
                         BufferedImage tempImage = ImageIO.read(imageFile);
                         tempTex = new Texture(tempImage, textureJSONtex);
                         if (textureJSON.has("hitbox")) {
-                            tempHitbox = new int[]{textureJSON.getJSONObject("hitbox").getInt("width"), textureJSON.getJSONObject("hitbox").getInt("height")};
+                            JSONObject textureJSONhitbox = textureJSON.getJSONObject("hitbox");
+                            if (textureJSONhitbox.has("offset")) {
+                                tempHitbox = new int[]{textureJSONhitbox.getJSONArray("offset").getInt(0), textureJSONhitbox.getJSONArray("offset").getInt(1), textureJSONhitbox.getInt("width"), textureJSONhitbox.getInt("height")};
+                            } else {
+                                tempHitbox = new int[]{0,0,textureJSONhitbox.getInt("width"), textureJSONhitbox.getInt("height")};
+                            }
                         } else {
-                            tempHitbox = new int[]{0, 0};
+                            tempHitbox = new int[]{0, 0, 0, 0};
                         }
                     } else {
                         tempTex = new Texture(ImageIO.read(new File("res/textures/block/error.png")), errorJSONtex);
                         assert errorJSON != null;
                         if (errorJSON.has("hitbox")) {
-                            tempHitbox = new int[]{errorJSON.getJSONObject("hitbox").getInt("width"), errorJSON.getJSONObject("hitbox").getInt("height")};
+                            JSONObject errorJSONhitbox = errorJSON.getJSONObject("hitbox");
+                            if (errorJSONhitbox.has("offset")) {
+                                tempHitbox = new int[]{errorJSONhitbox.getJSONArray("offset").getInt(0), errorJSONhitbox.getJSONArray("offset").getInt(1), errorJSONhitbox.getInt("width"), errorJSONhitbox.getInt("height")};
+                            } else {
+                                tempHitbox = new int[]{0,0,errorJSON.getJSONObject("hitbox").getInt("width"), errorJSON.getJSONObject("hitbox").getInt("height")};
+                            }
                         } else {
-                            tempHitbox = new int[]{0, 0};
+                            tempHitbox = new int[]{0, 0, 16, 16};
                         }
                     }
                     textureMap.put(texture.getKey(), tempTex);

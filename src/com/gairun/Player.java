@@ -30,14 +30,18 @@ public class Player {
     private float velX;
     private float velY;
     private float acc = 0.15F;
-    private float dcc = 0.05F;
-    //    private float acc = 0.55F;
-//    private float dcc = 1.05F;
+    // 0.05F best for ICE or air
+    private float dcc = 0.10F;
+    // 0.11F best for air
+    // 0.15F best for walking on Earth (planet)
+    private float grav = 0.15F;
     private int jumps = 1;
     private boolean flying = false;
     private boolean invisible = false;
     private boolean blockedKeys = false;
     private boolean noclip = false;
+    // width, height
+    private int[] offset = new int[]{8, 16};
 
     public Player(float x, float y, Game game) {
         this.x = x;
@@ -48,9 +52,7 @@ public class Player {
     }
 
     public void tick() {
-        if (!noclip) {
-            collisionCheck();
-        }
+        keyCheck();
         if (velX > 0.1) {
             lookingLeft = false;
             currentTexture = "walk";
@@ -60,10 +62,14 @@ public class Player {
         } else {
             currentTexture = "idle";
         }
-        y += velY;
+        if (!flying) {
+            velY -= grav;
+        }
+        if (!noclip) {
+            collisionCheck();
+        }
+        y -= velY;
         x += velX;
-
-        keyCheck();
 
         if (flying) {
             velX = clamp(velX, -4, 4);
@@ -76,11 +82,17 @@ public class Player {
     }
 
     public void render(Graphics g) {
-        float xRender = x - (float) textureMap.get(currentTexture).getTexture().getWidth() / 2 + (float) Game.WIDTH / 2;
-        float yRender = -(y + textureMap.get(currentTexture).getTexture().getHeight()) + (float) Game.HEIGHT / 2;
         if (!invisible) {
+            float xRender = x - (float) textureMap.get(currentTexture).getTexture().getWidth() / 2 + (float) Game.WIDTH / 2;
+            float yRender = y - (float) textureMap.get(currentTexture).getTexture().getHeight() + (float) Game.HEIGHT / 2;
             g.drawImage(flipper(textureMap.get(currentTexture).getTexture()), (int) xRender, (int) yRender, null);
         }
+    }
+
+    private void drawRec(Graphics g, Rectangle2D rect) {
+        float xRender = (float) (rect.getX() + Game.WIDTH / 2);
+        float yRender = (float) (rect.getY() + Game.HEIGHT / 2);
+        g.drawRect((int) xRender, (int) yRender, (int) rect.getWidth(), (int) rect.getHeight());
     }
 
     // this handles player collision in separate functions
@@ -98,12 +110,12 @@ public class Player {
         if (getHitboxWidth().intersects(block.getHitbox())) {
             if (velX > 0) {
                 velX = 0;
-                x = block.getX() - (float) getHitbox().getWidth() / 2;
+                x = (float) (block.getHitbox().getX() - getHitbox().getWidth() / 2);
             } else if (velX < 0) {
                 velX = 0;
-                x = (float) (block.getX() + block.getHitbox().getWidth() + getHitbox().getWidth() / 2);
+                x = (float) (block.getHitbox().getX() + block.getHitbox().getWidth() + getHitbox().getWidth() / 2);
             }
-            if (velY < 0 && !flying) {
+            if (!flying) {
                 velY += 0.5;
                 velY = clamp(velY, -8, -1);
             }
@@ -114,10 +126,10 @@ public class Player {
         if (getHitboxHeight().intersects(block.getHitbox())) {
             if (velY > 0) {
                 velY = 0;
-                y = (float) (block.getY() - block.getHitbox().getHeight() - getHitbox().getHeight());
+                y = (float) (block.getHitbox().getY() + block.getHitbox().getHeight() + getHitbox().getHeight());
             } else if (velY < 0) {
                 velY = 0;
-                y = block.getY();
+                y = (float) block.getHitbox().getY();
                 jumps = 1;
             }
         }
@@ -183,7 +195,6 @@ public class Player {
             velY = 4;
             jumps--;
         }
-        velY -= 0.11;
     }
 
     // clamps number between min and max
@@ -205,7 +216,7 @@ public class Player {
         velX = 0;
         velY = 0;
         this.x = x + 8;
-        this.y = y;
+        this.y = -y;
         jumps = 1;
     }
 
@@ -218,37 +229,37 @@ public class Player {
         velX = 0;
         velY = 0;
         x = pos.getInt(0) * 16 + 8;
-        y = pos.getInt(1) * 16;
+        y = pos.getInt(1) * -16;
         jumps = 1;
     }
 
     public Rectangle2D getHitbox() {
-        return new Rectangle2D.Float(x - 8, y + 16, 16, 32);
+        return new Rectangle2D.Double(x - (double) offset[0] / 2, y - offset[1], offset[0], offset[1]);
     }
 
     public Rectangle2D getHitboxWidth() {
         Rectangle2D hitbox = getHitbox();
-        return new Rectangle2D.Float((float) hitbox.getX() + velX, (float) hitbox.getY(), (float) hitbox.getWidth(), (float) hitbox.getHeight());
+        return new Rectangle2D.Double((float) hitbox.getX() + velX, (float) hitbox.getY(), (float) hitbox.getWidth(), (float) hitbox.getHeight());
     }
 
     public Rectangle2D getHitboxHeight() {
         Rectangle2D hitbox = getHitbox();
-        return new Rectangle2D.Float((float) hitbox.getX(), (float) hitbox.getY() + velY, (float) hitbox.getWidth(), (float) hitbox.getHeight());
+        return new Rectangle2D.Double((float) hitbox.getX(), (float) hitbox.getY() - velY, (float) hitbox.getWidth(), (float) hitbox.getHeight());
     }
 
     private Rectangle2D getWallLeft() {
         Rectangle2D hitbox = getHitbox();
-        return new Rectangle2D.Float((float) hitbox.getX() - 2, (float) hitbox.getY(), 2, (float) hitbox.getHeight());
+        return new Rectangle2D.Double((float) hitbox.getX() - 2, (float) hitbox.getY(), 2, (float) hitbox.getHeight());
     }
 
     private Rectangle2D getWallRight() {
         Rectangle2D hitbox = getHitbox();
-        return new Rectangle2D.Float((float) (hitbox.getX() + hitbox.getWidth()), (float) hitbox.getY(), 2, (float) hitbox.getHeight());
+        return new Rectangle2D.Double((float) (hitbox.getX() + hitbox.getWidth()), (float) hitbox.getY(), 2, (float) hitbox.getHeight());
     }
 
     private Rectangle2D getStanding() {
         Rectangle2D hitbox = getHitbox();
-        return new Rectangle2D.Float((float) hitbox.getX(), (float) (hitbox.getY() - hitbox.getHeight()), (float) hitbox.getWidth(), 2);
+        return new Rectangle2D.Double((float) hitbox.getX(), (float) (hitbox.getY() - hitbox.getHeight()), (float) hitbox.getWidth(), 2);
     }
 
     public float getX() {
@@ -315,8 +326,24 @@ public class Player {
         this.dcc = dcc;
     }
 
+    public float getGrav() {
+        return grav;
+    }
+
+    public void setGrav(float grav) {
+        this.grav = grav;
+    }
+
     public BufferedImage getCurrentTexture() {
         return textureMap.get(currentTexture).getTexture();
+    }
+
+    public int[] getOffset() {
+        return offset;
+    }
+
+    public void setOffset(int[] offset) {
+        this.offset = offset;
     }
 
     private void pullTextures() {

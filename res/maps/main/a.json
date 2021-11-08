@@ -1,0 +1,27 @@
+{
+  "playerSettings": {
+    "spawn": [
+      0,
+      1
+    ],
+    "fly": true
+  },
+  "usedBlocks": {
+    "B": "res/default_block",
+    "R": "res/brick_right",
+    "L": "res/brick_left",
+    "N": "res/default_block_noclip"
+  },
+  "backgrounds": {
+    "main": {
+      "type": "static",
+      "color": {
+        "R": 66,
+        "G": 166,
+        "B": 194,
+        "A": 255
+      }
+    }
+  },
+  "requiredResourcePacks": []
+}

@@ -3,10 +3,12 @@ package com.gairun;
 import com.gairun.controllers.BackgroundController;
 import com.gairun.controllers.KeyInput;
 import com.gairun.controllers.MapController;
+import com.gairun.interfaces.Blocks;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
+import java.util.List;
 
 // TODO: custom screen size (settings > create file > restart game > load external file > set screen size)
 // TODO: check why when player walks in diagonal (press W and D) and collides with data above and is "outside" rendered map
@@ -57,6 +59,7 @@ public class Game extends Canvas implements Runnable {
         keyListener = new KeyInput(this);
         addKeyListener(keyListener);
         mapController.loadMap("menu", "start");
+        limitedFrames = true;
     }
 
     public void run() {
@@ -128,7 +131,7 @@ public class Game extends Canvas implements Runnable {
         Graphics2D g2d = (Graphics2D) g;
         g2d.translate(WIDTH * (1 - cam.getScale()) / 2, HEIGHT * (1 - cam.getScale()) / 2);
         g2d.scale(cam.getScale(), cam.getScale());
-        g2d.translate((int) -cam.getX(), (int) cam.getY());
+        g2d.translate((int) -cam.getX(), (int) -cam.getY());
 
         // rendering
         bgController.render(g);
@@ -141,22 +144,22 @@ public class Game extends Canvas implements Runnable {
             // player hitbox debug
             g.setColor(Color.red);
             Rectangle2D mainHitbox = p.getHitbox();
-            g.drawRect((int) (p.getX() - (float) p.getCurrentTexture().getWidth() / 2) + Game.WIDTH / 2, (int) (-p.getY() - p.getCurrentTexture().getHeight()) + Game.HEIGHT / 2, (int) mainHitbox.getWidth(), (int) mainHitbox.getHeight());
+            g.drawRect((int) mainHitbox.getX() + Game.WIDTH / 2, (int) mainHitbox.getY() + Game.HEIGHT / 2, (int) mainHitbox.getWidth(), (int) mainHitbox.getHeight());
             // fps and ticks counter
             gCopy.setColor(Color.green);
             gCopy.drawString(lastFrames + "FPS, " + lastTicks + " ticks", 0, 10);
             // camera move to limit
             g.setColor(Color.yellow);
             float xRender = cam.getX() + (float) Game.WIDTH / 2 - cam.getCameraMovementLimit();
-            float yRender = -cam.getY() + (float) Game.HEIGHT / 2 - cam.getCameraMovementLimit();
+            float yRender = cam.getY() + (float) Game.HEIGHT / 2 - cam.getCameraMovementLimit();
             g.drawRect((int) xRender, (int) yRender, cam.getCameraMovementLimit() * 2, cam.getCameraMovementLimit() * 2);
             // camera rendering
             g.setColor(Color.green);
-            g.drawRect((int) cam.getX(), (int) -cam.getY(), Game.WIDTH-1, Game.HEIGHT-1);
+            g.drawRect((int) cam.getX(), (int) cam.getY(), Game.WIDTH-1, Game.HEIGHT-1);
             // cords
             gCopy.setColor(Color.white);
-            gCopy.drawString("XY: %s, %s".formatted((float) Math.round(p.getX() / 16 * 1000) / 1000, (float) Math.round(p.getY() / 16 * 1000) / 1000), 5, 25);
-            gCopy.drawString("px XY: %s, %s".formatted(p.getX(), p.getY()), 5, 40);
+            gCopy.drawString("XY: %s, %s".formatted((float) Math.round(p.getX() / 16 * 1000) / 1000, (float) -Math.round(p.getY() / 16 * 1000) / 1000), 5, 25);
+            gCopy.drawString("px XY: %s, %s".formatted(p.getX(), -p.getY()), 5, 40);
         } else {
             // fps counter
             gCopy.setColor(Color.green);
