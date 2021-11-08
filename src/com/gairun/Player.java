@@ -41,7 +41,7 @@ public class Player {
     private boolean blockedKeys = false;
     private boolean noclip = false;
     // width, height
-    private int[] offset = new int[]{8, 16};
+    private int[] offset = new int[]{16, 32};
 
     public Player(float x, float y, Game game) {
         this.x = x;
