@@ -27,7 +27,7 @@ public class Blocks {
             float xRender = x + (float) Game.WIDTH / 2;
             float yRender = y + (float) Game.HEIGHT / 2;
             g.drawImage(tex.getTexture(), (int) xRender, (int) yRender, null);
-            if (game.getCamera().isDebug()) {
+            if (game.getCamera().isDebug() && !(getHitbox().getWidth() <= 1 && getHitbox().getHeight() <= 1)) {
                 g.setColor(Color.red);
                 Rectangle2D mainHitbox = getHitbox();
                 g.drawRect((int) mainHitbox.getX() + Game.WIDTH / 2, (int) mainHitbox.getY() + Game.HEIGHT / 2, (int) mainHitbox.getWidth(), (int) mainHitbox.getHeight());

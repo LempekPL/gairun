@@ -7,5 +7,6 @@
     "path": "res/block",
     "width": 16,
     "height": 16
-  }
+  },
+  "script": "res/moving_block"
 }

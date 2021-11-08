@@ -3,6 +3,5 @@
     "path": "res/block",
     "width": 16,
     "height": 16
-  },
-  "minscript": "res/default_minscript"
+  }
 }
