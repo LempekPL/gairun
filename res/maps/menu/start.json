@@ -3,8 +3,7 @@
     "spawn": [
       5,
       16
-    ],
-    "fly": true
+    ]
   },
   "usedBlocks": {
     "L": "res/light_pad",

@@ -31,7 +31,7 @@ public class BackgroundController {
 
     public void render(Graphics g) {
         if (loading || backgroundMap == null || currentBackground == null) return;
-        g.drawImage(backgroundMap.get(currentBackground).getTexture(), (int) game.getCamera().getX(), (int) -game.getCamera().getY(), null);
+        g.drawImage(backgroundMap.get(currentBackground).getTexture(), (int) game.getCamera().getX(), (int) game.getCamera().getY(), null);
     }
 
     public void loadNewBackgrounds(JSONObject backgroundsJSON) {

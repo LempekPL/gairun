@@ -105,9 +105,9 @@ public class MapController {
 
     private Blocks createBlock(int i, int j, String block, TextureController textureController, List<List<String>> tempMapLayout) {
         if (textureController.getTextureMap().containsKey(block)) {
-            return new Blocks(j * 16, -i * 16 + tempMapLayout.size() * 16, textureController.getHitboxMap().get(block)[0], textureController.getHitboxMap().get(block)[1], textureController.getTextureMap().get(block), BlockType.BLOCK, game);
+            return new Blocks(j * 16, i * 16 - (tempMapLayout.size()-1) * 16, textureController.getHitboxMap().get(block), textureController.getTextureMap().get(block), BlockType.BLOCK, game);
         } else {
-            return new Blocks(j * 16, -i * 16 + tempMapLayout.size() * 16, textureController.getHitboxMap().get("error")[0], textureController.getHitboxMap().get("error")[1], textureController.getTextureMap().get("error"), BlockType.BLOCK, game);
+            return new Blocks(j * 16, i * 16 - (tempMapLayout.size()-1) * 16, textureController.getHitboxMap().get("error"), textureController.getTextureMap().get("error"), BlockType.BLOCK, game);
         }
     }
 
