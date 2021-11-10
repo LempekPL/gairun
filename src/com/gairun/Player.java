@@ -12,9 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,12 +85,6 @@ public class Player {
             float yRender = y - (float) textureMap.get(currentTexture).getTexture().getHeight() + (float) Game.HEIGHT / 2;
             g.drawImage(flipper(textureMap.get(currentTexture).getTexture()), (int) xRender, (int) yRender, null);
         }
-    }
-
-    private void drawRec(Graphics g, Rectangle2D rect) {
-        float xRender = (float) (rect.getX() + Game.WIDTH / 2);
-        float yRender = (float) (rect.getY() + Game.HEIGHT / 2);
-        g.drawRect((int) xRender, (int) yRender, (int) rect.getWidth(), (int) rect.getHeight());
     }
 
     // this handles player collision in separate functions
@@ -352,11 +344,13 @@ public class Player {
         for (String anName : animationName) {
             try {
                 Texture tempTex;
-                FileReader textureJSONfile = new FileReader("res/data/player/%s.json".formatted(anName));
-                JSONObject textureJSON = new JSONObject(new JSONTokener(textureJSONfile));
+                InputStream textureJSONfile = getClass().getClassLoader().getResourceAsStream("res/data/player/%s.json".formatted(anName));
+                assert textureJSONfile != null;
+                JSONObject textureJSON = new JSONObject(new JSONTokener(new InputStreamReader(textureJSONfile)));
                 textureJSON = textureJSON.getJSONObject("texture");
                 String texturePATH = textureJSON.get("path").toString();
-                File imageFile = new File("res/textures/player/%s.png".formatted(texturePATH.split("/")[1]));
+                InputStream imageFile = getClass().getClassLoader().getResourceAsStream("res/textures/player/%s.png".formatted(texturePATH.split("/")[1]));
+                assert imageFile != null;
                 BufferedImage tempImage = ImageIO.read(imageFile);
                 tempTex = new Texture(tempImage, textureJSON);
                 textureMap.put(anName, tempTex);
