@@ -23,12 +23,12 @@ public class TextureController {
         JSONObject errorJSON = null;
         JSONObject errorJSONtex = null;
         try {
-            InputStream errorJSONfile = getClass().getClassLoader().getResourceAsStream("res/data/block/error.json");
+            InputStream errorJSONfile = getClass().getClassLoader().getResourceAsStream("/data/blocks/error.json");
             assert errorJSONfile != null;
             errorJSON = new JSONObject(new JSONTokener(new InputStreamReader(errorJSONfile)));
             errorJSONtex = errorJSON.getJSONObject("texture");
             String errorPATH = errorJSONtex.getString("path");
-            textureMap.put("error", new Texture(ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("res/textures/block/%s.png".formatted(errorPATH.split("/")[1])))), errorJSONtex));
+            textureMap.put("error", new Texture(ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("/textures/blocks/%s.png".formatted(errorPATH.split("/")[1])))), errorJSONtex));
             if (errorJSON.has("hitbox")) {
                 JSONObject errorJSONhitbox = errorJSON.getJSONObject("hitbox");
                 if (errorJSONhitbox.has("offset")) {
@@ -44,17 +44,17 @@ public class TextureController {
         }
         for (var texture : textureList.entrySet()) {
             String[] place = texture.getValue().toString().split("/");
-            if (Objects.equals(place[0], "res")) {
+            if (Objects.equals(place[0], "")) {
                 try {
                     Texture tempTex;
                     int[] tempHitbox;
-                    InputStream textureJSONfile = getClass().getClassLoader().getResourceAsStream("res/data/block/%s.json".formatted(place[1]));
+                    InputStream textureJSONfile = getClass().getClassLoader().getResourceAsStream("/data/blocks/%s.json".formatted(place[1]));
                     assert textureJSONfile != null;
                     JSONObject textureJSON = new JSONObject(new JSONTokener(new InputStreamReader(textureJSONfile)));
                     JSONObject textureJSONtex = textureJSON.getJSONObject("texture");
                     String texturePATH = textureJSONtex.getString("path");
-                    // TODO: add custom pack/resPackName/block.png texture ability
-                    InputStream imageFile = getClass().getClassLoader().getResourceAsStream("res/textures/block/%s.png".formatted(texturePATH.split("/")[1]));
+                    // TODO: add custom pack/resPackName/blocks.png texture ability
+                    InputStream imageFile = getClass().getClassLoader().getResourceAsStream("/textures/blocks/%s.png".formatted(texturePATH.split("/")[1]));
                     assert imageFile != null;
                     BufferedImage tempImage = ImageIO.read(imageFile);
                     tempTex = new Texture(tempImage, textureJSONtex);

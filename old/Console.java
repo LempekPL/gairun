@@ -1,12 +1,20 @@
 package com.gairun;
 
+import org.json.JSONArray;
+import org.json.JSONTokener;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.File;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Console {
     private final Game game;
@@ -83,25 +91,30 @@ public class Console {
                     }
                     case "clear" -> commandLine = new ArrayList<>();
                     case "loadmap", "map" -> {
-                        List<String> sets = new ArrayList<>(Arrays.asList(Objects.requireNonNull(new File("res/maps").list())));
-                        List<String> ids = new ArrayList<>();
-                        if (commandString.length >= 2 && sets.contains(commandString[1])) {
-                            ids = new ArrayList<>(Arrays.asList(Objects.requireNonNull(new File("res/maps/%s".formatted(commandString[1])).list())));
-                            ids.removeIf(value -> value.endsWith(".csv"));
-                            ids.replaceAll(e -> e.replaceAll(".json", ""));
-                        }
-                        if (commandString.length <= 1 || (sets.size() > 0 && !sets.contains(commandString[1]))) {
-                            commandLine.add("&R Can't find this map set");
-                            commandLine.add("&O Available map sets are:");
-                            commandLine.add("&O     %s".formatted(sets));
-                        } else if (commandString.length <= 2 || (ids.size() > 0 && !ids.contains(commandString[2]))) {
-                            commandLine.add("&R Can't find this map id");
-                            commandLine.add("&O Available ids from this set are:");
-                            commandLine.add("&O     %s".formatted(ids));
-                        } else {
-                            game.getMapController().loadMap(commandString[1], commandString[2]);
-                        }
+
                     }
+//                    case "loadmap", "map" -> {
+//                        JSONArray setsArray = new JSONArray(new JSONTokener(new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("res/maps/maps.json")))));
+//                        List<String> sets = setsArray.toList().stream().map(object -> Objects.toString(object, null)).collect(Collectors.toList());
+//                        List<String> ids = new ArrayList<>();
+//                        if (commandString.length >= 2 && sets.contains(commandString[1])) {
+//                            JSONArray idsArray = new JSONArray(new JSONTokener(new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("res/maps/%s".formatted(commandString[1]))))));
+//                            ids = idsArray.toList().stream().map(object -> Objects.toString(object, null)).collect(Collectors.toList());
+//                            ids.removeIf(value -> value.endsWith(".csv"));
+//                            ids.replaceAll(e -> e.replaceAll(".json", ""));
+//                        }
+//                        if (commandString.length <= 1 || (sets.size() > 0 && !sets.contains(commandString[1]))) {
+//                            commandLine.add("&R Can't find this map set");
+//                            commandLine.add("&O Available map sets are:");
+//                            commandLine.add("&O     %s".formatted(sets));
+//                        } else if (commandString.length <= 2 || (ids.size() > 0 && !ids.contains(commandString[2]))) {
+//                            commandLine.add("&R Can't find this map id");
+//                            commandLine.add("&O Available ids from this set are:");
+//                            commandLine.add("&O     %s".formatted(ids));
+//                        } else {
+//                            game.getMapController().loadMap(commandString[1], commandString[2]);
+//                        }
+//                    }
                     case "teleport", "tp" -> {
                         float toSpawnX = (int) Float.parseFloat(commandString[1]);
                         if (Float.parseFloat(commandString[1]) != toSpawnX) {
@@ -323,7 +336,7 @@ public class Console {
                     commandLine.add("&Q Example: 'fly' or 'fly <boolean state>'");
                 }
                 case "noclip" -> {
-                    commandLine.add("&Q Turns on/off block collision");
+                    commandLine.add("&Q Turns on/off blocks collision");
                     commandLine.add("&Q Example: 'noclip' or 'noclip <boolean state>'");
                 }
                 case "invisible" -> {

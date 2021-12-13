@@ -14,16 +14,6 @@
     "R": "res/brick_right",
     "K": "res/brick"
   },
-  "backgrounds": {
-    "main": {
-      "type": "static",
-      "color": {
-        "R": 66,
-        "G": 166,
-        "B": 194,
-        "A": 255
-      }
-    }
-  },
+  "backgroundTextures": {},
   "requiredResourcePacks": []
 }

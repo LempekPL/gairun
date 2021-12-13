@@ -61,7 +61,7 @@ public class Game extends Canvas implements Runnable {
         limitedFrames = true;
     }
 
-    public void run() {
+    public voidrun() {
         long lastTime = System.nanoTime();
         long lastTimeR = System.nanoTime();
         final double amountOfTicks = 60.0;

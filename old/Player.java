@@ -344,12 +344,12 @@ public class Player {
         for (String anName : animationName) {
             try {
                 Texture tempTex;
-                InputStream textureJSONfile = getClass().getClassLoader().getResourceAsStream("res/data/player/%s.json".formatted(anName));
+                InputStream textureJSONfile = getClass().getClassLoader().getResourceAsStream("/data/player/%s.json".formatted(anName));
                 assert textureJSONfile != null;
                 JSONObject textureJSON = new JSONObject(new JSONTokener(new InputStreamReader(textureJSONfile)));
                 textureJSON = textureJSON.getJSONObject("texture");
                 String texturePATH = textureJSON.get("path").toString();
-                InputStream imageFile = getClass().getClassLoader().getResourceAsStream("res/textures/player/%s.png".formatted(texturePATH.split("/")[1]));
+                InputStream imageFile = getClass().getClassLoader().getResourceAsStream("/textures/player/%s.png".formatted(texturePATH.split("/")[1]));
                 assert imageFile != null;
                 BufferedImage tempImage = ImageIO.read(imageFile);
                 tempTex = new Texture(tempImage, textureJSON);

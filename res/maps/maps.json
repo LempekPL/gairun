@@ -1,0 +1,4 @@
+{
+  "main": ["1","2","3","a"],
+  "menu": ["main_menu", "start"]
+}

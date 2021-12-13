@@ -1,4 +1,6 @@
-package com.gairun;
+package dev.lempek.gairun.instances;
+
+import dev.lempek.gairun.Game;
 
 import javax.swing.*;
 import java.awt.*;

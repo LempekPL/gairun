@@ -48,13 +48,13 @@ public class MapController {
         List<List<Blocks>> tempBlocks = new ArrayList<>();
         backgroundsJSON = null;
         JSONObject mapJSON = null;
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("res/maps/%s/%s.csv".formatted(mapSet, mapId)))))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("/maps/%s/%s.csv".formatted(mapSet, mapId)))))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 tempMapLayout.add(Arrays.asList(values));
             }
-            InputStream mapJSONfile = getClass().getClassLoader().getResourceAsStream("res/maps/%s/%s.json".formatted(mapSet, mapId));
+            InputStream mapJSONfile = getClass().getClassLoader().getResourceAsStream("/maps/%s/%s.json".formatted(mapSet, mapId));
             assert mapJSONfile != null;
             mapJSON = new JSONObject(new JSONTokener(new InputStreamReader(mapJSONfile)));
         } catch (IOException e) {
