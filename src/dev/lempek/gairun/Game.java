@@ -2,9 +2,8 @@ package dev.lempek.gairun;
 
 import dev.lempek.gairun.controllers.KeyControl;
 import dev.lempek.gairun.controllers.MapControl;
-import dev.lempek.gairun.controllers.MouseControl;
 import dev.lempek.gairun.instances.Window;
-import com.gairun.instances.*;
+import dev.lempek.gairun.instances.*;
 import dev.lempek.gairun.instances.Camera;
 import dev.lempek.gairun.instances.Console;
 import dev.lempek.gairun.instances.GUIRenderer;
@@ -27,6 +26,7 @@ public class Game extends Canvas implements Runnable {
     private int lastFrames;
     private int lastTicks;
     private boolean limitedFrames = true;
+    private boolean cheats = false;
     private final float GRAVITATIONAL_PULL = 9.81f;
     // threading
     private boolean isRunning = false;
@@ -37,8 +37,7 @@ public class Game extends Canvas implements Runnable {
     private Console console;
     private MapControl mapControl;
     private KeyControl keyControl;
-    private MouseControl mouseControl;
-    private dev.lempek.gairun.instances.GUIRenderer GUIRenderer;
+    private GUIRenderer GUIRenderer;
 
     public Game() {
         new Window(WIDTH, HEIGHT, TITLE, this);
@@ -54,13 +53,13 @@ public class Game extends Canvas implements Runnable {
         requestFocus();
         keyControl = new KeyControl(this);
         addKeyListener(keyControl);
-        mouseControl = new MouseControl(this);
-        addMouseListener(mouseControl);
-        player = new Player(0, 0, this);
-        camera = new Camera(0, 0, this);
-        console = new Console(this);
+        player = new Player(this, 0, 0, 4);
+        camera = new Camera(this, 0, 0);
+//        console = new Console(this);
         mapControl = new MapControl(this);
         GUIRenderer = new GUIRenderer(this);
+
+        System.out.println(mapControl.loadMap("2"));
     }
 
     public void run() {
@@ -161,6 +160,14 @@ public class Game extends Canvas implements Runnable {
         isRunning = false;
     }
 
+    public boolean isCheats() {
+        return cheats;
+    }
+
+    public void setCheats(boolean cheats) {
+        this.cheats = cheats;
+    }
+
     public double getFramerate() {
         return framerate;
     }
@@ -195,9 +202,5 @@ public class Game extends Canvas implements Runnable {
 
     public KeyControl getKeyControl() {
         return keyControl;
-    }
-
-    public MouseControl getMouseControl() {
-        return mouseControl;
     }
 }

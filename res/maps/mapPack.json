@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "name": "Base Game",
+  "idName": "base-game",
+  "authors": [
+    "LempekPL",
+    "wiKapo"
+  ],
+  "description": "Base game map pack\n($c=#ff0000)DO NOT DELETE",
+  "maps": {
+    "main": ["1","2","3","a"],
+    "menu": ["main_menu", "start"]
+  },
+  "default": {
+    "returnToDefault": true,
+    "set": "menu",
+    "id": "main_menu"
+  }
+}

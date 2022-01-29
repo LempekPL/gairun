@@ -4,9 +4,9 @@
     "height": 16
   },
   "texture": {
-    "path": "res/block",
+    "path": "gairun:blocks/block",
     "width": 16,
     "height": 16
   },
-  "script": "res/moving_block"
+  "script": "gairun:moving_block"
 }

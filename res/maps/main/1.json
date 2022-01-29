@@ -1,18 +1,20 @@
 {
   "playerSettings": {
-    "spawn": [
-      1,
-      1
-    ]
+    "spawn": "P",
+    "flying": true,
+    "invisible": false,
+    "debug": false,
+    "blockedMovement": true,
+    "noclip": false
   },
   "usedBlocks": {
-    "B": "res/default_block",
-    "C": "res/brick",
-    "U": "res/glue",
-    "I": "res/ice",
-    "L": "res/brick_left",
-    "R": "res/brick_right",
-    "K": "res/brick"
+    "B": "gairun:blocks/default_block",
+    "C": "gairun:blocks/brick",
+    "U": "gairun:blocks/glue",
+    "I": "gairun:blocks/ice",
+    "L": "gairun:blocks/brick_left",
+    "R": "gairun:blocks/brick_right",
+    "K": "gairun:blocks/brick"
   },
   "backgroundTextures": {},
   "requiredResourcePacks": []

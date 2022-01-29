@@ -7,18 +7,18 @@ import dev.lempek.gairun.interfaces.GameEntity;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-public abstract class GameTemplateBlock implements GameEntity {
-    protected final Game game;
+public class Block implements GameEntity {
+    private final Game game;
     // placement
-    protected float x;
-    protected float y;
+    private float x;
+    private float y;
     // collisions
-    protected Rectangle hitBox;
-    protected boolean collisions;
+    private Rectangle hitBox;
+    private boolean collisions;
     // textures
-//    protected final Texture tex;
+//    private final Texture tex;
 
-    public GameTemplateBlock(Game game, float x, float y, String tex, int[] size, int[] offset) {
+    public Block(Game game, float x, float y, String tex, int[] size, int[] offset) {
         this.game = game;
         this.x = x;
         this.y = y;
@@ -26,6 +26,10 @@ public abstract class GameTemplateBlock implements GameEntity {
         if (size != null) {
             hitBox = new Rectangle((int) x + offset[0], (int) y + offset[1], size[0], size[1]);
         }
+    }
+
+    public void tick() {
+        // TODO: send ticks to scripts
     }
 
     public void render(Graphics g) {
@@ -39,6 +43,11 @@ public abstract class GameTemplateBlock implements GameEntity {
                 g.drawRect((int) mainHitbox.getX() + Game.WIDTH / 2, (int) mainHitbox.getY() + Game.HEIGHT / 2, (int) mainHitbox.getWidth(), (int) mainHitbox.getHeight());
             }
         }
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        return null;
     }
 
     public Rectangle2D getHitbox() {

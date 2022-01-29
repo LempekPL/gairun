@@ -56,14 +56,14 @@ public class BackgroundController {
 
             } else if (Objects.equals(dataBG.getString("type"), "image") || Objects.equals(dataBG.getString("type"), "animation")) {
 //            try {
-//                Texture tempTex;
+//                BlockTexture tempTex;
 //                FileReader textureJSONfile = new FileReader("res/data/player/%s.json".formatted(anName));
 //                JSONObject textureJSON = new JSONObject(new JSONTokener(textureJSONfile));
 //                textureJSON = textureJSON.getJSONObject("texture");
 //                String texturePATH = textureJSON.get("path").toString();
 //                File imageFile = new File("res/textures/player/%s.png".formatted(texturePATH.split("/")[1]));
 //                BufferedImage tempImage = ImageIO.read(imageFile);
-//                tempTex = new Texture(tempImage, textureJSON);
+//                tempTex = new BlockTexture(tempImage, textureJSON);
 //                textureMap.put(anName, tempTex);
 //            } catch (IOException e) {
 //                e.printStackTrace();

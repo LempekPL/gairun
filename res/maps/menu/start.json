@@ -6,8 +6,8 @@
     ]
   },
   "usedBlocks": {
-    "L": "res/light_pad",
-    "C": "res/glue"
+    "L": "gairun:blocks/light_pad",
+    "C": "gairun:blocks/glue"
   },
   "requiredResourcePacks": []
 }

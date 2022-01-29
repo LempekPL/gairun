@@ -9,10 +9,7 @@
     "noclip": true
   },
   "usedBlocks": {
-    "L": "res/light_pad"
-  },
-  "buttons": {
-    
+    "L": "gairun:blocks/light_pad"
   },
   "requiredResourcePacks": []
 }

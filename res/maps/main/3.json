@@ -6,8 +6,8 @@
     ]
   },
   "usedBlocks": {
-    "L": "res/lightPads",
-    "B": "res/block"
+    "L": "gairun:blocks/lightPads",
+    "B": "gairun:blocks/block"
   },
   "requiredResourcePacks": []
 }

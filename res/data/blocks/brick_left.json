@@ -5,7 +5,7 @@
     "offset": [8, 0]
   },
   "texture": {
-    "path": "res/brick_left",
+    "path": "gairun:blocks/brick_left",
     "width": 16,
     "height": 16
   }

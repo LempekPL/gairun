@@ -1,16 +1,13 @@
 {
   "playerSettings": {
-    "spawn": [
-      0,
-      1
-    ],
+    "spawn": "P",
     "fly": true
   },
   "usedBlocks": {
-    "B": "res/default_block",
-    "R": "res/brick_right",
-    "L": "res/brick_left",
-    "N": "res/default_block_noclip"
+    "B": "gairun:blocks/default_block",
+    "R": "gairun:blocks/brick_right",
+    "L": "gairun:blocks/brick_left",
+    "N": "gairun:blocks/default_block_noclip"
   },
   "backgrounds": {
     "main": {
@@ -21,6 +18,30 @@
         "B": 194,
         "A": 255
       }
+    },
+    "side": {
+      "type": "image",
+      "src": "gairun:blocks/default_block",
+      "repeat": true,
+      "fitToScreen": true,
+      "offset": [0, 0]
+    },
+    "side2": {
+      "type": "image",
+      "src": "gairun:blocks/default_block",
+      "repeat": true,
+      "fitToScreen": false,
+      "offset": [100, 100]
+    },
+    "3": {
+      "type": "animation",
+      "src": "gairun:blocks/light_pad",
+      "repeat": true
+    },
+    "accualImag": {
+      "type": "image",
+      "src": "gairun:backgrounds/rabet",
+      "repeat": true
     }
   },
   "requiredResourcePacks": []

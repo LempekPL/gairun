@@ -4,10 +4,14 @@
     "height": 16
   },
   "texture": {
-    "path": "res/light_pad",
+    "path": "gairun:blocks/light_pad",
     "width": 16,
     "height": 16,
     "animation": {
+      "defaults": {
+        "frame": 6,
+        "paused": false
+      },
       "speed": 8,
       "frames": 8,
       "frameOrder": [
