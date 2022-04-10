@@ -2,5 +2,7 @@
 /target
 # idea
 .idea
+# config gets created automatically so I don't want to overwrite it
+config.ron
 
 /CHANGING LANGUAGE
