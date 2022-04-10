@@ -1,16 +1,18 @@
 mod main_menu;
 mod asset_loader;
+mod toasts;
 
 use bevy::prelude::*;
 use bevy_kira_audio::{Audio, AudioPlugin};
 use serde::{Serialize, Deserialize};
 use std::fs::{self};
 use ron::ser::{PrettyConfig, to_string_pretty};
-use crate::asset_loader::{AssetLoaderPlugin, SoundAssets};
+use crate::asset_loader::{AssetLoaderPlugin, FontAssets, SoundAssets};
 use crate::main_menu::MainMenuPlugin;
+use crate::toasts::{ToastEvent, Toasts};
 
-const DEFAULT_WIDTH: f32 = 1280.0 / 2.0;
-const DEFAULT_HEIGHT: f32 = 960.0 / 2.0;
+const DEFAULT_WIDTH: f32 = 1280.0;
+const DEFAULT_HEIGHT: f32 = 720.0;
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
 enum AppState {
@@ -26,9 +28,10 @@ enum AppState {
     Game,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Copy, Clone)]
 struct GameSettings {
     volume: f32,
+    resolution: (f32, f32),
 }
 
 #[derive(Component)]
@@ -59,6 +62,8 @@ fn main() {
     app.add_plugin(AssetLoaderPlugin);
     // main menu systems
     app.add_plugin(MainMenuPlugin);
+    // toast notification
+    app.add_plugin(Toasts);
     // initiating setup
     app.add_system_set(SystemSet::on_enter(AppState::Loading).with_system(setup));
 
@@ -101,18 +106,16 @@ fn preload(
             ..Default::default()
         });
     }).insert(LoadingText);
-    // load game settings
-    commands.insert_resource(load_settings());
     // start loading assets
     app_state.set(AppState::LoadingAssets).unwrap();
 }
 
 // HELPER function, NOT system
-fn load_settings() -> GameSettings {
+fn load_settings() -> (GameSettings, bool) {
     if let Ok(saved_settings) = fs::read_to_string("./assets/settings/config.ron") {
         let settings: Result<GameSettings, _> = ron::from_str(&saved_settings);
         if settings.is_ok() {
-            settings.unwrap()
+            (settings.unwrap(), false)
         } else {
             create_settings()
         }
@@ -122,9 +125,10 @@ fn load_settings() -> GameSettings {
 }
 
 // HELPER function, NOT system
-fn create_settings() -> GameSettings {
+fn create_settings() -> (GameSettings, bool) {
     let settings = GameSettings {
-        volume: 1.0
+        volume: 1.0,
+        resolution: (DEFAULT_WIDTH, DEFAULT_HEIGHT),
     };
 
     let pretty = PrettyConfig::new()
@@ -133,9 +137,9 @@ fn create_settings() -> GameSettings {
         .decimal_floats(true);
 
     if let Ok(_res) = fs::write("./assets/settings/config.ron", &to_string_pretty(&settings, pretty).unwrap()) {
-        settings
+        (settings, false)
     } else {
-        panic!("COULD NOT SAVE FILE");
+        (settings, true)
     }
 }
 
@@ -143,10 +147,27 @@ fn setup(
     mut commands: Commands,
     mut app_state: ResMut<State<AppState>>,
     loading_text_query: Query<Entity, With<LoadingText>>,
-    sound_assets: Res<SoundAssets>,
     audio: Res<Audio>,
-    settings: Res<GameSettings>,
+    sound_assets: Res<SoundAssets>,
+    font_assets: Res<FontAssets>,
+    mut ev_toast: EventWriter<ToastEvent>,
+    mut win_desc: ResMut<WindowDescriptor>,
 ) {
+    // check for game settings
+    let (settings, error) = load_settings();
+    commands.insert_resource(settings.clone());
+    // display toast notification if user can't save settings file
+    if error {
+        ev_toast.send(ToastEvent {
+            text: "Can't save settings file".to_string(),
+            text_color: Color::WHITE,
+            background_color: Color::RED,
+            font: font_assets.open_sans_regular.clone(),
+        });
+    }
+    // set window size
+    win_desc.width = settings.resolution.0;
+    win_desc.height = settings.resolution.1;
     // remove loading text
     let loading_text_entity = loading_text_query.single();
     commands.entity(loading_text_entity).despawn_recursive();
