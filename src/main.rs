@@ -28,10 +28,21 @@ enum AppState {
     Game,
 }
 
+#[serde(default)]
 #[derive(Deserialize, Serialize, Copy, Clone)]
 struct GameSettings {
     volume: f32,
     resolution: (f32, f32),
+}
+
+
+impl Default for GameSettings {
+    fn default() -> Self {
+        Self {
+            volume: 1.0,
+            resolution: (DEFAULT_WIDTH, DEFAULT_HEIGHT),
+        }
+    }
 }
 
 #[derive(Component)]
@@ -115,7 +126,8 @@ fn load_settings() -> (GameSettings, bool) {
     if let Ok(saved_settings) = fs::read_to_string("./assets/settings/config.ron") {
         let settings: Result<GameSettings, _> = ron::from_str(&saved_settings);
         if settings.is_ok() {
-            (settings.unwrap(), false)
+            let settings = settings.unwrap();
+            save_settings(settings)
         } else {
             create_settings()
         }
@@ -126,11 +138,11 @@ fn load_settings() -> (GameSettings, bool) {
 
 // HELPER function, NOT system
 fn create_settings() -> (GameSettings, bool) {
-    let settings = GameSettings {
-        volume: 1.0,
-        resolution: (DEFAULT_WIDTH, DEFAULT_HEIGHT),
-    };
+    let settings: GameSettings = Default::default();
+    save_settings(settings)
+}
 
+fn save_settings(settings: GameSettings) -> (GameSettings, bool) {
     let pretty = PrettyConfig::new()
         .depth_limit(5)
         .separate_tuple_members(true)

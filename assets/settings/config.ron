@@ -1,3 +1,7 @@
 (
-    volume: 0.5,
+    volume: 0.0,
+    resolution: (
+        1280.0,
+        720.0,
+    ),
 )
