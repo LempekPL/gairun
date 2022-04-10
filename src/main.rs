@@ -14,11 +14,16 @@ const DEFAULT_HEIGHT: f32 = 960.0 / 2.0;
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
 enum AppState {
+    // loading
     Preload,
     LoadingAssets,
     Loading,
+    // main menu
     MainMenu,
     Settings,
+    // in-game
+    LoadingMap,
+    Game,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -140,7 +145,7 @@ fn setup(
     loading_text_query: Query<Entity, With<LoadingText>>,
     sound_assets: Res<SoundAssets>,
     audio: Res<Audio>,
-    settings: Res<GameSettings>
+    settings: Res<GameSettings>,
 ) {
     // remove loading text
     let loading_text_entity = loading_text_query.single();
