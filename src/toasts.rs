@@ -1,7 +1,7 @@
 use std::time::Duration;
 use bevy::prelude::*;
 
-pub struct Toasts;
+pub struct ToastsPlugin;
 
 #[derive(Debug)]
 pub struct ToastEvent {
@@ -17,7 +17,7 @@ struct ToastList;
 #[derive(Component)]
 struct ToastTimer(Timer);
 
-impl Plugin for Toasts {
+impl Plugin for ToastsPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_event::<ToastEvent>()

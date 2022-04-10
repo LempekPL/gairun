@@ -28,7 +28,7 @@ pub struct AssetLoaderPlugin;
 impl Plugin for AssetLoaderPlugin {
     fn build(&self, app: &mut App) {
         AssetLoader::new(AppState::LoadingAssets)
-            .continue_to_state(AppState::Loading)
+            .continue_to_state(AppState::Loading(0))
             .with_collection::<FontAssets>()
             .with_collection::<SoundAssets>()
             .with_collection::<TextureAssets>()
