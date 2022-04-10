@@ -1,6 +1,5 @@
 use std::time::Duration;
 use bevy::prelude::*;
-use crate::asset_loader::FontAssets;
 
 pub struct Toasts;
 

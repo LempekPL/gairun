@@ -127,6 +127,7 @@ fn despawn_menu(
 }
 
 // system for changing color for a button when user hovers over it or clicks it
+#[allow(clippy::type_complexity)]
 fn button_coloring_menu(
     mut interaction_query: Query<
         (&Interaction, &mut UiColor, &Children),
@@ -163,27 +164,24 @@ fn button_handling_menu(
     mut app_state: ResMut<State<AppState>>,
 ) {
     for (interaction, button_type) in interaction_query.iter() {
-        match interaction {
-            Interaction::Clicked => {
-                match button_type.0 {
-                    MenuButtonType::Quit => {
-                        event_writer.send(AppExit);
-                    }
-                    MenuButtonType::Play => {
-                        todo!();
-                    }
-                    MenuButtonType::Settings => {
-                        app_state.set(AppState::Settings).unwrap();
-                    }
-                    MenuButtonType::Back => {
-                        app_state.set(AppState::MainMenu).unwrap();
-                    }
-                    _ => {
-                        todo!();
-                    }
+        if interaction == &Interaction::Clicked {
+            match button_type.0 {
+                MenuButtonType::Quit => {
+                    event_writer.send(AppExit);
+                }
+                MenuButtonType::Play => {
+                    todo!();
+                }
+                MenuButtonType::Settings => {
+                    app_state.set(AppState::Settings).unwrap();
+                }
+                MenuButtonType::Back => {
+                    app_state.set(AppState::MainMenu).unwrap();
+                }
+                _ => {
+                    todo!();
                 }
             }
-            _ => {}
         }
     }
 }

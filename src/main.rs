@@ -28,7 +28,6 @@ enum AppState {
     Game,
 }
 
-#[serde(default)]
 #[derive(Deserialize, Serialize, Copy, Clone)]
 struct GameSettings {
     volume: f32,
@@ -53,7 +52,7 @@ struct LoadingText;
 
 fn main() {
     let mut app = App::new();
-    app.insert_resource(ClearColor(Color::BLACK.into()));
+    app.insert_resource(ClearColor(Color::BLACK));
     app.insert_resource(WindowDescriptor {
         title: "Gairun".to_string(),
         width: DEFAULT_WIDTH,
@@ -122,8 +121,7 @@ fn preload(
 fn load_settings() -> (GameSettings, bool) {
     if let Ok(saved_settings) = fs::read_to_string("./assets/settings/config.ron") {
         let settings: Result<GameSettings, _> = ron::from_str(&saved_settings);
-        if settings.is_ok() {
-            let settings = settings.unwrap();
+        if let Ok(settings) = settings {
             save_settings(settings)
         } else {
             create_settings()
@@ -152,6 +150,8 @@ fn save_settings(settings: GameSettings) -> (GameSettings, bool) {
     }
 }
 
+// to fix
+#[allow(clippy::too_many_arguments)]
 fn setup(
     mut commands: Commands,
     mut app_state: ResMut<State<AppState>>,
@@ -164,7 +164,7 @@ fn setup(
 ) {
     // check for game settings
     let (settings, error) = load_settings();
-    commands.insert_resource(settings.clone());
+    commands.insert_resource(settings);
     // display toast notification if user can't save settings file
     if error {
         ev_toast.send(ToastEvent {
@@ -183,6 +183,6 @@ fn setup(
     // move user to main menu
     app_state.set(AppState::MainMenu).unwrap();
     // play song
-    audio.set_volume(settings.volume.clone());
+    audio.set_volume(settings.volume);
     audio.play_looped(sound_assets.main_menu.clone());
 }
