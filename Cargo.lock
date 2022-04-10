@@ -272,18 +272,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_asset_ron"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5ee72bd3e8950e3dbcf6363742b1a2c253303192393d0dd9407d5273438d804"
-dependencies = [
- "anyhow",
- "bevy",
- "ron",
- "serde",
-]
-
-[[package]]
 name = "bevy_audio"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -939,6 +927,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "claxon"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4bfbf56724aa9eca8afa4fcfadeb479e722935bb2a0900c2d37e0cc477af0688"
+
+[[package]]
 name = "cocoa"
 version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1405,8 +1399,9 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_asset_loader",
- "bevy_asset_ron",
  "bevy_kira_audio",
+ "ron",
+ "serde",
 ]
 
 [[package]]
@@ -1621,12 +1616,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df"
 
 [[package]]
-name = "hound"
-version = "3.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a164bb2ceaeff4f42542bdb847c41517c78a60f5649671b2a07312b6e117549"
-
-[[package]]
 name = "ident_case"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1774,9 +1763,9 @@ checksum = "6e7a756bb5de5a0dea42a6f514037db18736b56c9e2313928746025721f9cca0"
 dependencies = [
  "atomic",
  "basedrop",
+ "claxon",
  "cpal",
  "getrandom",
- "hound",
  "indexmap",
  "instant",
  "lewton",

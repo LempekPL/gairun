@@ -13,7 +13,7 @@ pub struct FontAssets {
 
 #[derive(AssetCollection)]
 pub struct SoundAssets {
-    #[asset(path = "sounds/main_menu.wav")]
+    #[asset(path = "sounds/main_menu.flac")]
     pub main_menu: Handle<AudioSource>,
 }
 

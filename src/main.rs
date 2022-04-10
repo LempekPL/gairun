@@ -2,8 +2,10 @@ mod main_menu;
 mod asset_loader;
 
 use bevy::prelude::*;
-use bevy_asset_ron::RonAssetPlugin;
 use bevy_kira_audio::{Audio, AudioPlugin};
+use serde::{Serialize, Deserialize};
+use std::fs::{self};
+use ron::ser::{PrettyConfig, to_string_pretty};
 use crate::asset_loader::{AssetLoaderPlugin, SoundAssets};
 use crate::main_menu::MainMenuPlugin;
 
@@ -19,9 +21,7 @@ enum AppState {
     Settings,
 }
 
-#[derive(serde::Deserialize)]
-#[derive(TypeUuid)]
-#[uuid = "556b5b31-0b04-4ee2-a0ed-208184bd3905"]
+#[derive(Deserialize, Serialize)]
 struct GameSettings {
     volume: f32,
 }
@@ -31,6 +31,7 @@ struct Camera2D;
 
 #[derive(Component)]
 struct CameraUI;
+
 #[derive(Component)]
 struct LoadingText;
 
@@ -49,10 +50,6 @@ fn main() {
     app.add_state(AppState::Preload);
     app.add_plugins(DefaultPlugins);
     app.add_plugin(AudioPlugin);
-    // ron file reader
-    app.add_plugin(
-        RonAssetPlugin::<GameSettings>::new(&["sets"])
-    );
     // plugin that loads all needed assets
     app.add_plugin(AssetLoaderPlugin);
     // main menu systems
@@ -94,13 +91,47 @@ fn preload(
                     font_size: 80.0,
                     color: Color::WHITE,
                 },
-                Default::default()
+                Default::default(),
             ),
             ..Default::default()
         });
     }).insert(LoadingText);
+    // load game settings
+    commands.insert_resource(load_settings());
     // start loading assets
     app_state.set(AppState::LoadingAssets).unwrap();
+}
+
+// HELPER function, NOT system
+fn load_settings() -> GameSettings {
+    if let Ok(saved_settings) = fs::read_to_string("./assets/settings/config.ron") {
+        let settings: Result<GameSettings, _> = ron::from_str(&saved_settings);
+        if settings.is_ok() {
+            settings.unwrap()
+        } else {
+            create_settings()
+        }
+    } else {
+        create_settings()
+    }
+}
+
+// HELPER function, NOT system
+fn create_settings() -> GameSettings {
+    let settings = GameSettings {
+        volume: 1.0
+    };
+
+    let pretty = PrettyConfig::new()
+        .depth_limit(5)
+        .separate_tuple_members(true)
+        .decimal_floats(true);
+
+    if let Ok(_res) = fs::write("./assets/settings/config.ron", &to_string_pretty(&settings, pretty).unwrap()) {
+        settings
+    } else {
+        panic!("COULD NOT SAVE FILE");
+    }
 }
 
 fn setup(
@@ -109,6 +140,7 @@ fn setup(
     loading_text_query: Query<Entity, With<LoadingText>>,
     sound_assets: Res<SoundAssets>,
     audio: Res<Audio>,
+    settings: Res<GameSettings>
 ) {
     // remove loading text
     let loading_text_entity = loading_text_query.single();
@@ -118,5 +150,6 @@ fn setup(
     // move user to main menu
     app_state.set(AppState::MainMenu).unwrap();
     // play song
+    audio.set_volume(settings.volume.clone());
     audio.play_looped(sound_assets.main_menu.clone());
 }
