@@ -46,9 +46,6 @@ impl Default for GameSettings {
 }
 
 #[derive(Component)]
-struct Camera2D;
-
-#[derive(Component)]
 struct CameraUI;
 
 #[derive(Component)]
@@ -183,8 +180,6 @@ fn setup(
     // remove loading text
     let loading_text_entity = loading_text_query.single();
     commands.entity(loading_text_entity).despawn_recursive();
-    // camera 2d
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d()).insert(Camera2D);
     // move user to main menu
     app_state.set(AppState::MainMenu).unwrap();
     // play song
