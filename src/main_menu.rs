@@ -174,7 +174,7 @@ fn button_handling_menu(
                     ev_app_exit.send(AppExit);
                 }
                 MenuButtonType::Play => {
-                    todo!();
+                    app_state.set(AppState::Game(Playing)).unwrap();
                 }
                 MenuButtonType::ToMain => {
                     app_state.set(AppState::MainMenu(Main)).unwrap();

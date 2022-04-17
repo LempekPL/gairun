@@ -3,6 +3,8 @@ mod main_menu;
 mod asset_loader;
 mod toasts;
 mod loaders;
+mod entity;
+mod camera;
 
 use bevy::prelude::*;
 use bevy_kira_audio::AudioPlugin;
@@ -11,6 +13,8 @@ use crate::asset_loader::AssetLoaderPlugin;
 use crate::main_menu::MainMenuPlugin;
 use crate::toasts::ToastsPlugin;
 use crate::loaders::LoaderPlugin;
+use crate::entity::EntityPlugin;
+use crate::camera::CameraPlugin;
 
 const DEFAULT_WIDTH: f32 = 1280.0;
 const DEFAULT_HEIGHT: f32 = 720.0;
@@ -78,5 +82,7 @@ fn main() {
     app.add_plugin(MainMenuPlugin);
     app.add_plugin(ToastsPlugin);
     app.add_plugin(LoaderPlugin);
+    app.add_plugin(EntityPlugin);
+    app.add_plugin(CameraPlugin);
     app.run();
 }
