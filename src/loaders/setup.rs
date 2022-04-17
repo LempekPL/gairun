@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::{AppState, MainMenus};
+use crate::{AppState, Camera2D, MainMenus};
 use super::preload::LoadingText;
 
 pub(super) fn setup(
