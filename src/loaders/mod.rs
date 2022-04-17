@@ -2,13 +2,15 @@ mod preload;
 mod setup;
 mod setup_settings;
 mod setup_window;
+mod setup_sound;
 
 use bevy::prelude::*;
 use crate::AppState;
-use self::setup::{setup, setup_sound};
+use self::setup::setup;
 use self::preload::preload;
 use self::setup_settings::setup_settings;
 use self::setup_window::setup_window;
+use self::setup_sound::setup_sound;
 
 pub struct LoaderPlugin;
 
