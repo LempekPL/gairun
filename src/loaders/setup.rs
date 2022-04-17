@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_kira_audio::Audio;
-use crate::{AppState, GameSettings};
+use crate::{AppState, GameSettings, MainMenus};
 use crate::asset_loader::SoundAssets;
 use super::preload::LoadingText;
 
@@ -26,5 +26,5 @@ pub(super) fn setup(
     let loading_text_entity = loading_text_query.single();
     commands.entity(loading_text_entity).despawn_recursive();
     // move user to main menu
-    app_state.set(AppState::MainMenu).unwrap();
+    app_state.set(AppState::MainMenu(MainMenus::Main)).unwrap();
 }

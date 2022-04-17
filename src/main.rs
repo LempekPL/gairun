@@ -21,12 +21,23 @@ enum AppState {
     Preload,
     LoadingAssets,
     Loading(u8),
-    // main menu
-    MainMenu,
-    Settings,
+    MainMenu(MainMenus),
     // in-game
     LoadingMap,
-    Game,
+    Game(InGameState),
+}
+
+#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+enum MainMenus {
+    Main,
+    Settings(u8),
+    Credit
+}
+
+#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+enum InGameState {
+    Playing,
+    Paused
 }
 
 #[derive(Deserialize, Serialize, Copy, Clone)]
@@ -58,7 +69,6 @@ fn main() {
         title: "Gairun".to_string(),
         width: DEFAULT_WIDTH,
         height: DEFAULT_HEIGHT,
-        position: Some(Vec2::new(0.0, 0.0)),
         resizable: false,
         ..Default::default()
     });

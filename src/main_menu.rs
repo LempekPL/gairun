@@ -2,19 +2,22 @@ use bevy::prelude::*;
 use crate::{AppState, CameraUI};
 use crate::asset_loader::{FontAssets, TextureAssets};
 use bevy::app::AppExit;
+use crate::InGameState::Playing;
+use crate::MainMenus::{Credit, Main, Settings as Set};
 
 pub struct MainMenuPlugin;
 
 enum MenuButtonType {
     // main
     Play,
-    Settings,
     Quit,
     // settings
     Resolution,
     Sound,
     Credits,
-    Back,
+    // other
+    ToMain,
+    ToSettings,
 }
 
 #[derive(Component)]
@@ -32,24 +35,24 @@ struct MenuBackground;
 impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_system_set(SystemSet::on_enter(AppState::MainMenu)
+            .add_system_set(SystemSet::on_enter(AppState::MainMenu(Main))
                 .with_system(spawn_main_menu)
             )
-            .add_system_set(SystemSet::on_update(AppState::MainMenu)
+            .add_system_set(SystemSet::on_update(AppState::MainMenu(Main))
                 .with_system(button_coloring_menu)
                 .with_system(button_handling_menu)
             )
-            .add_system_set(SystemSet::on_exit(AppState::MainMenu)
+            .add_system_set(SystemSet::on_exit(AppState::MainMenu(Main))
                 .with_system(despawn_menu)
             )
-            .add_system_set(SystemSet::on_enter(AppState::Settings)
+            .add_system_set(SystemSet::on_enter(AppState::MainMenu(Set(0)))
                 .with_system(spawn_settings)
             )
-            .add_system_set(SystemSet::on_update(AppState::Settings)
+            .add_system_set(SystemSet::on_update(AppState::MainMenu(Set(0)))
                 .with_system(button_coloring_menu)
                 .with_system(button_handling_menu)
             )
-            .add_system_set(SystemSet::on_exit(AppState::Settings)
+            .add_system_set(SystemSet::on_exit(AppState::MainMenu(Set(0)))
                 .with_system(despawn_menu)
             );
     }
@@ -70,7 +73,7 @@ fn spawn_main_menu(
     let settings_button = spawn_return_list_button(
         &mut commands, &font_assets,
         "Settings".to_string(),
-        MenuButtonType::Settings,
+        MenuButtonType::ToSettings,
     );
     let quit_button = spawn_return_list_button(
         &mut commands, &font_assets,
@@ -89,11 +92,12 @@ fn spawn_settings(
     texture_assets: Res<TextureAssets>,
     camera_ui_query: Query<Entity, With<CameraUI>>,
 ) {
-    let res_button = spawn_return_list_button(
-        &mut commands, &font_assets,
-        "Resolution".to_string(),
-        MenuButtonType::Resolution,
-    );
+    // for now useless
+    // let res_button = spawn_return_list_button(
+    //     &mut commands, &font_assets,
+    //     "Resolution".to_string(),
+    //     MenuButtonType::Resolution,
+    // );
     let sound_button = spawn_return_list_button(
         &mut commands, &font_assets,
         "Sound".to_string(),
@@ -107,11 +111,11 @@ fn spawn_settings(
     let back_button = spawn_return_list_button(
         &mut commands, &font_assets,
         "Back".to_string(),
-        MenuButtonType::Back,
+        MenuButtonType::ToMain,
     );
     // grouping buttons into list
     let button_group = get_side_node(&mut commands);
-    commands.entity(button_group).push_children(&[res_button, sound_button, credits_button, back_button]);
+    commands.entity(button_group).push_children(&[sound_button, credits_button, back_button]);
     spawn_background(&mut commands, &camera_ui_query, &texture_assets);
 }
 
@@ -156,27 +160,34 @@ fn button_coloring_menu(
 }
 
 fn button_handling_menu(
-    interaction_query: Query<
+    q_interaction: Query<
         (&Interaction, &MenuButton),
         Changed<Interaction>
     >,
-    mut event_writer: EventWriter<AppExit>,
+    mut ev_app_exit: EventWriter<AppExit>,
     mut app_state: ResMut<State<AppState>>,
 ) {
-    for (interaction, button_type) in interaction_query.iter() {
+    for (interaction, button_type) in q_interaction.iter() {
         if interaction == &Interaction::Clicked {
             match button_type.0 {
                 MenuButtonType::Quit => {
-                    event_writer.send(AppExit);
+                    ev_app_exit.send(AppExit);
                 }
                 MenuButtonType::Play => {
                     todo!();
                 }
-                MenuButtonType::Settings => {
-                    app_state.set(AppState::Settings).unwrap();
+                MenuButtonType::ToMain => {
+                    app_state.set(AppState::MainMenu(Main)).unwrap();
                 }
-                MenuButtonType::Back => {
-                    app_state.set(AppState::MainMenu).unwrap();
+                // if resolution finds it's use it will be default
+                MenuButtonType::ToSettings => {
+                    app_state.set(AppState::MainMenu(Set(0))).unwrap();
+                }
+                MenuButtonType::Sound => {
+                    app_state.set(AppState::MainMenu(Set(1))).unwrap();
+                }
+                MenuButtonType::Credits => {
+                    app_state.set(AppState::MainMenu(Credit)).unwrap();
                 }
                 _ => {
                     todo!();

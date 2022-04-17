@@ -39,7 +39,7 @@ fn create_toast_node(
             align_items: AlignItems::Center,
             flex_direction: FlexDirection::Column,
             align_self: AlignSelf::Center,
-                ..Default::default()
+            ..Default::default()
         },
         color: UiColor(Color::NONE),
         ..Default::default()
