@@ -1,4 +1,5 @@
 #![windows_subsystem = "windows"]
+
 mod main_menu;
 mod asset_loader;
 mod toasts;
@@ -7,6 +8,7 @@ mod entity;
 mod camera;
 
 use bevy::prelude::*;
+use bevy_inspector_egui::WorldInspectorPlugin;
 use bevy_kira_audio::AudioPlugin;
 use serde::{Serialize, Deserialize};
 use crate::asset_loader::AssetLoaderPlugin;
@@ -20,7 +22,7 @@ const DEFAULT_WIDTH: f32 = 1280.0;
 const DEFAULT_HEIGHT: f32 = 720.0;
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
-enum AppState {
+pub enum AppState {
     // loading
     Preload,
     LoadingAssets,
@@ -32,16 +34,16 @@ enum AppState {
 }
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
-enum MainMenus {
+pub enum MainMenus {
     Main,
     Settings(u8),
-    Credit
+    Credit,
 }
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
-enum InGameState {
+pub enum InGameState {
     Playing,
-    Paused
+    Paused,
 }
 
 #[derive(Deserialize, Serialize, Copy, Clone)]
@@ -73,7 +75,7 @@ impl Default for GameKeys {
             up: KeyCode::W,
             down: KeyCode::S,
             left: KeyCode::A,
-            right: KeyCode::D
+            right: KeyCode::D,
         }
     }
 }
@@ -103,5 +105,7 @@ fn main() {
     app.add_plugin(LoaderPlugin);
     app.add_plugin(EntityPlugin);
     app.add_plugin(CameraPlugin);
+
+    app.add_plugin(WorldInspectorPlugin::new());
     app.run();
 }
