@@ -11,32 +11,29 @@ pub struct GameEntity;
 #[derive(Component)]
 pub struct GravityEntity;
 
-#[derive(Component)]
+#[derive(Reflect, Component)]
+#[reflect(Component)]
 pub struct Motion {
-    acc: f32,
-    dcc: f32,
-    weight: f32,
-    speed: Vec2,
+    pub acc: f32,
+    pub dcc: f32,
+    pub weight: f32,
+    pub speed: Vec2,
 }
-
-#[derive(Component)]
-pub struct Health(f32);
-
-#[derive(Component)]
-pub struct Visible;
-
-#[derive(Component)]
-pub struct Noclip;
 
 // components specific to player
 #[derive(Component)]
 pub struct Player;
 
 #[derive(Component)]
-pub struct Fly;
-
-#[derive(Component)]
 pub struct Controllable;
+
+#[derive(Reflect, Component)]
+#[reflect(Component)]
+pub struct EntitySettings {
+    pub visible: bool,
+    pub noclip: bool,
+    pub flying: bool,
+}
 
 // components specific to enemies
 #[derive(Component)]
@@ -56,6 +53,11 @@ impl Plugin for EntityPlugin {
             .add_system_set(SystemSet::on_exit(AppState::Game(Playing))
                 .with_system(despawn_player)
             );
+        app
+            .add_system(disable_visibility_on_change);
+        app
+            .register_type::<Motion>()
+            .register_type::<EntitySettings>();
     }
 }
 
@@ -77,29 +79,47 @@ fn spawn_player(
         .insert(Player)
         .insert(GravityEntity)
         .insert(Motion::new(0.1, 0.05, 1000.0))
-        .insert(Controllable);
+        .insert(Controllable)
+        .insert(EntitySettings::default());
 }
 
 fn controllable_user_keys(
-    mut q_motion: Query<&mut Motion, With<Controllable>>,
+    mut q_motion: Query<(&mut Motion, &EntitySettings), With<Controllable>>,
     keys: Res<Input<KeyCode>>,
     game_keys: Res<GameKeys>,
     time: Res<Time>,
 ) {
-    let delta = time.delta_seconds()*100.0;
-    for mut motion in q_motion.iter_mut() {
-        let key_a = keys.pressed(game_keys.left);
-        let key_d = keys.pressed(game_keys.right);
-        if keys.just_pressed(game_keys.up) {
+    let delta = time.delta_seconds() * 100.0;
+    for (mut motion, e_settings) in q_motion.iter_mut() {
+        let key_left = keys.pressed(game_keys.left);
+        let key_right = keys.pressed(game_keys.right);
+        // jump
+        if keys.just_pressed(game_keys.up) && !e_settings.flying {
             motion.speed.y = 5.0;
         }
-        if key_a {
+        // up down
+        if e_settings.flying {
+            let key_up = keys.pressed(game_keys.left);
+            let key_down = keys.pressed(game_keys.right);
+            if key_down {
+                motion.speed.y -= motion.acc * delta;
+            }
+            if key_up {
+                motion.speed.y += motion.acc * delta;
+            }
+            if (key_down && key_up) || (!key_down && !key_up) {
+                motion.speed.y -= motion.speed.y * motion.dcc * delta.clamp(0.0, 0.9);
+            }
+            motion.speed.y = motion.speed.y.clamp(-5.0, 5.0);
+        }
+        // left right
+        if key_left {
             motion.speed.x -= motion.acc * delta;
         }
-        if key_d {
+        if key_right {
             motion.speed.x += motion.acc * delta;
         }
-        if (key_a && key_d) || (!key_a && !key_d) {
+        if (key_left && key_right) || (!key_left && !key_right) {
             motion.speed.x -= motion.speed.x * motion.dcc * delta.clamp(0.0, 0.9);
         }
         motion.speed.x = motion.speed.x.clamp(-5.0, 5.0);
@@ -110,7 +130,7 @@ fn entity_motion(
     mut p_movement: Query<(&mut Transform, &Motion), With<GameEntity>>,
     time: Res<Time>,
 ) {
-    let delta = time.delta_seconds()*100.0;
+    let delta = time.delta_seconds() * 100.0;
     for (mut movement, motion) in p_movement.iter_mut() {
         movement.translation.x += motion.speed.x * delta;
         movement.translation.y += motion.speed.y * delta;
@@ -141,6 +161,14 @@ fn despawn_player(
         .despawn_recursive();
 }
 
+fn disable_visibility_on_change(
+    mut q_entity: Query<(&mut Visibility, &EntitySettings), Changed<EntitySettings>>,
+) {
+    for (mut vis, e_settings) in q_entity.iter_mut() {
+        vis.is_visible = e_settings.visible
+    }
+}
+
 impl Motion {
     fn new(acc: f32, dcc: f32, weight: f32) -> Self {
         Self {
@@ -159,6 +187,16 @@ impl Default for Motion {
             dcc: 1.0,
             weight: 0.0,
             speed: Vec2::new(0.0, 0.0),
+        }
+    }
+}
+
+impl Default for EntitySettings {
+    fn default() -> Self {
+        Self {
+            visible: true,
+            noclip: false,
+            flying: false,
         }
     }
 }
