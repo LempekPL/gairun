@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::{AppState, CameraUI};
+use crate::AppState;
 use crate::asset_loader::{FontAssets, TextureAssets};
 use bevy::app::AppExit;
 use crate::InGameState::Playing;
@@ -62,7 +62,7 @@ fn spawn_main_menu(
     mut commands: Commands,
     font_assets: Res<FontAssets>,
     texture_assets: Res<TextureAssets>,
-    camera_ui_query: Query<Entity, With<CameraUI>>,
+    camera_ui_query: Query<Entity, With<CameraUi>>,
 ) {
     // spawn buttons
     let play_button = spawn_return_list_button(
@@ -90,7 +90,7 @@ fn spawn_settings(
     mut commands: Commands,
     font_assets: Res<FontAssets>,
     texture_assets: Res<TextureAssets>,
-    camera_ui_query: Query<Entity, With<CameraUI>>,
+    camera_ui_query: Query<Entity, With<CameraUi>>,
 ) {
     // for now useless
     // let res_button = spawn_return_list_button(
@@ -244,7 +244,7 @@ fn spawn_return_list_button(commands: &mut Commands, font_assets: &Res<FontAsset
 // spawn background in bg camera
 fn spawn_background(
     commands: &mut Commands,
-    camera_ui_query: &Query<Entity, With<CameraUI>>,
+    camera_ui_query: &Query<Entity, With<CameraUi>>,
     texture_assets: &Res<TextureAssets>,
 ) {
     let cam = camera_ui_query.single();

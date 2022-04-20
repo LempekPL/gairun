@@ -80,13 +80,6 @@ impl Default for GameKeys {
     }
 }
 
-// global components
-#[derive(Component)]
-struct CameraUI;
-
-#[derive(Component)]
-struct Camera2D;
-
 fn main() {
     let mut app = App::new();
     app.insert_resource(ClearColor(Color::BLACK));

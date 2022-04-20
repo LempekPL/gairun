@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::{AppState, Camera2D, MainMenus};
+use crate::{AppState, MainMenus};
 use super::preload::LoadingText;
 
 pub(super) fn setup(
@@ -13,5 +13,5 @@ pub(super) fn setup(
     // move user to main menu
     app_state.set(AppState::MainMenu(MainMenus::Main)).unwrap();
     // create 2d camera
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d()).insert(Camera2D);
+    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 }

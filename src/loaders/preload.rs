@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::{AppState, CameraUI};
+use crate::AppState;
 
 #[derive(Component)]
 pub struct LoadingText;
@@ -10,7 +10,7 @@ pub(super) fn preload(
     asset_server: Res<AssetServer>,
 ) {
     // camera ui
-    commands.spawn_bundle(UiCameraBundle::default()).insert(CameraUI);
+    commands.spawn_bundle(UiCameraBundle::default());
     // loading text spawn
     commands.spawn_bundle(NodeBundle {
         style: Style {

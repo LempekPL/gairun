@@ -5,7 +5,7 @@ use crate::{AppState, GameKeys, GameSettings};
 use crate::asset_loader::FontAssets;
 use crate::toasts::ToastEvent;
 
-pub(super) fn setup_settings(
+pub fn setup_settings(
     mut commands: Commands,
     mut app_state: ResMut<State<AppState>>,
     font_assets: Res<FontAssets>,
@@ -62,11 +62,13 @@ fn load_settings<T>(settings_path: &str, default_settings: T) -> (T, bool)
 
 // HELPER function, NOT system
 fn save_settings<T: serde::Serialize>(settings_path: &str, settings: T) -> (T, bool) {
+    // makes ron files look better
     let pretty = PrettyConfig::new()
         .depth_limit(5)
         .separate_tuple_members(true)
         .decimal_floats(true);
 
+    // even if user can't save files you can still use default ones
     if let Ok(_res) = fs::write(settings_path, &to_string_pretty(&settings, pretty).unwrap()) {
         (settings, false)
     } else {

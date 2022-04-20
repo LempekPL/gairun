@@ -15,7 +15,7 @@ impl Plugin for CameraPlugin {
 }
 
 fn camera_follow_player(
-    mut p_cam_player: ParamSet<(Query<&mut Transform, With<Camera2D>>, Query<&Transform, With<Player>>)>
+    mut p_cam_player: ParamSet<(Query<&mut Transform, With<Camera2d>>, Query<&Transform, With<Player>>)>
 ) {
     let player = p_cam_player.p1();
     let player = player.single();
