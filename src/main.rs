@@ -59,6 +59,25 @@ impl Default for GameSettings {
     }
 }
 
+#[derive(Deserialize, Serialize, Copy, Clone)]
+struct GameKeys {
+    up: KeyCode,
+    down: KeyCode,
+    left: KeyCode,
+    right: KeyCode,
+}
+
+impl Default for GameKeys {
+    fn default() -> Self {
+        Self {
+            up: KeyCode::W,
+            down: KeyCode::S,
+            left: KeyCode::A,
+            right: KeyCode::D
+        }
+    }
+}
+
 // global components
 #[derive(Component)]
 struct CameraUI;
