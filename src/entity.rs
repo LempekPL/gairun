@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::egui::Shape::Vec;
-use crate::AppState;
+use crate::{AppState, GameKeys};
 use crate::InGameState::Playing;
 
 pub struct EntityPlugin;
@@ -77,20 +76,21 @@ fn spawn_player(
         .insert(GameEntity)
         .insert(Player)
         .insert(GravityEntity)
-        .insert(Motion::new(0.5, 0.05, 1000.0))
+        .insert(Motion::new(0.1, 0.05, 1000.0))
         .insert(Controllable);
 }
 
 fn controllable_user_keys(
     mut q_motion: Query<&mut Motion, With<Controllable>>,
     keys: Res<Input<KeyCode>>,
+    game_keys: Res<GameKeys>,
     time: Res<Time>,
 ) {
     let delta = time.delta_seconds()*100.0;
     for mut motion in q_motion.iter_mut() {
-        let key_a = keys.pressed(KeyCode::A);
-        let key_d = keys.pressed(KeyCode::D);
-        if keys.just_pressed(KeyCode::W) {
+        let key_a = keys.pressed(game_keys.left);
+        let key_d = keys.pressed(game_keys.right);
+        if keys.just_pressed(game_keys.up) {
             motion.speed.y = 5.0;
         }
         if key_a {
@@ -100,7 +100,7 @@ fn controllable_user_keys(
             motion.speed.x += motion.acc * delta;
         }
         if (key_a && key_d) || (!key_a && !key_d) {
-            motion.speed.x -= (motion.speed.x * motion.dcc * delta.clamp(0.0, 0.9));
+            motion.speed.x -= motion.speed.x * motion.dcc * delta.clamp(0.0, 0.9);
         }
         motion.speed.x = motion.speed.x.clamp(-5.0, 5.0);
     }
