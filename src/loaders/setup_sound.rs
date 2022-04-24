@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 use bevy_kira_audio::Audio;
-use crate::{AppState, GameSettings};
+use crate::AppState;
 use crate::asset_loader::SoundAssets;
+use crate::settings::GameSettings;
 
 pub(super) fn setup_sound(
     mut app_state: ResMut<State<AppState>>,

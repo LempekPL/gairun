@@ -8,6 +8,7 @@ mod entity;
 mod camera;
 mod menu;
 mod map_generation;
+mod settings;
 
 use bevy::prelude::*;
 use bevy::window::WindowMode;
@@ -67,55 +68,4 @@ pub enum MainMenus {
 pub enum InGameState {
     Playing,
     Paused,
-}
-
-#[derive(Deserialize, Serialize, Copy, Clone)]
-struct GameSettings {
-    volume: f32,
-    resolution: (f32, f32),
-    // 0 - Windowed
-    // 1 - BorderlessFullscreen
-    // 2 - SizedFullscreen
-    // 3 - Fullscreen
-    mode: u8,
-}
-
-impl GameSettings {
-    fn get_mode(self) -> WindowMode {
-        match self.mode {
-            0 => WindowMode::Windowed,
-            1 => WindowMode::BorderlessFullscreen,
-            2 => WindowMode::SizedFullscreen,
-            _ => WindowMode::Fullscreen,
-        }
-    }
-}
-
-#[derive(Deserialize, Serialize, Copy, Clone)]
-struct GameKeys {
-    up: KeyCode,
-    down: KeyCode,
-    left: KeyCode,
-    right: KeyCode,
-}
-
-impl Default for GameSettings {
-    fn default() -> Self {
-        Self {
-            volume: 1.0,
-            resolution: (1280.0, 720.0),
-            mode: 3,
-        }
-    }
-}
-
-impl Default for GameKeys {
-    fn default() -> Self {
-        Self {
-            up: KeyCode::W,
-            down: KeyCode::S,
-            left: KeyCode::A,
-            right: KeyCode::D,
-        }
-    }
 }

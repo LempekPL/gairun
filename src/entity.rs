@@ -1,7 +1,8 @@
 use bevy::prelude::*;
-use crate::{AppState, GameKeys};
+use crate::AppState;
 use crate::InGameState::Playing;
 use crate::MainMenus::Main;
+use crate::settings::GameKeybinds;
 
 pub struct EntityPlugin;
 
@@ -87,7 +88,7 @@ fn spawn_player(
 fn controllable_user_keys(
     mut q_motion: Query<(&mut Motion, &EntitySettings), With<Controllable>>,
     keys: Res<Input<KeyCode>>,
-    game_keys: Res<GameKeys>,
+    game_keys: Res<GameKeybinds>,
     time: Res<Time>,
 ) {
     let delta = time.delta_seconds() * 100.0;

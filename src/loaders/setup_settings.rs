@@ -1,8 +1,9 @@
 use std::fs;
 use bevy::prelude::*;
 use ron::ser::{PrettyConfig, to_string_pretty};
-use crate::{AppState, GameKeys, GameSettings};
+use crate::AppState;
 use crate::asset_loader::FontAssets;
+use crate::settings::{GameKeybinds, GameSettings};
 use crate::toasts::ToastEvent;
 
 pub fn setup_settings(
@@ -13,10 +14,10 @@ pub fn setup_settings(
     mut window: ResMut<Windows>,
 ) {
     // check for game settings
-    let (game_settings, error) = load_settings("./assets/settings/config.ron", GameSettings::default());
-    commands.insert_resource(game_settings);
-    // display toast notification if user can't save settings file
-    if error {
+    // main game settings
+    let (game_settings, err_settings) = load_settings("./assets/settings/config.ron", GameSettings::default());
+    // if there are any toasts send event
+    if err_settings {
         ev_toast.send(ToastEvent {
             text: "Can't save settings file".to_string(),
             text_color: Color::WHITE,
@@ -24,11 +25,11 @@ pub fn setup_settings(
             font: font_assets.open_sans_regular.clone(),
         });
     }
-    // check for game key settings
-    let (game_keys, error_keys) = load_settings("./assets/settings/keys.ron", GameKeys::default());
-    commands.insert_resource(game_keys);
-    // display toast notification if user can't save key settings file
-    if error_keys {
+    commands.insert_resource(game_settings);
+    // keybindings
+    let (game_keybinds, err_keybinds) = load_settings("./assets/settings/keys.ron", GameKeybinds::default());
+    // if there are any toasts send event
+    if err_keybinds {
         ev_toast.send(ToastEvent {
             text: "Can't save keybindings file".to_string(),
             text_color: Color::WHITE,
@@ -36,6 +37,8 @@ pub fn setup_settings(
             font: font_assets.open_sans_regular.clone(),
         });
     }
+    commands.insert_resource(game_keybinds);
+
     // set window settings
     let window = window.primary_mut();
     window.set_resolution(game_settings.resolution.0, game_settings.resolution.1);
@@ -70,8 +73,7 @@ fn save_settings<T: serde::Serialize>(settings_path: &str, settings: T) -> (T, b
         .separate_tuple_members(true)
         .decimal_floats(true);
 
-    // even if user can't save files you can still use default ones
-    if let Ok(_res) = fs::write(settings_path, &to_string_pretty(&settings, pretty).unwrap()) {
+    if let Ok(_) = fs::write(settings_path, &to_string_pretty(&settings, pretty).unwrap()) {
         (settings, false)
     } else {
         (settings, true)
