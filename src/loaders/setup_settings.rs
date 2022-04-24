@@ -73,7 +73,7 @@ fn save_settings<T: serde::Serialize>(settings_path: &str, settings: T) -> (T, b
         .separate_tuple_members(true)
         .decimal_floats(true);
 
-    if let Ok(_) = fs::write(settings_path, &to_string_pretty(&settings, pretty).unwrap()) {
+    if fs::write(settings_path, &to_string_pretty(&settings, pretty).unwrap()).is_ok() {
         (settings, false)
     } else {
         (settings, true)

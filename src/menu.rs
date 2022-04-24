@@ -149,9 +149,6 @@ fn button_handling_menu(
                 MenuButtonType::ToMainMenu => {
                     app_state.replace(AppState::MainMenu(Main)).unwrap();
                 }
-                _ => {
-                    panic!("Not supposed to happened");
-                }
             }
         }
     }

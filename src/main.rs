@@ -11,10 +11,8 @@ mod map_generation;
 mod settings;
 
 use bevy::prelude::*;
-use bevy::window::WindowMode;
 use bevy_inspector_egui::WorldInspectorPlugin;
 use bevy_kira_audio::AudioPlugin;
-use serde::{Serialize, Deserialize};
 use crate::asset_loader::AssetLoaderPlugin;
 use crate::camera::CameraPlugin;
 use crate::entity::EntityPlugin;
