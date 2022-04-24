@@ -30,7 +30,7 @@ pub fn setup_settings(
     // display toast notification if user can't save key settings file
     if error_keys {
         ev_toast.send(ToastEvent {
-            text: "Can't save settings keys file".to_string(),
+            text: "Can't save keybindings file".to_string(),
             text_color: Color::WHITE,
             background_color: Color::RED,
             font: font_assets.open_sans_regular.clone(),
