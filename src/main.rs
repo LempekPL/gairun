@@ -6,6 +6,7 @@ mod toasts;
 mod loaders;
 mod entity;
 mod camera;
+mod menu;
 
 use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
@@ -13,6 +14,7 @@ use bevy_kira_audio::AudioPlugin;
 use serde::{Serialize, Deserialize};
 use crate::asset_loader::AssetLoaderPlugin;
 use crate::main_menu::MainMenuPlugin;
+use crate::menu::InGameMenuPlugin;
 use crate::toasts::ToastsPlugin;
 use crate::loaders::LoaderPlugin;
 use crate::entity::EntityPlugin;
@@ -94,6 +96,7 @@ fn main() {
     app.add_plugin(AudioPlugin);
     app.add_plugin(AssetLoaderPlugin);
     app.add_plugin(MainMenuPlugin);
+    app.add_plugin(InGameMenuPlugin);
     app.add_plugin(ToastsPlugin);
     app.add_plugin(LoaderPlugin);
     app.add_plugin(EntityPlugin);

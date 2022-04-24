@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use crate::{AppState, GameKeys};
 use crate::InGameState::Playing;
+use crate::MainMenus::Main;
 
 pub struct EntityPlugin;
 
@@ -50,7 +51,7 @@ impl Plugin for EntityPlugin {
                 .with_system(entity_motion)
                 .with_system(entity_gravity_motion)
             )
-            .add_system_set(SystemSet::on_exit(AppState::Game(Playing))
+            .add_system_set(SystemSet::on_enter(AppState::MainMenu(Main))
                 .with_system(despawn_player)
             );
         app
@@ -155,10 +156,12 @@ fn despawn_player(
     mut commands: Commands,
     player: Query<Entity, With<Player>>,
 ) {
-    let player = player.single();
-    commands.
-        entity(player)
-        .despawn_recursive();
+    let player = player.get_single();
+    if let Ok(player) = player {
+        commands.
+            entity(player)
+            .despawn_recursive();
+    }
 }
 
 fn disable_visibility_on_change(
