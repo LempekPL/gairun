@@ -10,7 +10,7 @@ pub fn setup_settings(
     mut app_state: ResMut<State<AppState>>,
     font_assets: Res<FontAssets>,
     mut ev_toast: EventWriter<ToastEvent>,
-    mut win_desc: ResMut<WindowDescriptor>,
+    mut window: ResMut<Windows>,
 ) {
     // check for game settings
     let (game_settings, error) = load_settings("./assets/settings/config.ron", GameSettings::default());
@@ -36,9 +36,11 @@ pub fn setup_settings(
             font: font_assets.open_sans_regular.clone(),
         });
     }
-    // set window size
-    win_desc.width = game_settings.resolution.0;
-    win_desc.height = game_settings.resolution.1;
+    // set window settings
+    let window = window.primary_mut();
+    window.set_resolution(game_settings.resolution.0, game_settings.resolution.1);
+    window.set_mode(game_settings.get_mode());
+
     // move user to next loading step
     app_state.set(AppState::Loading(1)).unwrap();
 }

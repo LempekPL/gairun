@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::WindowId;
 use bevy::winit::WinitWindows;
+use winit::platform::windows::WindowExtWindows;
 use winit::window::Icon;
 
 pub fn setup_window(
@@ -17,7 +18,8 @@ pub fn setup_window(
         (rgba, width, height)
     };
     let icon = Icon::from_rgba(icon_rgba, icon_width, icon_height).unwrap();
-    primary.set_window_icon(Some(icon));
+    primary.set_window_icon(Some(icon.clone()));
+    primary.set_taskbar_icon(Some(icon));
     let monitor = primary.primary_monitor().unwrap();
     // set window position to be in the middle of primary screen
     let primary_game = window.get_primary_mut().unwrap();
