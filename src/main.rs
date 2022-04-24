@@ -29,6 +29,8 @@ fn main() {
     app.insert_resource(WindowDescriptor {
         title: "Gairun".to_string(),
         resizable: false,
+        width: 1920.0,
+        height: 1080.0,
         ..Default::default()
     });
     app.add_plugins(DefaultPlugins);
