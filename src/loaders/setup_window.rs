@@ -1,29 +1,19 @@
 use bevy::prelude::*;
+use crate::{AppState, MainMenus};
+use crate::settings::GameSettings;
 use bevy::window::WindowId;
 use bevy::winit::WinitWindows;
-use winit::platform::windows::WindowExtWindows;
-use winit::window::Icon;
 
 pub fn setup_window(
-    windows: NonSend<WinitWindows>,
+    mut app_state: ResMut<State<AppState>>,
     mut window: ResMut<Windows>,
+    game_settings: Res<GameSettings>,
 ) {
-    let primary = windows.get_window(WindowId::primary()).unwrap();
-    let (icon_rgba, icon_width, icon_height) = {
-        let image = image::open("icon.png")
-            .expect("Failed to open icon path")
-            .into_rgba8();
-        let (width, height) = image.dimensions();
-        let rgba = image.into_raw();
-        (rgba, width, height)
-    };
-    let icon = Icon::from_rgba(icon_rgba, icon_width, icon_height).unwrap();
-    primary.set_window_icon(Some(icon.clone()));
-    primary.set_taskbar_icon(Some(icon));
-    let monitor = primary.primary_monitor().unwrap();
-    // set window position to be in the middle of primary screen
-    let primary_game = window.get_primary_mut().unwrap();
-    let w_pos = ((monitor.size().width as f32 - primary_game.width()) / 2.0) as i32;
-    let h_pos = ((monitor.size().height as f32 - primary_game.height()) / 2.0) as i32;
-    primary_game.set_position(IVec2::new(w_pos, h_pos));
+    // set window settings
+    let window = window.get_primary_mut().unwrap();
+    window.set_mode(game_settings.get_mode());
+    window.set_resolution(game_settings.resolution.0, game_settings.resolution.1);
+    window.set_position(IVec2::new(0,0));
+
+    app_state.set(AppState::MainMenu(MainMenus::Main)).unwrap();
 }

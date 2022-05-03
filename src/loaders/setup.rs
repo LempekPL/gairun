@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::{AppState, MainMenus};
+use crate::AppState;
 use super::preload::LoadingText;
 
 pub(super) fn setup(
@@ -11,7 +11,7 @@ pub(super) fn setup(
     let loading_text_entity = loading_text_query.single();
     commands.entity(loading_text_entity).despawn_recursive();
     // move user to main menu
-    app_state.set(AppState::MainMenu(MainMenus::Main)).unwrap();
+    app_state.set(AppState::Loading(3)).unwrap();
     // create 2d camera
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 }

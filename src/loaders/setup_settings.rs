@@ -39,11 +39,6 @@ pub fn setup_settings(
     }
     commands.insert_resource(game_keybinds);
 
-    // set window settings
-    let window = window.primary_mut();
-    window.set_mode(game_settings.get_mode());
-    window.set_resolution(game_settings.resolution.0, game_settings.resolution.1);
-
     // move user to next loading step
     app_state.set(AppState::Loading(1)).unwrap();
 }
