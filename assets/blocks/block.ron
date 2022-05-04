@@ -1,0 +1,9 @@
+(
+    hitbox: (16., 16.),
+    texture: (
+        path: "gairun:blocks/block",
+        width: 16,
+        height: 16,
+        animation: None
+    )
+)

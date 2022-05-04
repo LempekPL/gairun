@@ -4,6 +4,7 @@ use crate::asset_loader::{FontAssets, TextureAssets};
 use bevy::app::AppExit;
 use crate::InGameState::Playing;
 use crate::MainMenus::{Credit, Main, Settings as Set};
+use crate::mapper::LoadMapEvent;
 
 pub struct MainMenuPlugin;
 
@@ -44,7 +45,8 @@ impl Plugin for MainMenuPlugin {
             )
             .add_system_set(SystemSet::on_exit(AppState::MainMenu(Main))
                 .with_system(despawn_menu)
-            )
+            );
+        app
             .add_system_set(SystemSet::on_enter(AppState::MainMenu(Set(0)))
                 .with_system(spawn_settings)
             )
@@ -166,6 +168,7 @@ fn button_handling_menu(
     >,
     mut ev_app_exit: EventWriter<AppExit>,
     mut app_state: ResMut<State<AppState>>,
+    mut ev_map_gen: EventWriter<LoadMapEvent>,
 ) {
     for (interaction, button_type) in q_interaction.iter() {
         if interaction == &Interaction::Clicked {
@@ -174,6 +177,11 @@ fn button_handling_menu(
                     ev_app_exit.send(AppExit);
                 }
                 MenuButtonType::Play => {
+                    ev_map_gen.send(LoadMapEvent {
+                        pack: "gairun".to_string(),
+                        collection: "collection".to_string(),
+                        name: "1".to_string(),
+                    });
                     app_state.set(AppState::Game(Playing)).unwrap();
                 }
                 MenuButtonType::ToMain => {

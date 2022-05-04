@@ -1,0 +1,22 @@
+(
+    playerSettings: (
+        spawn: Point("S"),
+        invisible: true,
+        controllability: true,
+        noclip: true
+    ),
+    // after in-game map editor update the names will be randomized
+    usedBlocks: {
+        "b": "gairun:blocks/block"
+    },
+    requiredPacks: [],
+    gameMap: [
+        ["b","b","b","b","b","b","b"],
+        ["b","","","","","","b"],
+        ["b","","","","","","b"],
+        ["b","","","","","","b"],
+        ["b","","","S","","","b"],
+        ["b","","","","","","b"],
+        ["b","b","b","b","b","b","b"],
+    ]
+)
