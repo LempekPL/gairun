@@ -8,7 +8,7 @@ pub struct ToastEvent {
     pub text: String,
     pub text_color: Color,
     pub background_color: Color,
-    pub font: Handle<Font>,
+    pub font: Option<Handle<Font>>,
 }
 
 #[derive(Component)]
@@ -50,9 +50,15 @@ fn spawn_toast(
     mut commands: Commands,
     mut ev_toasts: EventReader<ToastEvent>,
     mut q: Query<Entity, With<ToastList>>,
+    asset_server: Res<AssetServer>,
 ) {
     let toast_list = q.single_mut();
     for ev in ev_toasts.iter() {
+        let font: Handle<Font> = if ev.font.is_some() {
+            ev.font.as_ref().unwrap().clone()
+        } else {
+            asset_server.load("fonts/open_sans/OpenSans-Regular.ttf")
+        };
         let button_entity = commands.
             spawn_bundle(NodeBundle {
                 style: Style {
@@ -76,7 +82,7 @@ fn spawn_toast(
                         TextStyle {
                             color: ev.text_color,
                             font_size: 25.0,
-                            font: ev.font.clone(),
+                            font: font.clone(),
                         },
                         Default::default(),
                     ),
