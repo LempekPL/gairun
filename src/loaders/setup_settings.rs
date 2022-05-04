@@ -2,16 +2,13 @@ use std::fs;
 use bevy::prelude::*;
 use ron::ser::{PrettyConfig, to_string_pretty};
 use crate::AppState;
-use crate::asset_loader::FontAssets;
 use crate::settings::{GameKeybinds, GameSettings};
 use crate::toasts::ToastEvent;
 
 pub fn setup_settings(
     mut commands: Commands,
     mut app_state: ResMut<State<AppState>>,
-    font_assets: Res<FontAssets>,
     mut ev_toast: EventWriter<ToastEvent>,
-    mut window: ResMut<Windows>,
 ) {
     // check for game settings
     // main game settings
@@ -22,7 +19,7 @@ pub fn setup_settings(
             text: "Can't save settings file".to_string(),
             text_color: Color::WHITE,
             background_color: Color::RED,
-            font: font_assets.open_sans_regular.clone(),
+            font: None,
         });
     }
     commands.insert_resource(game_settings);
@@ -34,7 +31,7 @@ pub fn setup_settings(
             text: "Can't save keybindings file".to_string(),
             text_color: Color::WHITE,
             background_color: Color::RED,
-            font: font_assets.open_sans_regular.clone(),
+            font: None,
         });
     }
     commands.insert_resource(game_keybinds);
