@@ -1,14 +1,15 @@
 #![windows_subsystem = "windows"]
 
-mod main_menu;
+mod settings;
 mod asset_loader;
-mod toasts;
-mod loaders;
 mod entity;
 mod camera;
+mod loaders;
+mod mapper;
+mod toasts;
+mod main_menu;
 mod menu;
-mod map_generation;
-mod settings;
+mod presence;
 
 use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
@@ -17,9 +18,11 @@ use crate::asset_loader::AssetLoaderPlugin;
 use crate::camera::CameraPlugin;
 use crate::entity::EntityPlugin;
 use crate::loaders::LoaderPlugin;
+use crate::mapper::MapPlugin;
+use crate::toasts::ToastsPlugin;
 use crate::main_menu::MainMenuPlugin;
 use crate::menu::InGameMenuPlugin;
-use crate::toasts::ToastsPlugin;
+use crate::presence::DiscordPlugin;
 
 fn main() {
     let mut app = App::new();
@@ -33,6 +36,8 @@ fn main() {
     });
     app.add_plugins(DefaultPlugins);
     app.add_plugin(AudioPlugin);
+    app.add_plugin(WorldInspectorPlugin::new());
+
     app.add_plugin(AssetLoaderPlugin);
     app.add_plugin(MainMenuPlugin);
     app.add_plugin(InGameMenuPlugin);
@@ -40,10 +45,20 @@ fn main() {
     app.add_plugin(LoaderPlugin);
     app.add_plugin(EntityPlugin);
     app.add_plugin(CameraPlugin);
+    app.add_plugin(MapPlugin);
+    // only use discordRPC if compiled with --release flag
+    // unoptimized compiled version slows down the app
+    if !cfg!(debug_assertions) {
+        app.add_plugin(DiscordPlugin);
+    }
 
-    app.add_plugin(WorldInspectorPlugin::new());
+    app.insert_resource(GlobalScale(Vec3::new(2.0, 2.0, 2.0)));
+
     app.run();
 }
+
+#[derive(Clone, Copy)]
+pub struct GlobalScale(Vec3);
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
 pub enum AppState {
@@ -53,7 +68,6 @@ pub enum AppState {
     Loading(u8),
     MainMenu(MainMenus),
     // in-game
-    LoadingMap,
     Game(InGameState),
 }
 
