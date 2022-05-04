@@ -1,8 +1,9 @@
 use bevy::prelude::*;
-use crate::AppState;
+use crate::{AppState, GlobalScale};
 use crate::InGameState::Playing;
 use crate::MainMenus::Main;
 use crate::settings::GameKeybinds;
+// use bevy_render::texture::DEFAULT_IMAGE_HANDLE;
 
 pub struct EntityPlugin;
 
@@ -67,12 +68,17 @@ fn spawn_player(
     // currentMap: Res<CurrentMap>
     mut commands: Commands,
     // texture: Res<Image>
+    r_gs: Res<GlobalScale>
 ) {
     commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
                 color: Color::RED,
-                custom_size: Some(Vec2::new(32.0, 64.0)),
+                custom_size: Some(Vec2::new(16.0, 32.0)),
+                ..Default::default()
+            },
+            transform: Transform {
+                scale: r_gs.0,
                 ..Default::default()
             },
             ..Default::default()
