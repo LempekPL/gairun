@@ -1,31 +1,11 @@
-
+use bevy::prelude::{Bundle, SpriteSheetBundle};
 use serde::{Deserialize, Serialize};
+use crate::global::{Coords, Hitbox};
 
-// #[derive(Bundle)]
-// struct BlockBundle {
-//     transform: Transform
-// }
-
-
-// block file struct
-#[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct BlockConfig {
-    pub hitbox: (f32, f32),
-    pub texture: BlockTexture,
+#[derive(Bundle)]
+pub struct BlockBundle {
+    pub coords: Coords,
+    pub hitbox: Hitbox,
+    #[bundle]
+    pub sprite: SpriteSheetBundle,
 }
-
-#[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct BlockTexture {
-    pub path: String,
-    animation: Option<BlockAnimation>,
-    pub width: u32,
-    pub height: u32,
-}
-
-#[derive(Deserialize, Serialize, Clone, Debug)]
-struct BlockAnimation {
-    speed: String,
-    frames: u32,
-    frame_order: Vec<u32>,
-}
-//

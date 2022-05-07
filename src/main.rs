@@ -1,5 +1,6 @@
 #![windows_subsystem = "windows"]
 
+mod global;
 mod settings;
 mod asset_loader;
 mod entity;
