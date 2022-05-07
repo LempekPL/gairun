@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::render::texture::DEFAULT_IMAGE_HANDLE;
 use crate::{AppState, GlobalScale};
 use crate::InGameState::Playing;
 use crate::MainMenus::Main;
@@ -14,8 +15,7 @@ pub struct GameEntity;
 #[derive(Component)]
 pub struct GravityEntity;
 
-#[derive(Reflect, Component)]
-#[reflect(Component)]
+#[derive(Component)]
 pub struct Motion {
     pub acc: f32,
     pub dcc: f32,
@@ -30,12 +30,14 @@ pub struct Player;
 #[derive(Component)]
 pub struct Controllable;
 
-#[derive(Reflect, Component)]
-#[reflect(Component)]
-pub struct EntitySettings {
-    pub visible: bool,
-    pub noclip: bool,
-    pub flying: bool,
+#[derive(Component)]
+pub struct Noclip {
+    pub is_noclip: bool,
+}
+
+#[derive(Component)]
+pub struct Flying {
+    pub is_flying: bool,
 }
 
 // components specific to enemies
@@ -56,11 +58,6 @@ impl Plugin for EntityPlugin {
             .add_system_set(SystemSet::on_enter(AppState::MainMenu(Main))
                 .with_system(despawn_player)
             );
-        app
-            .add_system(disable_visibility_on_change);
-        app
-            .register_type::<Motion>()
-            .register_type::<EntitySettings>();
     }
 }
 
@@ -68,45 +65,43 @@ fn spawn_player(
     // currentMap: Res<CurrentMap>
     mut commands: Commands,
     // texture: Res<Image>
-    r_gs: Res<GlobalScale>
+    r_gs: Res<GlobalScale>,
 ) {
-    commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                color: Color::RED,
-                custom_size: Some(Vec2::new(16.0, 32.0)),
-                ..Default::default()
-            },
-            transform: Transform {
-                scale: r_gs.0,
-                ..Default::default()
-            },
+    commands.spawn_bundle(PlayerBundle {
+        sprite: Sprite {
+            color: Color::RED,
+            custom_size: Some(Vec2::new(16.0, 32.0)),
             ..Default::default()
-        })
+        },
+        transform: Transform {
+            scale: r_gs.0,
+            ..Default::default()
+        },
+        motion: Motion::new(0.1, 0.05, 1000.0),
+        ..Default::default()
+    })
         .insert(GameEntity)
         .insert(Player)
         .insert(GravityEntity)
-        .insert(Motion::new(0.1, 0.05, 1000.0))
-        .insert(Controllable)
-        .insert(EntitySettings::default());
+        .insert(Controllable);
 }
 
 fn controllable_user_keys(
-    mut q_motion: Query<(&mut Motion, &EntitySettings), With<Controllable>>,
+    mut q_motion: Query<(&mut Motion, &Flying), With<Controllable>>,
     keys: Res<Input<KeyCode>>,
     game_keys: Res<GameKeybinds>,
     time: Res<Time>,
 ) {
     let delta = time.delta_seconds() * 100.0;
-    for (mut motion, e_settings) in q_motion.iter_mut() {
+    for (mut motion, fly) in q_motion.iter_mut() {
         let key_left = keys.pressed(game_keys.left);
         let key_right = keys.pressed(game_keys.right);
         // jump
-        if keys.just_pressed(game_keys.up) && !e_settings.flying {
+        if keys.just_pressed(game_keys.up) && !fly.is_flying {
             motion.speed.y = 5.0;
         }
         // up down
-        if e_settings.flying {
+        if fly.is_flying {
             let key_up = keys.pressed(game_keys.left);
             let key_down = keys.pressed(game_keys.right);
             if key_down {
@@ -171,11 +166,30 @@ fn despawn_player(
     }
 }
 
-fn disable_visibility_on_change(
-    mut q_entity: Query<(&mut Visibility, &EntitySettings), Changed<EntitySettings>>,
-) {
-    for (mut vis, e_settings) in q_entity.iter_mut() {
-        vis.is_visible = e_settings.visible
+#[derive(Bundle)]
+pub struct PlayerBundle {
+    pub sprite: Sprite,
+    pub transform: Transform,
+    pub global_transform: GlobalTransform,
+    pub texture: Handle<Image>,
+    pub visibility: Visibility,
+    pub flying: Flying,
+    pub noclip: Noclip,
+    pub motion: Motion,
+}
+
+impl Default for PlayerBundle {
+    fn default() -> Self {
+        Self {
+            sprite: Default::default(),
+            transform: Default::default(),
+            global_transform: Default::default(),
+            texture: DEFAULT_IMAGE_HANDLE.typed(),
+            visibility: Default::default(),
+            flying: Default::default(),
+            noclip: Default::default(),
+            motion: Default::default(),
+        }
     }
 }
 
@@ -195,18 +209,24 @@ impl Default for Motion {
         Self {
             acc: 1.0,
             dcc: 1.0,
-            weight: 0.0,
+            weight: 1.0,
             speed: Vec2::new(0.0, 0.0),
         }
     }
 }
 
-impl Default for EntitySettings {
+impl Default for Flying {
     fn default() -> Self {
         Self {
-            visible: true,
-            noclip: false,
-            flying: false,
+            is_flying: false,
+        }
+    }
+}
+
+impl Default for Noclip {
+    fn default() -> Self {
+        Self {
+            is_noclip: false,
         }
     }
 }
