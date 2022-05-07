@@ -1,8 +1,6 @@
 use bevy::prelude::*;
 use crate::{AppState, MainMenus};
 use crate::settings::GameSettings;
-use bevy::window::WindowId;
-use bevy::winit::WinitWindows;
 
 pub fn setup_window(
     mut app_state: ResMut<State<AppState>>,
