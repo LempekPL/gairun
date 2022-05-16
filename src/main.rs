@@ -8,8 +8,7 @@ mod camera;
 mod loaders;
 mod mapper;
 mod toasts;
-mod main_menu;
-mod menu;
+mod menus;
 
 use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
@@ -21,8 +20,7 @@ use crate::entity::EntityPlugin;
 use crate::loaders::LoaderPlugin;
 use crate::mapper::MapPlugin;
 use crate::toasts::ToastsPlugin;
-use crate::main_menu::MainMenuPlugin;
-use crate::menu::InGameMenuPlugin;
+use crate::menus::MenuPlugin;
 
 fn main() {
     let mut app = App::new();
@@ -39,13 +37,12 @@ fn main() {
     app.add_plugin(WorldInspectorPlugin::new());
 
     app.add_plugin(AssetLoaderPlugin);
-    app.add_plugin(MainMenuPlugin);
-    app.add_plugin(InGameMenuPlugin);
     app.add_plugin(ToastsPlugin);
     app.add_plugin(LoaderPlugin);
     app.add_plugin(EntityPlugin);
     app.add_plugin(CameraPlugin);
     app.add_plugin(MapPlugin);
+    app.add_plugin(MenuPlugin);
 
     app.insert_resource(GlobalScale(Vec3::new(2.0, 2.0, 2.0)));
 

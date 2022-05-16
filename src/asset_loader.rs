@@ -21,6 +21,8 @@ pub struct SoundAssets {
 pub struct TextureAssets {
     #[asset(path = "textures/main_menu_background.png")]
     pub main_menu_background: Handle<Image>,
+    #[asset(path = "textures/gairun.png")]
+    pub gairun_title: Handle<Image>,
 }
 
 pub struct AssetLoaderPlugin;
