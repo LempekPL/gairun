@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use bevy::render::texture::DEFAULT_IMAGE_HANDLE;
-use crate::{AppState, GlobalScale};
-use crate::InGameState::Playing;
-use crate::MainMenus::Main;
+use crate::global::{AppState, GlobalScale};
+use crate::global::InGameState::Playing;
+use crate::global::MenuState::Main;
 use crate::settings::GameKeybinds;
 // use bevy_render::texture::DEFAULT_IMAGE_HANDLE;
 
@@ -55,7 +55,7 @@ impl Plugin for EntityPlugin {
                 .with_system(entity_motion)
                 .with_system(entity_gravity_motion)
             )
-            .add_system_set(SystemSet::on_enter(AppState::MainMenu(Main))
+            .add_system_set(SystemSet::on_enter(AppState::Menu(Main))
                 .with_system(despawn_player)
             );
     }

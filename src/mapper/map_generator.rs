@@ -3,10 +3,10 @@ use bevy::prelude::*;
 use bevy::utils::HashMap;
 use bevy::sprite::Rect;
 use serde::{Deserialize, Serialize};
-use crate::{EventWriter, GlobalScale};
-use crate::global::{Coords, Hitbox};
+use crate::EventWriter;
+use crate::global::{Coords, GlobalScale, Hitbox};
 use crate::mapper::{LoadMapEvent, MapComponent};
-use crate::mapper::blocks::{BlockBundle};
+use crate::mapper::blocks::BlockBundle;
 use crate::toasts::ToastEvent;
 
 pub fn generate_map(
@@ -80,7 +80,7 @@ pub fn generate_map(
                                     coords: Coords(Vec2::new(j as f32, i as f32)),
                                     hitbox: Hitbox(Vec2::new(block_data.width as f32, block_data.height as f32)),
                                     sprite: SpriteSheetBundle {
-                                        transform: Transform {
+                                        global_transform: GlobalTransform {
                                             translation: Vec3::new(j as f32 * 16.0 * 2., -(i as f32 * 16.0 * 2.), 1.0),
                                             scale: r_gs.0,
                                             ..Default::default()
@@ -89,9 +89,9 @@ pub fn generate_map(
                                         ..Default::default()
                                     }
                                 }).id();
+                                commands.entity(map_entity).push_children(&[block]);
                             }
                         }
-                        // commands.entity(map_entity).push_children(&[block]);
                     }
                 }
             } else {

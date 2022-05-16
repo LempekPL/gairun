@@ -2,8 +2,8 @@ mod map_generator;
 mod blocks;
 
 use bevy::prelude::*;
-use crate::AppState;
-use crate::InGameState::Playing;
+use crate::global::AppState;
+use crate::global::InGameState::Playing;
 use crate::mapper::map_generator::generate_map;
 
 pub struct MapPlugin;

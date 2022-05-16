@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::AppState;
+use crate::global::AppState;
 
 #[derive(Component)]
 pub struct LoadingText;

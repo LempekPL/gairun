@@ -6,7 +6,7 @@ mod setup_sound;
 mod setup_window;
 
 use bevy::prelude::{App, Plugin, SystemSet};
-use crate::AppState;
+use crate::global::AppState;
 use self::setup::setup;
 use self::preload::preload;
 use self::setup_settings::setup_settings;

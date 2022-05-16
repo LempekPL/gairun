@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_asset_loader::{AssetLoader, AssetCollection};
 use bevy_kira_audio::AudioSource;
-use crate::AppState;
+use crate::global::AppState;
 
 #[derive(AssetCollection)]
 pub struct FontAssets {

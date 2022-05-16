@@ -14,6 +14,7 @@ mod menu;
 use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
 use bevy_kira_audio::AudioPlugin;
+use global::GlobalScale;
 use crate::asset_loader::AssetLoaderPlugin;
 use crate::camera::CameraPlugin;
 use crate::entity::EntityPlugin;
@@ -49,31 +50,4 @@ fn main() {
     app.insert_resource(GlobalScale(Vec3::new(2.0, 2.0, 2.0)));
 
     app.run();
-}
-
-#[derive(Clone, Copy)]
-pub struct GlobalScale(Vec3);
-
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
-pub enum AppState {
-    // loading
-    Preload,
-    LoadingAssets,
-    Loading(u8),
-    MainMenu(MainMenus),
-    // in-game
-    Game(InGameState),
-}
-
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
-pub enum MainMenus {
-    Main,
-    Settings(u8),
-    Credit,
-}
-
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
-pub enum InGameState {
-    Playing,
-    Paused,
 }

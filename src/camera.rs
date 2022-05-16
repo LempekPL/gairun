@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use bevy::render::camera::Camera2d;
-use crate::AppState;
+use crate::global::AppState;
 use crate::entity::Player;
-use crate::InGameState::Playing;
+use crate::global::InGameState::Playing;
 
 pub(crate) struct CameraPlugin;
 

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::AppState;
+use crate::global::AppState;
 use super::preload::LoadingText;
 
 pub(super) fn setup(
