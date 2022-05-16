@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_kira_audio::Audio;
-use crate::AppState;
+use crate::global::AppState;
 use crate::asset_loader::SoundAssets;
 use crate::settings::GameSettings;
 

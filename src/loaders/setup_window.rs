@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::{AppState, MainMenus};
+use crate::global::{AppState, MenuState};
 use crate::settings::GameSettings;
 
 pub fn setup_window(
@@ -13,5 +13,5 @@ pub fn setup_window(
     window.set_resolution(game_settings.resolution.0, game_settings.resolution.1);
     window.set_position(IVec2::new(0,0));
 
-    app_state.set(AppState::MainMenu(MainMenus::Main)).unwrap();
+    app_state.set(AppState::Menu(MenuState::Main)).unwrap();
 }

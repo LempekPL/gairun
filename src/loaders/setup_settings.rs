@@ -1,7 +1,7 @@
 use std::fs;
 use bevy::prelude::*;
 use ron::ser::{PrettyConfig, to_string_pretty};
-use crate::AppState;
+use crate::global::AppState;
 use crate::settings::{GameKeybinds, GameSettings};
 use crate::toasts::ToastEvent;
 
