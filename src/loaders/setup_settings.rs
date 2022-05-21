@@ -12,7 +12,7 @@ pub fn setup_settings(
 ) {
     // check for game settings
     // main game settings
-    let (game_settings, err_settings) = load_settings("./assets/settings/config.ron", GameSettings::default());
+    let (game_settings, err_settings) = load_settings::<GameSettings>("./assets/settings/config.ron");
     // if there are any toasts send event
     if err_settings {
         ev_toast.send(ToastEvent {
@@ -24,7 +24,7 @@ pub fn setup_settings(
     }
     commands.insert_resource(game_settings);
     // keybindings
-    let (game_keybinds, err_keybinds) = load_settings("./assets/settings/keys.ron", GameKeybinds::default());
+    let (game_keybinds, err_keybinds) = load_settings::<GameKeybinds>("./assets/settings/keys.ron");
     // if there are any toasts send event
     if err_keybinds {
         ev_toast.send(ToastEvent {
@@ -41,19 +41,19 @@ pub fn setup_settings(
 }
 
 // HELPER function, NOT system
-fn load_settings<T>(settings_path: &str, default_settings: T) -> (T, bool)
+fn load_settings<T>(settings_path: &str) -> (T, bool)
     where
-        T: serde::Serialize + serde::de::DeserializeOwned
+        T: serde::Serialize + serde::de::DeserializeOwned + std::default::Default
 {
     if let Ok(saved_settings) = fs::read_to_string(settings_path) {
         let settings: Result<T, _> = ron::from_str(&saved_settings);
         if let Ok(settings) = settings {
             save_settings(settings_path, settings)
         } else {
-            save_settings(settings_path, default_settings)
+            save_settings(settings_path, T::default())
         }
     } else {
-        save_settings(settings_path, default_settings)
+        save_settings(settings_path, T::default())
     }
 }
 
