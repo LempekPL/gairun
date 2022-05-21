@@ -3,7 +3,7 @@ use bevy::window::WindowId;
 use bevy::winit::WinitWindows;
 use winit::window::Icon;
 use winit::platform::windows::WindowExtWindows;
-use crate::toasts::ToastEvent;
+use crate::ui::toasts::ToastEvent;
 
 pub fn setup_icon(
     windows: NonSend<WinitWindows>,

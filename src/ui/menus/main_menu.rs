@@ -1,11 +1,12 @@
 use bevy::app::AppExit;
 use bevy::prelude::*;
 use crate::asset_loader::{FontAssets, TextureAssets};
-use crate::global::AppState;
+use crate::global::{AppState};
 use crate::global::InGameState::Playing;
 use crate::global::MenuState::{Credit, Main, Settings};
 use crate::mapper::LoadMapEvent;
-use crate::menus::{button_coloring, create_button, despawn_ui_node_recursive, get_custom_ui_node, get_ui_node, MenuButton, UiNode};
+use crate::ui::MenuLayer;
+use crate::ui::menus::*;
 
 pub struct MainMenuPlugin;
 
@@ -54,7 +55,12 @@ fn spawn_menu(
     mut commands: Commands,
     font_assets: Res<FontAssets>,
     texture_assets: Res<TextureAssets>,
+    mut q: Query<Entity, With<MenuLayer>>,
 ) {
+    let menu = match q.get_single_mut() {
+        Ok(ent) => {ent}
+        Err(_) => {return}
+    };
     // spawn buttons
     let play_button = create_button(
         &mut commands,
@@ -77,21 +83,20 @@ fn spawn_menu(
     // title
     let gairun_title = commands.spawn_bundle(ImageBundle {
         style: Style {
-            // flex_grow: 2.,
             flex_shrink: 2.,
             margin: Rect {
                 top: Val::Px(-50.),
                 bottom: Val::Px(-50.),
-                ..Default::default()
+                ..default()
             },
-            ..Default::default()
+            ..default()
         },
         image: UiImage(texture_assets.gairun_title.clone()),
         transform: Transform {
             scale: Vec3::new(0.5,0.5,0.5),
-            ..Default::default()
+            ..default()
         },
-        ..Default::default()
+        ..default()
     }).id();
     // grouping everything into list
     let node_bundle = NodeBundle {
@@ -101,15 +106,16 @@ fn spawn_menu(
             justify_content: JustifyContent::Center,
             margin: Rect {
                 bottom: Val::Px(40.),
-                ..Default::default()
+                ..default()
             },
-            ..Default::default()
+            ..default()
         },
         color: UiColor::from(Color::rgba(0.0, 0.0, 0.0, 0.4)),
-        ..Default::default()
+        ..default()
     };
-    let button_grouper = get_custom_ui_node(&mut commands, node_bundle);
-    commands.entity(button_grouper).push_children(&[gairun_title, play_button, settings_button, quit_button]);
+    let grouper = get_custom_ui_node(&mut commands, node_bundle, "MainMenuGrouper".to_string());
+    commands.entity(menu).add_child(grouper);
+    commands.entity(grouper).push_children(&[gairun_title, play_button, settings_button, quit_button]);
 }
 
 fn button_handler_menu(

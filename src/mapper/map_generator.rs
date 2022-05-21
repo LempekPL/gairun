@@ -7,7 +7,7 @@ use crate::EventWriter;
 use crate::global::{Coords, GlobalScale, Hitbox};
 use crate::mapper::{LoadMapEvent, MapComponent};
 use crate::mapper::blocks::BlockBundle;
-use crate::toasts::ToastEvent;
+use crate::ui::toasts::ToastEvent;
 
 pub fn generate_map(
     mut commands: Commands,

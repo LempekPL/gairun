@@ -4,7 +4,7 @@ use bevy::ecs::query::{ChangedFetch, FilterFetch, WithFetch};
 use bevy::prelude::*;
 use crate::asset_loader::FontAssets;
 use crate::KeyCode::D;
-use crate::menus::main_menu::MainMenuPlugin;
+use crate::ui::menus::main_menu::MainMenuPlugin;
 
 pub struct MenuPlugin;
 
@@ -19,11 +19,11 @@ impl Plugin for MenuPlugin {
 pub struct MenuButton;
 
 #[derive(Component)]
-pub struct UiNode;
+pub struct UiMenu;
 
 pub fn despawn_ui_node_recursive(
     mut commands: Commands,
-    q_ui_node: Query<Entity, With<UiNode>>,
+    q_ui_node: Query<Entity, With<UiMenu>>,
 ) {
     let entity = q_ui_node.single();
     commands.entity(entity).despawn_recursive();
@@ -52,28 +52,29 @@ pub fn button_coloring(
 }
 
 // helper function
-pub fn get_ui_node(commands: &mut Commands) -> Entity {
+pub fn get_ui_node(commands: &mut Commands, name: String) -> Entity {
     let node_bundle = NodeBundle {
         style: Style {
             flex_direction: FlexDirection::ColumnReverse,
             margin: Rect {
                 left: Val::Auto,
                 right: Val::Auto,
-                ..Default::default()
+                ..default()
             },
-            ..Default::default()
+            ..default()
         },
         color: UiColor::from(Color::rgba(0.0, 0.0, 0.0, 0.4)),
-        ..Default::default()
+        ..default()
     };
-    get_custom_ui_node(commands, node_bundle)
+    get_custom_ui_node(commands, node_bundle, name)
 }
 
 // helper funciton
-pub fn get_custom_ui_node(commands: &mut Commands, node_bundle: NodeBundle) -> Entity {
+pub fn get_custom_ui_node(commands: &mut Commands, node_bundle: NodeBundle, name: String) -> Entity {
     commands
         .spawn_bundle(node_bundle)
-        .insert(UiNode)
+        .insert(UiMenu)
+        .insert(Name::new(name))
         .id()
 }
 
@@ -98,7 +99,7 @@ pub fn create_button<T: bevy::prelude::Component>(commands: &mut Commands, font:
         .with_children(|parent| {
             parent.spawn_bundle(TextBundle {
                 text: Text::with_section(
-                    name,
+                    &name,
                     TextStyle {
                         font: font.clone(),
                         font_size: 40.0,
@@ -111,5 +112,6 @@ pub fn create_button<T: bevy::prelude::Component>(commands: &mut Commands, font:
         })
         .insert(MenuButton)
         .insert(button_type)
+        .insert(Name::new(format!("{} button", name)))
         .id()
 }

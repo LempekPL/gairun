@@ -22,7 +22,7 @@ impl Plugin for GlobalPlugin {
 // global states and other
 
 #[derive(Clone, Copy)]
-pub struct GlobalScale(pub(crate) Vec3);
+pub struct GlobalScale(pub Vec3);
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
 pub enum AppState {

@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use ron::ser::{PrettyConfig, to_string_pretty};
 use crate::global::AppState;
 use crate::settings::{GameKeybinds, GameSettings};
-use crate::toasts::ToastEvent;
+use crate::ui::toasts::ToastEvent;
 
 pub fn setup_settings(
     mut commands: Commands,
