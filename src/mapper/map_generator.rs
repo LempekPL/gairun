@@ -30,7 +30,10 @@ pub fn generate_map(
         if let Ok(map_entity) = map_entity {
             commands.entity(map_entity).despawn_recursive();
         }
-        let map_entity = commands.spawn().insert(MapComponent).id();
+        let map_entity = commands.spawn()
+            .insert(MapComponent)
+            .insert(Name::new("MapGrouper"))
+            .id();
 
         // start loading new map
         let path = get_path(true, &map.pack, &format!("maps/{}", map.collection), &map.name);
@@ -89,18 +92,18 @@ pub fn generate_map(
                             let block_data = blocks_data.get(block_id);
                             if let Some(block_data) = block_data {
                                 let block = commands.spawn_bundle(BlockBundle {
-                                    coords: Coords(Vec2::new(j as f32, (i as f32))),
+                                    coords: Coords(Vec2::new(j as f32, i as f32)),
                                     hitbox: Hitbox(Vec2::new(block_data.width as f32, block_data.height as f32)),
                                     sprite: SpriteSheetBundle {
                                         global_transform: GlobalTransform {
-                                            translation: Vec3::new(j as f32 * 16.0 * r_gs.0.x, (i as f32 * 16.0 * r_gs.0.y), -0.01),
+                                            translation: Vec3::new(j as f32 * 16.0 * r_gs.0.x, i as f32 * 16.0 * r_gs.0.y, -0.01),
                                             scale: r_gs.0,
                                             ..default()
                                         },
                                         texture_atlas: block_data.texture.clone(),
                                         ..default()
                                     },
-                                }).id();
+                                }).insert(Name::new(format!("Block X: {}, Y: {}", j, i))).id();
                                 commands.entity(map_entity).push_children(&[block]);
                             }
                         }

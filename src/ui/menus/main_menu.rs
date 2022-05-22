@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::asset_loader::{FontAssets, TextureAssets};
 use crate::global::{AppState};
 use crate::global::InGameState::Playing;
-use crate::global::MenuState::{Credit, MainMenu, Settings};
+use crate::global::MenuState::{MainMenu};
 use crate::mapper::LoadMapEvent;
 use crate::ui::MenuLayer;
 use crate::ui::menus::*;

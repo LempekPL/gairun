@@ -1,11 +1,9 @@
 use bevy::prelude::*;
 use crate::asset_loader::{FontAssets, TextureAssets};
 use crate::global::{AppState};
-use crate::global::AppState::Menu;
 use crate::global::InGameState::{Paused, Playing};
 use crate::global::MenuState::{Credit, MainMenu, Settings};
 use crate::global::PausedState::InMain;
-use crate::mapper::LoadMapEvent;
 use crate::ui::MenuLayer;
 use crate::ui::menus::*;
 

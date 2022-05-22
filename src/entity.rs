@@ -1,13 +1,13 @@
 use bevy::prelude::*;
 use bevy::render::texture::DEFAULT_IMAGE_HANDLE;
 use bevy::sprite::collide_aabb::{collide, Collision};
-use bevy_prototype_debug_lines::DebugLines;
+use bevy_console::AddConsoleCommand;
+use bevy_inspector_egui::{Inspectable, RegisterInspectable};
 use crate::asset_loader::TextureAssets;
 use crate::global::{AppState, Coords, GlobalScale, Hitbox};
 use crate::global::InGameState::Playing;
 use crate::global::MenuState::MainMenu;
 use crate::settings::GameKeybinds;
-// use bevy_render::texture::DEFAULT_IMAGE_HANDLE;
 
 pub struct EntityPlugin;
 
@@ -18,10 +18,13 @@ pub struct GameEntity;
 #[derive(Component)]
 pub struct GravityEntity;
 
-#[derive(Component)]
+#[derive(Component, Inspectable)]
 pub struct Motion {
+    #[inspectable(min = 0.001, max = 2.0)]
     pub acc: f32,
+    #[inspectable(min = 0.001, max = 2.0)]
     pub dcc: f32,
+    #[inspectable(min = 0.001, max = 2000.0)]
     pub weight: f32,
     pub speed: Vec2,
 }
@@ -30,17 +33,17 @@ pub struct Motion {
 #[derive(Component)]
 pub struct Player;
 
-#[derive(Component, Default)]
+#[derive(Component, Inspectable, Default)]
 pub struct Controllable {
     pub is_controllable: bool,
 }
 
-#[derive(Component, Default)]
+#[derive(Component, Inspectable, Default)]
 pub struct Noclip {
     pub is_noclip: bool,
 }
 
-#[derive(Component, Default)]
+#[derive(Component, Inspectable, Default)]
 pub struct Flying {
     pub is_flying: bool,
 }
@@ -51,28 +54,31 @@ pub struct AI;
 
 impl Plugin for EntityPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_system_set(SystemSet::on_enter(AppState::Game(Playing))
-                .with_system(spawn_player)
+        app.add_system_set(SystemSet::on_enter(AppState::Game(Playing))
+            .with_system(spawn_player)
+        );
+        app.add_system_set(SystemSet::on_update(AppState::Game(Playing))
+            .with_system(controllable_user_keys
+                .before(entity_motion)
             )
-            .add_system_set(SystemSet::on_update(AppState::Game(Playing))
-                .with_system(controllable_user_keys
-                    .before(entity_motion)
-                )
-                .with_system(entity_motion)
-                .with_system(entity_gravity_motion
-                    .before(entity_motion)
-                    .before(controllable_user_keys)
-                )
-                .with_system(entity_collision
-                    .after(entity_gravity_motion)
-                    .after(controllable_user_keys)
-                    .after(entity_motion)
-                )
+            .with_system(entity_motion)
+            .with_system(entity_gravity_motion
+                .before(entity_motion)
+                .before(controllable_user_keys)
             )
-            .add_system_set(SystemSet::on_enter(AppState::Menu(MainMenu))
-                .with_system(despawn_player)
-            );
+            .with_system(entity_collision
+                .after(entity_gravity_motion)
+                .after(controllable_user_keys)
+                .after(entity_motion)
+            )
+        );
+        app.add_system_set(SystemSet::on_enter(AppState::Menu(MainMenu))
+            .with_system(despawn_player)
+        );
+        app.register_inspectable::<Motion>();
+        app.register_inspectable::<Controllable>();
+        app.register_inspectable::<Noclip>();
+        app.register_inspectable::<Flying>();
     }
 }
 
@@ -97,7 +103,8 @@ fn spawn_player(
     })
         .insert(GameEntity)
         .insert(Player)
-        .insert(GravityEntity);
+        .insert(GravityEntity)
+        .insert(Name::new("Player"));
 }
 
 fn controllable_user_keys(
