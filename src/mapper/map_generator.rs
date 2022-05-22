@@ -2,7 +2,8 @@ use std::fs;
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 use serde::{Deserialize, Serialize};
-use crate::EventWriter;
+use crate::entity::{Controllable, Player};
+use crate::{EventWriter, Flying, Noclip};
 use crate::global::{Coords, GlobalScale, Hitbox};
 use crate::mapper::{LoadMapEvent, MapComponent};
 use crate::mapper::blocks::BlockBundle;
@@ -13,10 +14,13 @@ pub fn generate_map(
     mut ev_gen_map: EventReader<LoadMapEvent>,
     mut ev_toast: EventWriter<ToastEvent>,
     q_map_entity: Query<Entity, With<MapComponent>>,
+    mut q_player: Query<(&mut Transform, &mut Flying, &mut Visibility, &mut Noclip, &mut Controllable), With<Player>>,
     r_gs: Res<GlobalScale>,
     mut r_tex_atlas: ResMut<Assets<TextureAtlas>>,
     asset_server: Res<AssetServer>,
 ) {
+    // get player
+    let (mut p_transform, mut fly, mut vis, mut noc, mut con) = q_player.get_single_mut().unwrap();
     // get first map to be in event
     let map = ev_gen_map.iter().next();
     if let Some(map) = map {
@@ -49,10 +53,10 @@ pub fn generate_map(
                             // TODO: check for animation
                             let texture_path = get_path_custom(false, block_config.texture.path, "textures");
                             let texture: Handle<Image> = asset_server.load(&format!("{}.png", texture_path)).clone();
-                            let texture= r_tex_atlas.add(TextureAtlas::from_grid(
+                            let texture = r_tex_atlas.add(TextureAtlas::from_grid(
                                 texture,
-                                Vec2::new(block_config.texture.width,block_config.texture.height),
-                                1,1
+                                Vec2::new(block_config.texture.width, block_config.texture.height),
+                                1, 1,
                             ));
                             blocks_data.insert(block_id.to_owned(), TempBlock {
                                 texture,
@@ -73,6 +77,13 @@ pub fn generate_map(
                 for (i, row) in map_config.game_map.iter().enumerate() {
                     for (j, block_id) in row.iter().enumerate() {
                         if !block_id.is_empty() {
+                            if map_config.player_settings.spawn.check_point(block_id) {
+                                p_transform.translation = Vec3::new(
+                                    j as f32 * 16. * r_gs.0.x,
+                                    -((i as f32 - 1.) * 16. + 8.) * r_gs.0.y,
+                                    0.,
+                                );
+                            }
                             let block_data = blocks_data.get(block_id);
                             if let Some(block_data) = block_data {
                                 let block = commands.spawn_bundle(BlockBundle {
@@ -86,13 +97,27 @@ pub fn generate_map(
                                         },
                                         texture_atlas: block_data.texture.clone(),
                                         ..default()
-                                    }
+                                    },
                                 }).id();
                                 commands.entity(map_entity).push_children(&[block]);
                             }
                         }
                     }
                 }
+
+                // check how to spawn player
+                if let PlayerSpawn::Coords(x, y) = map_config.player_settings.spawn {
+                    p_transform.translation = Vec3::new(
+                        x * 16. * r_gs.0.x,
+                        ((y - (map_config.game_map.len() as f32 - 1.)) * 16. + 8.) * r_gs.0.y,
+                        0.,
+                    );
+                }
+
+                fly.is_flying = map_config.player_settings.fly;
+                vis.is_visible = map_config.player_settings.visibility;
+                noc.is_noclip = map_config.player_settings.noclip;
+                con.is_controllable = map_config.player_settings.controllability;
             } else {
                 todo!("Display error toast 1 (wRONg formatting)")
             }
@@ -150,16 +175,38 @@ struct MapConfig {
 #[derive(Deserialize, Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 struct PlayerSettings {
+    #[serde(default = "DEF_SPA")]
     spawn: PlayerSpawn,
-    invisible: bool,
+    #[serde(default = "DEF_VIS")]
+    visibility: bool,
+    #[serde(default = "DEF_CON")]
     controllability: bool,
+    #[serde(default = "DEF_NOC")]
     noclip: bool,
+    #[serde(default = "DEF_FLY")]
+    fly: bool,
 }
+
+const DEF_SPA: fn() -> PlayerSpawn = || PlayerSpawn::Coords(0., 0.);
+const DEF_VIS: fn() -> bool = || true;
+const DEF_CON: fn() -> bool = || true;
+const DEF_NOC: fn() -> bool = || false;
+const DEF_FLY: fn() -> bool = || false;
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 enum PlayerSpawn {
     Point(String),
     Coords(f32, f32),
+}
+
+impl PlayerSpawn {
+    fn check_point(&self, s: &String) -> bool {
+        if let PlayerSpawn::Point(p) = self {
+            p == s
+        } else {
+            false
+        }
+    }
 }
 //
 

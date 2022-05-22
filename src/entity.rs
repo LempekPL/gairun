@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy::render::texture::DEFAULT_IMAGE_HANDLE;
-use crate::global::{AppState, GlobalScale};
+use bevy::sprite::collide_aabb::{collide, Collision};
+use bevy_prototype_debug_lines::DebugLines;
+use crate::global::{AppState, Coords, GlobalScale, Hitbox};
 use crate::global::InGameState::Playing;
 use crate::global::MenuState::Main;
 use crate::settings::GameKeybinds;
@@ -28,7 +30,9 @@ pub struct Motion {
 pub struct Player;
 
 #[derive(Component)]
-pub struct Controllable;
+pub struct Controllable {
+    pub is_controllable: bool,
+}
 
 #[derive(Component)]
 pub struct Noclip {
@@ -71,19 +75,19 @@ fn spawn_player(
         sprite: Sprite {
             color: Color::RED,
             custom_size: Some(Vec2::new(16.0, 32.0)),
-            ..Default::default()
+            ..default()
         },
         transform: Transform {
             scale: r_gs.0,
-            ..Default::default()
+            ..default()
         },
         motion: Motion::new(0.1, 0.05, 1000.0),
-        ..Default::default()
+        hitbox: Hitbox(Vec2::new(16., 32.)),
+        ..default()
     })
         .insert(GameEntity)
         .insert(Player)
-        .insert(GravityEntity)
-        .insert(Controllable);
+        .insert(GravityEntity);
 }
 
 fn controllable_user_keys(
@@ -93,7 +97,8 @@ fn controllable_user_keys(
     time: Res<Time>,
 ) {
     let delta = time.delta_seconds() * 100.0;
-    for (mut motion, fly) in q_motion.iter_mut() {
+    for (mut motion, fly, cont) in q_motion.iter_mut() {
+        if !cont.is_controllable { break; }
         let key_left = keys.pressed(game_keys.left);
         let key_right = keys.pressed(game_keys.right);
         // jump
@@ -102,8 +107,8 @@ fn controllable_user_keys(
         }
         // up down
         if fly.is_flying {
-            let key_up = keys.pressed(game_keys.left);
-            let key_down = keys.pressed(game_keys.right);
+            let key_up = keys.pressed(game_keys.up);
+            let key_down = keys.pressed(game_keys.down);
             if key_down {
                 motion.speed.y -= motion.acc * delta;
             }
@@ -141,16 +146,15 @@ fn entity_motion(
 }
 
 fn entity_gravity_motion(
-    mut q_motion: Query<(&Transform, &mut Motion), With<GravityEntity>>,
+    mut q_motion: Query<(&mut Motion, Option<&Flying>), With<GravityEntity>>,
     time: Res<Time>,
 ) {
     let delta = time.delta_seconds();
-    for (tr, mut motion) in q_motion.iter_mut() {
-        if tr.translation.y > 0.0 {
-            motion.speed.y -= 9.81 * motion.weight / 1000.0 * delta;
-        } else if motion.speed.y < 0.0 {
-            motion.speed.y = 0.0;
+    for (mut motion, flying) in q_motion.iter_mut() {
+        if let Some(fly) = flying {
+            if fly.is_flying { return; }
         }
+        motion.speed.y -= 9.81 * motion.weight / 1000.0 * delta;
     }
 }
 
@@ -172,9 +176,11 @@ pub struct PlayerBundle {
     pub transform: Transform,
     pub global_transform: GlobalTransform,
     pub texture: Handle<Image>,
+    pub hitbox: Hitbox,
     pub visibility: Visibility,
     pub flying: Flying,
     pub noclip: Noclip,
+    pub controllable: Controllable,
     pub motion: Motion,
 }
 
@@ -185,9 +191,11 @@ impl Default for PlayerBundle {
             transform: Default::default(),
             global_transform: Default::default(),
             texture: DEFAULT_IMAGE_HANDLE.typed(),
+            hitbox: Default::default(),
             visibility: Default::default(),
             flying: Default::default(),
             noclip: Default::default(),
+            controllable: Default::default(),
             motion: Default::default(),
         }
     }
@@ -227,6 +235,14 @@ impl Default for Noclip {
     fn default() -> Self {
         Self {
             is_noclip: false,
+        }
+    }
+}
+
+impl Default for Controllable {
+    fn default() -> Self {
+        Self {
+            is_controllable: false,
         }
     }
 }
