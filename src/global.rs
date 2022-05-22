@@ -10,9 +10,6 @@ pub struct Coords(pub Vec2);
 #[derive(Component, Inspectable)]
 pub struct Hitbox(pub Vec2);
 
-#[derive(Component)]
-pub struct GloballyScaled;
-
 pub struct GlobalPlugin;
 
 impl Plugin for GlobalPlugin {
@@ -22,47 +19,22 @@ impl Plugin for GlobalPlugin {
 
         app.insert_resource(IsDebug(false));
         app.insert_resource(GlobalScale::default());
-        #[cfg(debug_assertions)]
-        app.add_plugin(InspectorPlugin::<GlobalScale>::new());
-        app.add_system(change_global_scale_coords);
-        app.add_system(change_global_scale_translate);
     }
 }
 
 // global systems
 
-fn change_global_scale_coords(
-    mut q_globally_scaled: Query<(&mut GlobalTransform, &Coords), With<GloballyScaled>>,
-    r_gs: Res<GlobalScale>,
-) {
-    for (mut tran, coords) in q_globally_scaled.iter_mut() {
-        tran.scale = r_gs.0;
-        tran.translation = Vec3::new(coords.0.x * 16. * r_gs.0.x, coords.0.y * 16. * r_gs.0.y,0.0)
-    }
-}
-
-fn change_global_scale_translate(
-    mut q_globally_scaled: Query<(&mut Transform), With<GloballyScaled>>,
-    r_gs: Res<GlobalScale>,
-) {
-    for (mut tran) in q_globally_scaled.iter_mut() {
-        tran.scale = r_gs.0;
-        tran.translation = Vec3::new(tran.translation.x * 16. * r_gs.0.x, tran.translation.y * 16. * r_gs.0.y,0.0)
-    }
-}
 
 // global states and other
 
-#[derive(Clone, Copy, Inspectable)]
+#[derive(Clone, Copy)]
 pub struct GlobalScale(
-    #[inspectable(min = Vec3::new(0.1, 0.1, 0.1), max = Vec3::new(4., 4., 4.))]
     pub Vec3
 );
 
-
 impl Default for GlobalScale {
     fn default() -> Self {
-        Self(Vec3::new(2.,2.,2.))
+        Self(Vec3::new(4., 4., 1.))
     }
 }
 
