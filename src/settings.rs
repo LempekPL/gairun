@@ -12,12 +12,15 @@ pub struct GameKeybinds {
     pub left: KeyCode,
     #[serde(default = "DEF_KEY_RIGHT")]
     pub right: KeyCode,
+    #[serde(default = "DEF_KEY_DEBUG")]
+    pub debug: KeyCode,
 }
 
 const DEF_KEY_UP: fn() -> KeyCode = || KeyCode::W;
 const DEF_KEY_DOWN: fn() -> KeyCode = || KeyCode::S;
 const DEF_KEY_LEFT: fn() -> KeyCode = || KeyCode::A;
 const DEF_KEY_RIGHT: fn() -> KeyCode = || KeyCode::D;
+const DEF_KEY_DEBUG: fn() -> KeyCode = || KeyCode::F1;
 
 #[derive(Deserialize, Serialize, Copy, Clone)]
 pub struct GameSettings {
@@ -44,6 +47,7 @@ impl Default for GameKeybinds {
             down: KeyCode::S,
             left: KeyCode::A,
             right: KeyCode::D,
+            debug: KeyCode::F1,
         }
     }
 }

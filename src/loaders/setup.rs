@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use crate::global::AppState;
 use super::preload::LoadingText;
 
-pub(super) fn setup(
+pub fn setup(
     mut commands: Commands,
     mut app_state: ResMut<State<AppState>>,
     loading_text_query: Query<Entity, With<LoadingText>>,

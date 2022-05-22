@@ -1,10 +1,9 @@
 use std::fs;
 use bevy::prelude::*;
 use bevy::utils::HashMap;
-use bevy::sprite::Rect;
 use serde::{Deserialize, Serialize};
 use crate::EventWriter;
-use crate::global::{Coords, GlobalScale, Hitbox};
+use crate::global::{Coords, GloballyScaled, GlobalScale, Hitbox};
 use crate::mapper::{LoadMapEvent, MapComponent};
 use crate::mapper::blocks::BlockBundle;
 use crate::ui::toasts::ToastEvent;
@@ -81,14 +80,14 @@ pub fn generate_map(
                                     hitbox: Hitbox(Vec2::new(block_data.width as f32, block_data.height as f32)),
                                     sprite: SpriteSheetBundle {
                                         global_transform: GlobalTransform {
-                                            translation: Vec3::new(j as f32 * 16.0 * 2., -(i as f32 * 16.0 * 2.), 1.0),
+                                            translation: Vec3::new(j as f32 * 16.0 * r_gs.0.x, -(i as f32 * 16.0 * r_gs.0.y), -1.0),
                                             scale: r_gs.0,
                                             ..Default::default()
                                         },
                                         texture_atlas: block_data.texture.clone(),
                                         ..Default::default()
                                     }
-                                }).id();
+                                }).insert(GloballyScaled).id();
                                 commands.entity(map_entity).push_children(&[block]);
                             }
                         }
@@ -160,7 +159,7 @@ struct PlayerSettings {
 #[derive(Deserialize, Serialize, Clone, Debug)]
 enum PlayerSpawn {
     Point(String),
-    Coords(u32, u32),
+    Coords(f32, f32),
 }
 //
 

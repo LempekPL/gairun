@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_inspector_egui::WorldInspectorParams;
 use crate::global::AppState;
 
 #[derive(Component)]
@@ -8,6 +9,7 @@ pub(super) fn preload(
     mut commands: Commands,
     mut app_state: ResMut<State<AppState>>,
     asset_server: Res<AssetServer>,
+    mut world_inspector_params: ResMut<WorldInspectorParams>
 ) {
     // camera ui
     commands.spawn_bundle(UiCameraBundle::default());
@@ -40,6 +42,8 @@ pub(super) fn preload(
             ..Default::default()
         });
     }).insert(LoadingText);
+    // disable world egui
+    world_inspector_params.enabled = false;
     // start loading assets
     app_state.set(AppState::LoadingAssets).unwrap();
 }

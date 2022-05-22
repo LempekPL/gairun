@@ -1,7 +1,5 @@
 use std::time::Duration;
-use bevy::ecs::system::QuerySingleError;
 use bevy::prelude::*;
-use bevy::ui::FocusPolicy;
 use crate::ui::ToastLayer;
 
 pub struct ToastsPlugin;

@@ -1,9 +1,6 @@
 mod main_menu;
 
-use bevy::ecs::query::{ChangedFetch, FilterFetch, WithFetch};
 use bevy::prelude::*;
-use crate::asset_loader::FontAssets;
-use crate::KeyCode::D;
 use crate::ui::menus::main_menu::MainMenuPlugin;
 
 pub struct MenuPlugin;
