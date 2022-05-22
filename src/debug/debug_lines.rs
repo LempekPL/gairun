@@ -1,4 +1,3 @@
-use std::ops::Mul;
 use bevy::prelude::*;
 use bevy_prototype_debug_lines::DebugLines;
 use crate::global::{Coords, GlobalScale, Hitbox};

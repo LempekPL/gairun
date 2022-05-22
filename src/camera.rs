@@ -18,7 +18,7 @@ impl Plugin for CameraPlugin {
     }
 }
 
-#[warn(clippy::type_complexity)]
+#[allow(clippy::type_complexity)]
 fn camera_follow_player(
     mut q_camera_player: ParamSet<(Query<&mut Transform, With<Camera2d>>, Query<&Transform, With<Player>>)>
 ) {
@@ -48,5 +48,5 @@ fn move_camera(camera: f32, player: f32) -> f32 {
     if camera + BOX_SIZE < player {
         return (player - camera - BOX_SIZE) * CAMERA_SPEED;
     }
-    return 0.;
+    0.
 }

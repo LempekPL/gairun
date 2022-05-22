@@ -1,13 +1,13 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::{Inspectable, InspectorPlugin, RegisterInspectable};
+use bevy_inspector_egui::{Inspectable, RegisterInspectable};
 use crate::IsDebug;
 
 // components that could be used in more than one file
 
-#[derive(Component, Inspectable)]
+#[derive(Component, Inspectable, Default)]
 pub struct Coords(pub Vec2);
 
-#[derive(Component, Inspectable)]
+#[derive(Component, Inspectable, Default)]
 pub struct Hitbox(pub Vec2);
 
 pub struct GlobalPlugin;
@@ -68,18 +68,3 @@ pub enum PausedState {
     Main,
     Settings,
 }
-
-// defaults
-
-impl Default for Coords {
-    fn default() -> Self {
-        Self(Default::default())
-    }
-}
-
-impl Default for Hitbox {
-    fn default() -> Self {
-        Self(Default::default())
-    }
-}
-

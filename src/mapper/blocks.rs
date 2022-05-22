@@ -1,5 +1,4 @@
-use bevy::prelude::{Bundle, SpriteSheetBundle};
-use serde::{Deserialize, Serialize};
+use bevy::prelude::*;
 use crate::global::{Coords, Hitbox};
 
 #[derive(Bundle)]

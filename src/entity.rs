@@ -29,17 +29,17 @@ pub struct Motion {
 #[derive(Component)]
 pub struct Player;
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Controllable {
     pub is_controllable: bool,
 }
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Noclip {
     pub is_noclip: bool,
 }
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Flying {
     pub is_flying: bool,
 }
@@ -91,7 +91,7 @@ fn spawn_player(
 }
 
 fn controllable_user_keys(
-    mut q_motion: Query<(&mut Motion, &Flying), With<Controllable>>,
+    mut q_motion: Query<(&mut Motion, &Flying, &Controllable)>,
     keys: Res<Input<KeyCode>>,
     game_keys: Res<GameKeybinds>,
     time: Res<Time>,
@@ -219,30 +219,6 @@ impl Default for Motion {
             dcc: 1.0,
             weight: 1.0,
             speed: Vec2::new(0.0, 0.0),
-        }
-    }
-}
-
-impl Default for Flying {
-    fn default() -> Self {
-        Self {
-            is_flying: false,
-        }
-    }
-}
-
-impl Default for Noclip {
-    fn default() -> Self {
-        Self {
-            is_noclip: false,
-        }
-    }
-}
-
-impl Default for Controllable {
-    fn default() -> Self {
-        Self {
-            is_controllable: false,
         }
     }
 }

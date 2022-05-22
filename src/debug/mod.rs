@@ -1,10 +1,9 @@
-mod debug;
+mod debug_lines;
 
 use bevy::ecs::schedule::ShouldRun;
 use bevy::prelude::*;
-use bevy_console::{AddConsoleCommand, ConsolePlugin};
 use bevy_inspector_egui::WorldInspectorParams;
-use crate::debug::debug::debug_lines;
+use crate::debug::debug_lines::debug_lines;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct IsDebug(pub bool);

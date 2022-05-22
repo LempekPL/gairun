@@ -9,6 +9,7 @@ use crate::mapper::{LoadMapEvent, MapComponent};
 use crate::mapper::blocks::BlockBundle;
 use crate::ui::toasts::ToastEvent;
 
+#[allow(clippy::too_many_arguments)]
 pub fn generate_map(
     mut commands: Commands,
     mut ev_gen_map: EventReader<LoadMapEvent>,
@@ -150,15 +151,15 @@ fn get_path(full: bool, pack: &str, place: &str, name: &str) -> String {
 
 // helper function
 fn get_path_from_string(full: bool, path_string: String) -> String {
-    let pack: Vec<&str> = path_string.split(":").collect();
-    let place: Vec<&str> = pack[1].split("/").collect();
+    let pack: Vec<&str> = path_string.split(':').collect();
+    let place: Vec<&str> = pack[1].split('/').collect();
     get_path(full, pack[0], place[0], place[1])
 }
 
 // helper function
 fn get_path_custom(full: bool, path_string: String, custom: &str) -> String {
-    let pack: Vec<&str> = path_string.split(":").collect();
-    let place: Vec<&str> = pack[1].split("/").collect();
+    let pack: Vec<&str> = path_string.split(':').collect();
+    let place: Vec<&str> = pack[1].split('/').collect();
     get_path(full, pack[0], &format!("{}/{}", custom, place[0]), place[1])
 }
 
