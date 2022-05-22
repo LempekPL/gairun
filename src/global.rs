@@ -52,7 +52,7 @@ pub enum AppState {
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
 pub enum MenuState {
-    Main,
+    MainMenu,
     Settings,
     Credit,
 }
@@ -65,6 +65,6 @@ pub enum InGameState {
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
 pub enum PausedState {
-    Main,
+    InMain,
     Settings,
 }

@@ -1,55 +1,60 @@
-use bevy::app::AppExit;
 use bevy::prelude::*;
 use crate::asset_loader::{FontAssets, TextureAssets};
 use crate::global::{AppState};
-use crate::global::InGameState::Playing;
+use crate::global::AppState::Menu;
+use crate::global::InGameState::{Paused, Playing};
 use crate::global::MenuState::{Credit, MainMenu, Settings};
+use crate::global::PausedState::InMain;
 use crate::mapper::LoadMapEvent;
 use crate::ui::MenuLayer;
 use crate::ui::menus::*;
 
-pub struct MainMenuPlugin;
+pub struct InGameMenuPlugin;
 
-impl Plugin for MainMenuPlugin {
+impl Plugin for InGameMenuPlugin {
     fn build(&self, app: &mut App) {
-        // main menu
+        // in-game main
         app
-            .add_system_set(SystemSet::on_enter(AppState::Menu(MainMenu))
+            .add_system_set(SystemSet::on_update(AppState::Game(Playing))
+                .with_system(check_for_un_pause)
+            )
+            .add_system_set(SystemSet::on_enter(AppState::Game(Paused(InMain)))
                 .with_system(spawn_menu)
             )
-            .add_system_set(SystemSet::on_update(AppState::Menu(MainMenu))
+            .add_system_set(SystemSet::on_update(AppState::Game(Paused(InMain)))
                 .with_system(button_coloring)
                 .with_system(button_handler_menu)
+                .with_system(check_for_un_pause)
             )
-            .add_system_set(SystemSet::on_exit(AppState::Menu(MainMenu))
+            .add_system_set(SystemSet::on_exit(AppState::Game(Paused(InMain)))
                 .with_system(despawn_ui_node_recursive)
             );
-        // settings
-        // app
-        //     .add_system_set(SystemSet::on_enter(AppState::Menu(Settings))
-        //                         .with_system(spawn_settings)
-        //                     // .with_system()
-        //     )
-        //     .add_system_set(SystemSet::on_update(AppState::Menu(Settings))
-        //         .with_system(button_coloring)
-        //         .with_system(button_handler_settings)
-        //     )
-        //     .add_system_set(SystemSet::on_exit(AppState::Menu(Settings))
-        //         .with_system(despawn_settings)
-        //     );
     }
 }
 
 #[derive(Component)]
 enum ButtonType {
-    Play,
-    ToSettings,
+    Continue,
     ToMain,
-    Quit,
 }
 
 #[derive(Component)]
 struct GairunTitle;
+
+fn check_for_un_pause(
+    mut keys: ResMut<Input<KeyCode>>,
+    mut app_state: ResMut<State<AppState>>,
+) {
+    if keys.just_pressed(KeyCode::Escape) {
+        if app_state.current() == &AppState::Game(Playing) {
+            app_state.push(AppState::Game(Paused(InMain))).unwrap();
+            keys.reset(KeyCode::Escape);
+        } else if app_state.current() == &AppState::Game(Paused(InMain)) {
+            app_state.pop().unwrap();
+            keys.reset(KeyCode::Escape);
+        }
+    }
+}
 
 fn spawn_menu(
     mut commands: Commands,
@@ -62,23 +67,17 @@ fn spawn_menu(
         Err(_) => {return}
     };
     // spawn buttons
-    let play_button = create_button(
+    let continue_button = create_button(
         &mut commands,
         font_assets.open_sans_regular.clone(),
-        "PLAY".to_string(),
-        ButtonType::Play,
+        "Continue".to_string(),
+        ButtonType::Continue,
     );
-    let settings_button = create_button(
+    let main_button = create_button(
         &mut commands,
         font_assets.open_sans_regular.clone(),
-        "Settings".to_string(),
-        ButtonType::ToSettings,
-    );
-    let quit_button = create_button(
-        &mut commands,
-        font_assets.open_sans_regular.clone(),
-        "Quit".to_string(),
-        ButtonType::Quit,
+        "Main Menu".to_string(),
+        ButtonType::ToMain,
     );
     // title
     let gairun_title = commands.spawn_bundle(ImageBundle {
@@ -110,12 +109,12 @@ fn spawn_menu(
             },
             ..default()
         },
-        color: UiColor::from(Color::rgba(0.0, 0.0, 0.0, 0.4)),
+        color: UiColor::from(Color::rgba(0.0, 0.0, 0.0, 0.5)),
         ..default()
     };
-    let grouper = get_custom_ui_node(&mut commands, node_bundle, "MainMenuGrouper".to_string());
+    let grouper = get_custom_ui_node(&mut commands, node_bundle, "InGameGrouper".to_string());
     commands.entity(menu).add_child(grouper);
-    commands.entity(grouper).push_children(&[gairun_title, play_button, settings_button, quit_button]);
+    commands.entity(grouper).push_children(&[gairun_title, continue_button, main_button]);
 }
 
 fn button_handler_menu(
@@ -123,26 +122,16 @@ fn button_handler_menu(
         (&Interaction, &ButtonType),
         Changed<Interaction>
     >,
-    mut ev_app_exit: EventWriter<AppExit>,
     mut app_state: ResMut<State<AppState>>,
-    mut ev_map_gen: EventWriter<LoadMapEvent>,
 ) {
     for (interaction, button_type) in q_interaction.iter() {
         if interaction == &Interaction::Clicked {
             match button_type {
-                ButtonType::Quit => {
-                    ev_app_exit.send(AppExit);
+                ButtonType::Continue => {
+                    app_state.pop().unwrap();
                 }
-                ButtonType::Play => {
-                    ev_map_gen.send(LoadMapEvent {
-                        pack: "gairun".to_string(),
-                        collection: "collection".to_string(),
-                        name: "1".to_string(),
-                    });
-                    app_state.set(AppState::Game(Playing)).unwrap();
-                }
-                ButtonType::ToSettings => {
-                    app_state.set(AppState::Menu(Settings)).unwrap();
+                ButtonType::ToMain => {
+                    app_state.set(AppState::Menu(MainMenu)).unwrap();
                 }
                 _ => {
                     app_state.set(AppState::Menu(MainMenu)).unwrap();

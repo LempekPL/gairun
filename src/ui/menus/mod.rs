@@ -1,6 +1,8 @@
 mod main_menu;
+mod ingame_menu;
 
 use bevy::prelude::*;
+use crate::ui::menus::ingame_menu::InGameMenuPlugin;
 use crate::ui::menus::main_menu::MainMenuPlugin;
 
 pub struct MenuPlugin;
@@ -8,7 +10,7 @@ pub struct MenuPlugin;
 impl Plugin for MenuPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(MainMenuPlugin);
-        // app.add_plugin(InGameMenuPlugin);
+        app.add_plugin(InGameMenuPlugin);
     }
 }
 
@@ -81,7 +83,7 @@ pub fn create_button<T: bevy::prelude::Component>(commands: &mut Commands, font:
         .spawn_bundle(ButtonBundle {
             style: Style {
                 // size button
-                size: Size::new(Val::Px(150.0), Val::Px(65.0)),
+                size: Size::new(Val::Px(200.0), Val::Px(65.0)),
                 // center button
                 margin: Rect::all(Val::Auto),
                 // horizontally center child text

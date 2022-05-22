@@ -5,7 +5,7 @@ use bevy_prototype_debug_lines::DebugLines;
 use crate::asset_loader::TextureAssets;
 use crate::global::{AppState, Coords, GlobalScale, Hitbox};
 use crate::global::InGameState::Playing;
-use crate::global::MenuState::Main;
+use crate::global::MenuState::MainMenu;
 use crate::settings::GameKeybinds;
 // use bevy_render::texture::DEFAULT_IMAGE_HANDLE;
 
@@ -56,16 +56,21 @@ impl Plugin for EntityPlugin {
                 .with_system(spawn_player)
             )
             .add_system_set(SystemSet::on_update(AppState::Game(Playing))
-                .with_system(controllable_user_keys)
+                .with_system(controllable_user_keys
+                    .before(entity_motion)
+                )
                 .with_system(entity_motion)
-                .with_system(entity_gravity_motion)
+                .with_system(entity_gravity_motion
+                    .before(entity_motion)
+                    .before(controllable_user_keys)
+                )
                 .with_system(entity_collision
                     .after(entity_gravity_motion)
                     .after(controllable_user_keys)
                     .after(entity_motion)
                 )
             )
-            .add_system_set(SystemSet::on_enter(AppState::Menu(Main))
+            .add_system_set(SystemSet::on_enter(AppState::Menu(MainMenu))
                 .with_system(despawn_player)
             );
     }
