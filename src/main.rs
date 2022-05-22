@@ -106,27 +106,27 @@ fn noclip_command(
 ) {
     if let Some(NoclipCommand { option }) = log.take() {
         match q_entity.get_single_mut() {
-            Ok(ent) => {
+            Ok(mut ent) => {
                 log.ok();
                 match option {
                     Some(true) => {
-                        ent.is_noclip.0 = true;
+                        ent.is_noclip = true;
                         reply!(log, "Noclip turned on");
                     }
                     Some(false) => {
-                        ent.is_noclip.0 = false;
+                        ent.is_noclip = false;
                         reply!(log, "Noclip turned off");
                     }
                     None => {
-                        ent.is_noclip = !ent.is_noclip.0;
-                        let what = if r_debug.0 { "on" } else { "off" };
+                        ent.is_noclip = !ent.is_noclip;
+                        let what = if ent.is_noclip { "on" } else { "off" };
                         reply!(log, "Noclip turned {}", what);
                     }
                 }
             }
             Err(ent_err) => {
                 log.failed();
-                reply!(ent_err);
+                reply!(log, "{:?}",ent_err);
             }
         }
     }
@@ -145,27 +145,27 @@ fn fly_command(
 ) {
     if let Some(FlyCommand { option }) = log.take() {
         match q_entity.get_single_mut() {
-            Ok(ent) => {
+            Ok(mut ent) => {
                 log.ok();
                 match option {
                     Some(true) => {
-                        ent.is_flying.0 = true;
+                        ent.is_flying = true;
                         reply!(log, "Fly turned on");
                     }
                     Some(false) => {
-                        ent.is_flying.0 = false;
+                        ent.is_flying = false;
                         reply!(log, "Fly turned off");
                     }
                     None => {
-                        ent.is_flying = !ent.is_flying.0;
-                        let what = if r_debug.0 { "on" } else { "off" };
+                        ent.is_flying = !ent.is_flying;
+                        let what = if ent.is_flying { "on" } else { "off" };
                         reply!(log, "Fly turned {}", what);
                     }
                 }
             }
             Err(ent_err) => {
                 log.failed();
-                reply!(ent_err);
+                reply!(log, "{:?}",ent_err);
             }
         }
     }
