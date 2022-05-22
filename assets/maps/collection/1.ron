@@ -11,6 +11,7 @@
     usedBlocks: {
         "b": "gairun:blocks/block"
     },
+    // new system
     // resources: {
     //     "b": Block("gairun:blocks/block")
     //     "t": Embedded("b")

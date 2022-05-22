@@ -142,7 +142,7 @@ fn button_handler_menu(
                     app_state.set(AppState::Game(Playing)).unwrap();
                 }
                 ButtonType::ToSettings => {
-                    app_state.set(AppState::Menu(Settings)).unwrap();
+                    // app_state.set(AppState::Menu(Settings)).unwrap();
                 }
                 _ => {
                     app_state.set(AppState::Menu(MainMenu)).unwrap();

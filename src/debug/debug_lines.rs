@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_prototype_debug_lines::DebugLines;
 use crate::global::{Coords, GlobalScale, Hitbox};
 
-pub fn debug_lines(
+pub fn debug_lines_blocks(
     mut lines: ResMut<DebugLines>,
     q_debuggable: Query<(&Coords, &Hitbox)>,
     r_gs: Res<GlobalScale>,

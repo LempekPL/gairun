@@ -21,7 +21,7 @@ use crate::debug::{DebugPlugin, IsDebug};
 use crate::entity::{EntityPlugin, Flying, Noclip};
 use crate::global::GlobalPlugin;
 use crate::loaders::LoaderPlugin;
-use crate::mapper::MapPlugin;
+use crate::mapper::{LoadMapEvent, MapPlugin};
 use crate::ui::UiPlugin;
 
 fn main() {
@@ -56,6 +56,7 @@ fn main() {
     app.add_console_command::<DebugCommand, _, _>(debug_command);
     app.add_console_command::<NoclipCommand, _, _>(noclip_command);
     app.add_console_command::<FlyCommand, _, _>(fly_command);
+    app.add_console_command::<MapCommand, _, _>(map_command);
 
     app.run();
 }
@@ -168,5 +169,28 @@ fn fly_command(
                 reply!(log, "{:?}",ent_err);
             }
         }
+    }
+}
+
+// Changes map
+#[derive(ConsoleCommand)]
+#[console_command(name = "map")]
+struct MapCommand {
+    pack: String,
+    collection: String,
+    name: String,
+}
+
+fn map_command(
+    mut log: ConsoleCommand<MapCommand>,
+    mut ev_map_gen: EventWriter<LoadMapEvent>,
+) {
+    if let Some(MapCommand { pack, collection, name, }) = log.take() {
+        log.ok();
+        ev_map_gen.send(LoadMapEvent {
+            pack,
+            collection,
+            name,
+        });
     }
 }

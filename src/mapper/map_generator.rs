@@ -2,7 +2,7 @@ use std::fs;
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 use serde::{Deserialize, Serialize};
-use crate::entity::{Controllable, Player};
+use crate::entity::{Controllable, Motion, Player};
 use crate::{EventWriter, Flying, Noclip};
 use crate::global::{Coords, GlobalScale, Hitbox};
 use crate::mapper::{LoadMapEvent, MapComponent};
@@ -15,13 +15,13 @@ pub fn generate_map(
     mut ev_gen_map: EventReader<LoadMapEvent>,
     mut ev_toast: EventWriter<ToastEvent>,
     q_map_entity: Query<Entity, With<MapComponent>>,
-    mut q_player: Query<(&mut Transform, &mut Flying, &mut Visibility, &mut Noclip, &mut Controllable), With<Player>>,
+    mut q_player: Query<(&mut Transform, &mut Motion, &mut Flying, &mut Visibility, &mut Noclip, &mut Controllable), With<Player>>,
     r_gs: Res<GlobalScale>,
     mut r_tex_atlas: ResMut<Assets<TextureAtlas>>,
     asset_server: Res<AssetServer>,
 ) {
     // get player
-    let (mut p_transform, mut fly, mut vis, mut noc, mut con) = q_player.get_single_mut().unwrap();
+    let (mut p_transform, mut motion, mut fly, mut vis, mut noc, mut con) = q_player.get_single_mut().unwrap();
     // get first map to be in event
     let map = ev_gen_map.iter().next();
     if let Some(map) = map {
@@ -43,6 +43,7 @@ pub fn generate_map(
                 // load blocks
                 let mut blocks_data: HashMap<String, TempBlock> = HashMap::new();
                 for (block_id, path_string) in map_config.used_blocks.iter() {
+                    if block_id.starts_with("!") { continue; }
                     let path = get_path_from_string(true, path_string.to_string());
 
                     // read block data
@@ -119,6 +120,7 @@ pub fn generate_map(
                 vis.is_visible = map_config.player_settings.visibility;
                 noc.is_noclip = map_config.player_settings.noclip;
                 con.is_controllable = map_config.player_settings.controllability;
+                motion.speed = Vec2::splat(0.);
             } else {
                 todo!("Display error toast 1 (wRONg formatting)")
             }
