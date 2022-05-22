@@ -75,24 +75,24 @@ pub fn generate_map(
                 }
 
                 //spawn blocks
-                for (i, row) in map_config.game_map.iter().enumerate() {
+                for (i, row) in map_config.game_map.iter().rev().enumerate() {
                     for (j, block_id) in row.iter().enumerate() {
                         if !block_id.is_empty() {
                             if map_config.player_settings.spawn.check_point(block_id) {
                                 p_transform.translation = Vec3::new(
                                     j as f32 * 16. * r_gs.0.x,
-                                    -((i as f32 - 1.) * 16. + 8.) * r_gs.0.y,
+                                    (i as f32 * 16. + 8.) * r_gs.0.y,
                                     0.,
                                 );
                             }
                             let block_data = blocks_data.get(block_id);
                             if let Some(block_data) = block_data {
                                 let block = commands.spawn_bundle(BlockBundle {
-                                    coords: Coords(Vec2::new(j as f32, i as f32)),
+                                    coords: Coords(Vec2::new(j as f32, (i as f32))),
                                     hitbox: Hitbox(Vec2::new(block_data.width as f32, block_data.height as f32)),
                                     sprite: SpriteSheetBundle {
                                         global_transform: GlobalTransform {
-                                            translation: Vec3::new(j as f32 * 16.0 * r_gs.0.x, -(i as f32 * 16.0 * r_gs.0.y), 0.0),
+                                            translation: Vec3::new(j as f32 * 16.0 * r_gs.0.x, (i as f32 * 16.0 * r_gs.0.y), -0.01),
                                             scale: r_gs.0,
                                             ..default()
                                         },
@@ -110,7 +110,7 @@ pub fn generate_map(
                 if let PlayerSpawn::Coords(x, y) = map_config.player_settings.spawn {
                     p_transform.translation = Vec3::new(
                         x * 16. * r_gs.0.x,
-                        ((y - (map_config.game_map.len() as f32 - 1.)) * 16. + 8.) * r_gs.0.y,
+                        (y * 16. + 8.) * r_gs.0.y,
                         0.,
                     );
                 }
@@ -201,7 +201,7 @@ enum PlayerSpawn {
 }
 
 impl PlayerSpawn {
-    fn check_point(&self, s: &String) -> bool {
+    fn check_point(&self, s: &str) -> bool {
         if let PlayerSpawn::Point(p) = self {
             p == s
         } else {

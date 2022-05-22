@@ -23,6 +23,8 @@ pub struct TextureAssets {
     pub main_menu_background: Handle<Image>,
     #[asset(path = "textures/gairun.png")]
     pub gairun_title: Handle<Image>,
+    #[asset(path = "textures/gairun_walk_test.png")]
+    pub gairun_walk_test: Handle<Image>,
 }
 
 pub struct AssetLoaderPlugin;

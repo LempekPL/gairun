@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy::render::texture::DEFAULT_IMAGE_HANDLE;
 use bevy::sprite::collide_aabb::{collide, Collision};
 use bevy_prototype_debug_lines::DebugLines;
+use crate::asset_loader::TextureAssets;
 use crate::global::{AppState, Coords, GlobalScale, Hitbox};
 use crate::global::InGameState::Playing;
 use crate::global::MenuState::Main;
@@ -58,6 +59,11 @@ impl Plugin for EntityPlugin {
                 .with_system(controllable_user_keys)
                 .with_system(entity_motion)
                 .with_system(entity_gravity_motion)
+                .with_system(entity_collision
+                    .after(entity_gravity_motion)
+                    .after(controllable_user_keys)
+                    .after(entity_motion)
+                )
             )
             .add_system_set(SystemSet::on_enter(AppState::Menu(Main))
                 .with_system(despawn_player)
@@ -66,17 +72,16 @@ impl Plugin for EntityPlugin {
 }
 
 fn spawn_player(
-    // currentMap: Res<CurrentMap>
     mut commands: Commands,
-    // texture: Res<Image>
+    texture: Res<TextureAssets>,
     r_gs: Res<GlobalScale>,
 ) {
     commands.spawn_bundle(PlayerBundle {
         sprite: Sprite {
-            color: Color::RED,
             custom_size: Some(Vec2::new(16.0, 32.0)),
             ..default()
         },
+        texture: texture.gairun_walk_test.clone(),
         transform: Transform {
             scale: r_gs.0,
             ..default()
@@ -91,13 +96,13 @@ fn spawn_player(
 }
 
 fn controllable_user_keys(
-    mut q_motion: Query<(&mut Motion, &Flying, &Controllable)>,
+    mut q_motion: Query<(&mut Motion, &mut Sprite, &Flying, &Controllable)>,
     keys: Res<Input<KeyCode>>,
     game_keys: Res<GameKeybinds>,
     time: Res<Time>,
 ) {
     let delta = time.delta_seconds() * 100.0;
-    for (mut motion, fly, cont) in q_motion.iter_mut() {
+    for (mut motion, mut sprite, fly, cont) in q_motion.iter_mut() {
         if !cont.is_controllable { break; }
         let key_left = keys.pressed(game_keys.left);
         let key_right = keys.pressed(game_keys.right);
@@ -123,9 +128,11 @@ fn controllable_user_keys(
         // left right
         if key_left {
             motion.speed.x -= motion.acc * delta;
+            sprite.flip_x = true;
         }
         if key_right {
             motion.speed.x += motion.acc * delta;
+            sprite.flip_x = false;
         }
         if (key_left && key_right) || (!key_left && !key_right) {
             motion.speed.x -= motion.speed.x * motion.dcc * delta.clamp(0.0, 0.9);
@@ -155,6 +162,44 @@ fn entity_gravity_motion(
             if fly.is_flying { return; }
         }
         motion.speed.y -= 9.81 * motion.weight / 1000.0 * delta;
+    }
+}
+
+fn entity_collision(
+    q_block: Query<(&Coords, &Hitbox)>,
+    mut q_entity: Query<(&mut Transform, &mut Motion, &Hitbox, &Noclip)>,
+    r_gs: Res<GlobalScale>,
+) {
+    if let Ok((mut transform, mut motion, e_hitbox, noclip)) = q_entity.get_single_mut() {
+        if noclip.is_noclip { return; }
+        for (b_coords, b_hitbox) in q_block.iter() {
+            // change values to match the scale
+            let a_size = Vec2::new(e_hitbox.0.x * r_gs.0.x, e_hitbox.0.y * r_gs.0.y);
+            let b_pos = Vec3::new(b_coords.0.x * 16. * r_gs.0.x, b_coords.0.y * 16. * r_gs.0.y, 1.);
+            let b_size = Vec2::new(b_hitbox.0.x * r_gs.0.x, b_hitbox.0.y * r_gs.0.y);
+            // check for collisions
+            if let Some(colliding) = collide(transform.translation, a_size, b_pos, b_size) {
+                match colliding {
+                    Collision::Left => {
+                        motion.speed.x = 0.;
+                        transform.translation.x = (b_coords.0.x * 16.) * r_gs.0.x - (a_size.x + b_size.x) / 2.;
+                    }
+                    Collision::Right => {
+                        motion.speed.x = 0.;
+                        transform.translation.x = (b_coords.0.x * 16.) * r_gs.0.x + (a_size.x + b_size.x) / 2.;
+                    }
+                    Collision::Top => {
+                        motion.speed.y = 0.;
+                        transform.translation.y = (b_coords.0.y * 16.) * r_gs.0.y + (a_size.y + b_size.y) / 2.;
+                    }
+                    Collision::Bottom => {
+                        motion.speed.y = 0.;
+                        transform.translation.y = (b_coords.0.y * 16.) * r_gs.0.y - (a_size.y + b_size.y) / 2.;
+                    }
+                    _ => {}
+                }
+            }
+        }
     }
 }
 

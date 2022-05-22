@@ -1,22 +1,28 @@
 (
     playerSettings: (
         spawn: Point("S"),
-        invisible: true,
+        // spawn: Coords(1, 1),
+        visibility: true,
         controllability: true,
-        noclip: true
+        noclip: false,
+        fly: false,
     ),
     // after in-game map editor update the names will be randomized
     usedBlocks: {
         "b": "gairun:blocks/block"
     },
+    // resources: {
+    //     "b": Block("gairun:blocks/block")
+    //     "t": Embedded("b")
+    // },
     requiredPacks: [],
     gameMap: [
-        ["b", "b", "b", "b", "b", "b", "b"],
+        ["b", "b", "b", "b", "", "b", "b"],
         ["b", "", "", "", "", "", "b"],
         ["b", "", "", "", "", "", "b"],
-        ["b", "", "", "", "", "", "b"],
-        ["b", "", "", "", "", "", "b"],
+        ["", "", "", "", "", "", ""],
+        ["b", "", "", "", "", "", ""],
         ["b", "", "", "S", "", "", "b"],
-        ["b", "b", "b", "b", "b", "b", "b"],
+        ["b", "b", "", "b", "b", "b", "b"],
     ]
 )

@@ -34,7 +34,7 @@ pub struct GlobalScale(
 
 impl Default for GlobalScale {
     fn default() -> Self {
-        Self(Vec3::new(4., 4., 1.))
+        Self(Vec3::new(2., 2., 1.))
     }
 }
 
