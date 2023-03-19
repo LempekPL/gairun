@@ -1,21 +1,22 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::{Inspectable, RegisterInspectable};
-use crate::IsDebug;
+// use bevy_inspector_egui::{Inspectable, RegisterInspectable};
+use bevy_inspector_egui::prelude::*;
+use crate::debug::IsDebug;
 
 // components that could be used in more than one file
 
-#[derive(Component, Inspectable, Default)]
+#[derive(Component, InspectorOptions, Reflect, Default)]
 pub struct Coords(pub Vec2);
 
-#[derive(Component, Inspectable, Default)]
+#[derive(Component, InspectorOptions, Reflect, Default)]
 pub struct Hitbox(pub Vec2);
 
 pub struct GlobalPlugin;
 
 impl Plugin for GlobalPlugin {
     fn build(&self, app: &mut App) {
-        app.register_inspectable::<Hitbox>();
-        app.register_inspectable::<Coords>();
+        app.register_type::<Hitbox>();
+        app.register_type::<Coords>();
 
         app.insert_resource(IsDebug(false));
         app.insert_resource(GlobalScale::default());
@@ -27,7 +28,7 @@ impl Plugin for GlobalPlugin {
 
 // global states and other
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Resource)]
 pub struct GlobalScale(
     pub Vec3
 );
@@ -38,33 +39,19 @@ impl Default for GlobalScale {
     }
 }
 
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+#[derive(Clone, Eq, PartialEq, Debug, Hash, Default, States)]
 pub enum AppState {
     // loading
-    Preload,
+    #[default]
+    SetupIcon,
+    SetupSystems,
     LoadingAssets,
-    Loading(u8),
     // main menu
-    Menu(MenuState),
+    MenuMain,
+    MenuSettings,
+    MenuCredits,
     // in-game
-    Game(InGameState),
-}
-
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
-pub enum MenuState {
-    MainMenu,
-    Settings,
-    Credit,
-}
-
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
-pub enum InGameState {
-    Playing,
-    Paused(PausedState),
-}
-
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
-pub enum PausedState {
-    InMain,
-    Settings,
+    GamePlaying,
+    GamePaused,
+    GamePausedSettings
 }

@@ -28,12 +28,12 @@ impl Plugin for UiPlugin {
 fn create_ui_layers(
     mut commands: Commands
 ) {
-    commands.spawn_bundle(NodeBundle {
+    commands.spawn(NodeBundle {
         style: Style {
             size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
             ..default()
         },
-        color: Color::NONE.into(),
+        background_color: Color::NONE.into(),
         ..default()
     })
         .insert(LayerUi)
@@ -41,15 +41,15 @@ fn create_ui_layers(
         .with_children(|root| {
 
             // menu layer
-            root.spawn_bundle(NodeBundle {
-                color: Color::NONE.into(),
+            root.spawn(NodeBundle {
+                background_color: Color::NONE.into(),
                 ..default()
             })
                 .insert(MenuLayer)
                 .insert(Name::new("Menu"));
 
             // toasts layer
-            root.spawn_bundle(NodeBundle {
+            root.spawn(NodeBundle {
                 style: Style {
                     display: Display::Flex,
                     size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
@@ -61,7 +61,7 @@ fn create_ui_layers(
                     ..default()
                 },
                 focus_policy: FocusPolicy::Pass,
-                color: Color::NONE.into(),
+                background_color: Color::NONE.into(),
                 ..default()
             }).insert(ToastLayer).insert(Name::new("Toasts"));
         });

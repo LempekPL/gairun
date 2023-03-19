@@ -1,9 +1,7 @@
 use bevy::app::AppExit;
 use bevy::prelude::*;
-use crate::asset_loader::{FontAssets, TextureAssets};
-use crate::global::{AppState};
-use crate::global::InGameState::Playing;
-use crate::global::MenuState::{MainMenu};
+use crate::loaders::{FontAssets, TextureAssets};
+use crate::global::AppState;
 use crate::mapper::LoadMapEvent;
 use crate::ui::MenuLayer;
 use crate::ui::menus::*;
@@ -13,17 +11,20 @@ pub struct MainMenuPlugin;
 impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
         // main menu
-        app
-            .add_system_set(SystemSet::on_enter(AppState::Menu(MainMenu))
-                .with_system(spawn_menu)
-            )
-            .add_system_set(SystemSet::on_update(AppState::Menu(MainMenu))
-                .with_system(button_coloring)
-                .with_system(button_handler_menu)
-            )
-            .add_system_set(SystemSet::on_exit(AppState::Menu(MainMenu))
-                .with_system(despawn_ui_node_recursive)
-            );
+        app.add_system(spawn_menu.in_schedule(OnEnter(AppState::MenuMain)));
+        app.add_systems((button_coloring, button_handler_menu).in_set(OnUpdate(AppState::MenuMain)));
+        app.add_system(despawn_ui_node_recursive.in_schedule(OnExit(AppState::MenuMain)));
+        // app
+        //     .add_system_set(SystemSet::on_enter(AppState::Menu(MainMenu))
+        //         .with_system(spawn_menu)
+        //     )
+        //     .add_system_set(SystemSet::on_update(AppState::Menu(MainMenu))
+        //         .with_system(button_coloring)
+        //         .with_system(button_handler_menu)
+        //     )
+        //     .add_system_set(SystemSet::on_exit(AppState::Menu(MainMenu))
+        //         .with_system(despawn_ui_node_recursive)
+        //     );
         // settings
         // app
         //     .add_system_set(SystemSet::on_enter(AppState::Menu(Settings))
@@ -57,10 +58,7 @@ fn spawn_menu(
     texture_assets: Res<TextureAssets>,
     mut q: Query<Entity, With<MenuLayer>>,
 ) {
-    let menu = match q.get_single_mut() {
-        Ok(ent) => {ent}
-        Err(_) => {return}
-    };
+    let Ok(menu) = q.get_single_mut() else { return; };
     // spawn buttons
     let play_button = create_button(
         &mut commands,
@@ -81,36 +79,40 @@ fn spawn_menu(
         ButtonType::Quit,
     );
     // title
-    let gairun_title = commands.spawn_bundle(ImageBundle {
+    let gairun_title = commands.spawn(ImageBundle {
         style: Style {
-            flex_shrink: 2.,
-            margin: Rect {
-                top: Val::Px(-50.),
-                bottom: Val::Px(-50.),
-                ..default()
-            },
+            // flex_shrink: 2.,
+            // margin: UiRect {
+            //     top: Val::Px(-50.),
+            //     bottom: Val::Px(-50.),
+            //     ..default()
+            // },
             ..default()
         },
-        image: UiImage(texture_assets.gairun_title.clone()),
+        image: UiImage {
+            texture: texture_assets.gairun_title.clone(),
+            flip_x: false,
+            flip_y: false,
+        },
         transform: Transform {
-            scale: Vec3::new(0.5,0.5,0.5),
+            scale: Vec3::new(1., 1., 1.),
             ..default()
         },
         ..default()
-    }).id();
+    }).insert(Name::new("GairunTitle")).id();
     // grouping everything into list
     let node_bundle = NodeBundle {
         style: Style {
-            flex_direction: FlexDirection::ColumnReverse,
+            flex_direction: FlexDirection::Column,
             size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
             justify_content: JustifyContent::Center,
-            margin: Rect {
+            margin: UiRect {
                 bottom: Val::Px(40.),
                 ..default()
             },
             ..default()
         },
-        color: UiColor::from(Color::rgba(0.0, 0.0, 0.0, 0.4)),
+        background_color: BackgroundColor(Color::rgba(0.0, 0.0, 0.0, 0.4)),
         ..default()
     };
     let grouper = get_custom_ui_node(&mut commands, node_bundle, "MainMenuGrouper".to_string());
@@ -124,7 +126,7 @@ fn button_handler_menu(
         Changed<Interaction>
     >,
     mut ev_app_exit: EventWriter<AppExit>,
-    mut app_state: ResMut<State<AppState>>,
+    mut app_state: ResMut<NextState<AppState>>,
     mut ev_map_gen: EventWriter<LoadMapEvent>,
 ) {
     for (interaction, button_type) in q_interaction.iter() {
@@ -139,13 +141,13 @@ fn button_handler_menu(
                         collection: "collection".to_string(),
                         name: "1".to_string(),
                     });
-                    app_state.set(AppState::Game(Playing)).unwrap();
+                    app_state.set(AppState::GamePlaying);
                 }
                 ButtonType::ToSettings => {
                     // app_state.set(AppState::Menu(Settings)).unwrap();
                 }
                 _ => {
-                    app_state.set(AppState::Menu(MainMenu)).unwrap();
+                    app_state.set(AppState::MenuMain);
                 }
             }
         }

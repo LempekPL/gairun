@@ -1,8 +1,8 @@
-use bevy::prelude::KeyCode;
+use bevy::prelude::{KeyCode, Resource};
 use bevy::window::WindowMode;
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize, Copy, Clone)]
+#[derive(Deserialize, Serialize, Copy, Clone, Resource)]
 pub struct GameKeybinds {
     #[serde(default = "DEF_KEY_UP")]
     pub up: KeyCode,
@@ -22,7 +22,7 @@ const DEF_KEY_LEFT: fn() -> KeyCode = || KeyCode::A;
 const DEF_KEY_RIGHT: fn() -> KeyCode = || KeyCode::D;
 const DEF_KEY_DEBUG: fn() -> KeyCode = || KeyCode::F1;
 
-#[derive(Deserialize, Serialize, Copy, Clone)]
+#[derive(Deserialize, Serialize, Copy, Clone, Resource)]
 pub struct GameSettings {
     #[serde(default = "DEF_SET_VOL")]
     pub volume: f32,

@@ -41,36 +41,35 @@ fn spawn_toast(
             asset_server.load("fonts/open_sans/OpenSans-Regular.ttf")
         };
         let button_entity = commands.
-            spawn_bundle(NodeBundle {
+            spawn(NodeBundle {
                 style: Style {
                     size: Size::new(Val::Percent(60.0), Val::Px(50.0)),
                     align_items: AlignItems::FlexStart,
-                    padding: Rect { left: Val::Px(16.0), ..Default::default() },
-                    margin: Rect { top: Val::Px(16.0), ..Default::default() },
+                    padding: UiRect { left: Val::Px(16.0), ..Default::default() },
+                    margin: UiRect { top: Val::Px(16.0), ..Default::default() },
                     ..Default::default()
                 },
-                color: UiColor(ev.background_color),
+                background_color: BackgroundColor(ev.background_color),
                 ..Default::default()
             })
             .with_children(|parent| {
-                parent.spawn_bundle(TextBundle {
+                parent.spawn(TextBundle {
                     style: Style {
                         align_self: AlignSelf::Center,
                         ..Default::default()
                     },
-                    text: Text::with_section(
+                    text: Text::from_section(
                         &ev.text,
                         TextStyle {
                             color: ev.text_color,
                             font_size: 25.0,
                             font: font.clone(),
-                        },
-                        Default::default(),
+                        }
                     ),
                     ..Default::default()
                 });
             })
-            .insert(ToastTimer(Timer::new(Duration::from_secs(5), false)))
+            .insert(ToastTimer(Timer::new(Duration::from_secs(5), TimerMode::Once)))
             .id();
         commands.entity(toast_list).add_child(button_entity);
     };

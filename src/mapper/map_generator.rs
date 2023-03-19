@@ -30,10 +30,7 @@ pub fn generate_map(
         if let Ok(map_entity) = map_entity {
             commands.entity(map_entity).despawn_recursive();
         }
-        let map_entity = commands.spawn()
-            .insert(MapComponent)
-            .insert(Name::new("MapGrouper"))
-            .id();
+        let map_entity = commands.spawn((MapComponent, Name::new("MapGrouper"), SpatialBundle::default())).id();
 
         // start loading new map
         let path = get_path(true, &map.pack, &format!("maps/{}", map.collection), &map.name);
@@ -62,6 +59,7 @@ pub fn generate_map(
                                 texture,
                                 Vec2::new(block_config.texture.width, block_config.texture.height),
                                 1, 1,
+                                None, None
                             ));
                             blocks_data.insert(block_id.to_owned(), TempBlock {
                                 texture,
@@ -91,11 +89,11 @@ pub fn generate_map(
                             }
                             let block_data = blocks_data.get(block_id);
                             if let Some(block_data) = block_data {
-                                let block = commands.spawn_bundle(BlockBundle {
+                                let block = commands.spawn(BlockBundle {
                                     coords: Coords(Vec2::new(j as f32, i as f32)),
                                     hitbox: Hitbox(Vec2::new(block_data.width as f32, block_data.height as f32)),
                                     sprite: SpriteSheetBundle {
-                                        global_transform: GlobalTransform {
+                                        transform: Transform {
                                             translation: Vec3::new(j as f32 * 16.0 * r_gs.0.x, i as f32 * 16.0 * r_gs.0.y, -0.01),
                                             scale: r_gs.0,
                                             ..default()
@@ -120,7 +118,11 @@ pub fn generate_map(
                 }
 
                 fly.is_flying = map_config.player_settings.fly;
-                vis.is_visible = map_config.player_settings.visibility;
+                // vis = if map_config.player_settings.visibility {
+                //     Visibility::Visible.into()
+                // } else {
+                //     Visibility::Hidden.into()
+                // };
                 noc.is_noclip = map_config.player_settings.noclip;
                 con.is_controllable = map_config.player_settings.controllability;
                 motion.speed = Vec2::splat(0.);
@@ -169,7 +171,7 @@ fn get_path_custom(full: bool, path_string: String, custom: &str) -> String {
 }
 
 // map file destruct
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, Resource)]
 #[serde(rename_all = "camelCase")]
 struct MapConfig {
     player_settings: PlayerSettings,
@@ -178,7 +180,7 @@ struct MapConfig {
     game_map: Vec<Vec<String>>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, Resource)]
 #[serde(rename_all = "camelCase")]
 struct PlayerSettings {
     #[serde(default = "DEF_SPA")]

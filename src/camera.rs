@@ -1,8 +1,6 @@
 use bevy::prelude::*;
-use bevy::render::camera::Camera2d;
 use crate::global::AppState;
 use crate::entity::Player;
-use crate::global::InGameState::Playing;
 
 pub(crate) struct CameraPlugin;
 
@@ -11,10 +9,7 @@ const CAMERA_SPEED: f32 = 0.064;
 
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_system_set(SystemSet::on_update(AppState::Game(Playing))
-                .with_system(camera_follow_player)
-            );
+        app.add_system(camera_follow_player.in_set(OnUpdate(AppState::GamePlaying)));
     }
 }
 

@@ -31,7 +31,7 @@ pub fn despawn_ui_node_recursive(
 #[allow(clippy::type_complexity)]
 pub fn button_coloring(
     mut q_interaction: Query<
-        (&Interaction, &mut UiColor),
+        (&Interaction, &mut BackgroundColor),
         (Changed<Interaction>, With<MenuButton>),
     >,
 ) {
@@ -55,14 +55,14 @@ pub fn get_ui_node(commands: &mut Commands, name: String) -> Entity {
     let node_bundle = NodeBundle {
         style: Style {
             flex_direction: FlexDirection::ColumnReverse,
-            margin: Rect {
+            margin: UiRect {
                 left: Val::Auto,
                 right: Val::Auto,
                 ..default()
             },
             ..default()
         },
-        color: UiColor::from(Color::rgba(0.0, 0.0, 0.0, 0.4)),
+        background_color: BackgroundColor(Color::rgba(0.0, 0.0, 0.0, 0.4)),
         ..default()
     };
     get_custom_ui_node(commands, node_bundle, name)
@@ -71,7 +71,7 @@ pub fn get_ui_node(commands: &mut Commands, name: String) -> Entity {
 // helper funciton
 pub fn get_custom_ui_node(commands: &mut Commands, node_bundle: NodeBundle, name: String) -> Entity {
     commands
-        .spawn_bundle(node_bundle)
+        .spawn(node_bundle)
         .insert(UiMenu)
         .insert(Name::new(name))
         .id()
@@ -80,31 +80,30 @@ pub fn get_custom_ui_node(commands: &mut Commands, node_bundle: NodeBundle, name
 // helper function
 pub fn create_button<T: bevy::prelude::Component>(commands: &mut Commands, font: Handle<Font>, name: String, button_type: T) -> Entity {
     commands
-        .spawn_bundle(ButtonBundle {
+        .spawn(ButtonBundle {
             style: Style {
                 // size button
                 size: Size::new(Val::Px(200.0), Val::Px(65.0)),
                 // center button
-                margin: Rect::all(Val::Auto),
+                margin: UiRect::all(Val::Auto),
                 // horizontally center child text
                 justify_content: JustifyContent::Center,
                 // vertically center child text
                 align_items: AlignItems::Center,
                 ..Default::default()
             },
-            color: Color::WHITE.into(),
+            background_color: Color::WHITE.into(),
             ..Default::default()
         })
         .with_children(|parent| {
-            parent.spawn_bundle(TextBundle {
-                text: Text::with_section(
+            parent.spawn(TextBundle {
+                text: Text::from_section(
                     &name,
                     TextStyle {
                         font: font.clone(),
                         font_size: 40.0,
                         color: Color::WHITE,
-                    },
-                    Default::default(),
+                    }
                 ),
                 ..Default::default()
             });

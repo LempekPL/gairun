@@ -1,5 +1,6 @@
 use std::fs;
 use bevy::prelude::*;
+use bevy::window::{PrimaryWindow, WindowResolution};
 use ron::ser::{PrettyConfig, to_string_pretty};
 use crate::global::AppState;
 use crate::settings::{GameKeybinds, GameSettings};
@@ -7,8 +8,9 @@ use crate::ui::toasts::ToastEvent;
 
 pub fn setup_settings(
     mut commands: Commands,
-    mut app_state: ResMut<State<AppState>>,
+    mut app_state: ResMut<NextState<AppState>>,
     mut ev_toast: EventWriter<ToastEvent>,
+    mut primary_query: Query<&mut Window, With<PrimaryWindow>>
 ) {
     // check for game settings
     // main game settings
@@ -35,9 +37,14 @@ pub fn setup_settings(
         });
     }
     commands.insert_resource(game_keybinds);
+    info!("Settings Setup is Done");
 
-    // move user to next loading step
-    app_state.set(AppState::Loading(1)).unwrap();
+    // set window settings
+    let Ok(mut primary) = primary_query.get_single_mut() else { return; };
+    primary.mode = game_settings.get_mode();
+    primary.resolution = game_settings.resolution.into();
+    info!("Window Setup is Done");
+    app_state.set(AppState::LoadingAssets);
 }
 
 // HELPER function, NOT system
@@ -62,8 +69,7 @@ fn save_settings<T: serde::Serialize>(settings_path: &str, settings: T) -> (T, b
     // makes ron files look better
     let pretty = PrettyConfig::new()
         .depth_limit(5)
-        .separate_tuple_members(true)
-        .decimal_floats(true);
+        .separate_tuple_members(true);
 
     if fs::write(settings_path, &to_string_pretty(&settings, pretty).unwrap()).is_ok() {
         (settings, false)

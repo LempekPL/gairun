@@ -2,11 +2,9 @@ use bevy::prelude::*;
 use bevy::render::texture::DEFAULT_IMAGE_HANDLE;
 use bevy::sprite::collide_aabb::{collide, Collision};
 use bevy_console::AddConsoleCommand;
-use bevy_inspector_egui::{Inspectable, RegisterInspectable};
-use crate::asset_loader::TextureAssets;
+use bevy_inspector_egui::prelude::*;
+use crate::loaders::TextureAssets;
 use crate::global::{AppState, Coords, GlobalScale, Hitbox};
-use crate::global::InGameState::Playing;
-use crate::global::MenuState::MainMenu;
 use crate::settings::GameKeybinds;
 
 pub struct EntityPlugin;
@@ -18,13 +16,14 @@ pub struct GameEntity;
 #[derive(Component)]
 pub struct GravityEntity;
 
-#[derive(Component, Inspectable)]
+#[derive(Component, InspectorOptions, Reflect)]
+#[reflect(InspectorOptions)]
 pub struct Motion {
-    #[inspectable(min = 0.001, max = 2.0)]
+    #[inspector(min = 0.001, max = 2.0)]
     pub acc: f32,
-    #[inspectable(min = 0.001, max = 2.0)]
+    #[inspector(min = 0.001, max = 2.0)]
     pub dcc: f32,
-    #[inspectable(min = 0.001, max = 2000.0)]
+    #[inspector(min = 0.001, max = 2000.0)]
     pub weight: f32,
     pub speed: Vec2,
 }
@@ -33,17 +32,17 @@ pub struct Motion {
 #[derive(Component)]
 pub struct Player;
 
-#[derive(Component, Inspectable, Default)]
+#[derive(Component, InspectorOptions, Reflect, Default)]
 pub struct Controllable {
     pub is_controllable: bool,
 }
 
-#[derive(Component, Inspectable, Default)]
+#[derive(Component, InspectorOptions, Reflect, Default)]
 pub struct Noclip {
     pub is_noclip: bool,
 }
 
-#[derive(Component, Inspectable, Default)]
+#[derive(Component, InspectorOptions, Reflect, Default)]
 pub struct Flying {
     pub is_flying: bool,
 }
@@ -54,31 +53,43 @@ pub struct AI;
 
 impl Plugin for EntityPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_enter(AppState::Game(Playing))
-            .with_system(spawn_player)
-        );
-        app.add_system_set(SystemSet::on_update(AppState::Game(Playing))
-            .with_system(controllable_user_keys
-                .before(entity_motion)
-            )
-            .with_system(entity_motion)
-            .with_system(entity_gravity_motion
-                .before(entity_motion)
-                .before(controllable_user_keys)
-            )
-            .with_system(entity_collision
-                .after(entity_gravity_motion)
-                .after(controllable_user_keys)
-                .after(entity_motion)
-            )
-        );
-        app.add_system_set(SystemSet::on_enter(AppState::Menu(MainMenu))
-            .with_system(despawn_player)
-        );
-        app.register_inspectable::<Motion>();
-        app.register_inspectable::<Controllable>();
-        app.register_inspectable::<Noclip>();
-        app.register_inspectable::<Flying>();
+        app.add_system(spawn_player.in_schedule(OnEnter(AppState::GamePlaying)));
+
+        app.add_systems((
+            controllable_user_keys.before(entity_motion),
+            entity_motion,
+            entity_gravity_motion.before(entity_motion).before(controllable_user_keys),
+            entity_collision.after(entity_gravity_motion).after(controllable_user_keys).after(entity_motion)
+        ).in_set(OnUpdate(AppState::GamePlaying)));
+
+        app.add_system(despawn_player.in_schedule(OnEnter(AppState::MenuMain)));
+
+
+        // app.add_system_set(SystemSet::on_enter(AppState::GamePlaying)
+        //     .with_system(spawn_player)
+        // );
+        // app.add_system_set(SystemSet::on_update(AppState::GamePlaying)
+        //     .with_system(controllable_user_keys
+        //         .before(entity_motion)
+        //     )
+        //     .with_system(entity_motion)
+        //     .with_system(entity_gravity_motion
+        //         .before(entity_motion)
+        //         .before(controllable_user_keys)
+        //     )
+        //     .with_system(entity_collision
+        //         .after(entity_gravity_motion)
+        //         .after(controllable_user_keys)
+        //         .after(entity_motion)
+        //     )
+        // );
+        // app.add_system_set(SystemSet::on_enter(AppState::Menu(MainMenu))
+        //     .with_system(despawn_player)
+        // );
+        app.register_type::<Motion>();
+        app.register_type::<Controllable>();
+        app.register_type::<Noclip>();
+        app.register_type::<Flying>();
     }
 }
 
@@ -87,7 +98,7 @@ fn spawn_player(
     texture: Res<TextureAssets>,
     r_gs: Res<GlobalScale>,
 ) {
-    commands.spawn_bundle(PlayerBundle {
+    commands.spawn(PlayerBundle {
         sprite: Sprite {
             custom_size: Some(Vec2::new(16.0, 32.0)),
             ..default()
@@ -227,35 +238,19 @@ fn despawn_player(
     }
 }
 
-#[derive(Bundle)]
+#[derive(Bundle, Default)]
 pub struct PlayerBundle {
     pub sprite: Sprite,
-    pub transform: Transform,
-    pub global_transform: GlobalTransform,
     pub texture: Handle<Image>,
     pub hitbox: Hitbox,
-    pub visibility: Visibility,
     pub flying: Flying,
     pub noclip: Noclip,
     pub controllable: Controllable,
     pub motion: Motion,
-}
-
-impl Default for PlayerBundle {
-    fn default() -> Self {
-        Self {
-            sprite: Default::default(),
-            transform: Default::default(),
-            global_transform: Default::default(),
-            texture: DEFAULT_IMAGE_HANDLE.typed(),
-            hitbox: Default::default(),
-            visibility: Default::default(),
-            flying: Default::default(),
-            noclip: Default::default(),
-            controllable: Default::default(),
-            motion: Default::default(),
-        }
-    }
+    pub visibility: Visibility,
+    pub computed: ComputedVisibility,
+    pub transform: Transform,
+    pub global_transform: GlobalTransform,
 }
 
 impl Motion {

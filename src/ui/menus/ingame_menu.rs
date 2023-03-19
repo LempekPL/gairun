@@ -1,9 +1,6 @@
 use bevy::prelude::*;
-use crate::asset_loader::{FontAssets, TextureAssets};
-use crate::global::{AppState};
-use crate::global::InGameState::{Paused, Playing};
-use crate::global::MenuState::{Credit, MainMenu, Settings};
-use crate::global::PausedState::InMain;
+use crate::loaders::{FontAssets, TextureAssets};
+use crate::global::AppState;
 use crate::ui::MenuLayer;
 use crate::ui::menus::*;
 
@@ -11,22 +8,27 @@ pub struct InGameMenuPlugin;
 
 impl Plugin for InGameMenuPlugin {
     fn build(&self, app: &mut App) {
+        app.add_system(check_for_un_pause.in_set(OnUpdate(AppState::GamePlaying)));
+        app.add_system(spawn_menu.in_schedule(OnEnter(AppState::GamePaused)));
+        app.add_systems((button_coloring, button_handler_menu, check_for_un_pause).in_set(OnUpdate(AppState::GamePaused)));
+        app.add_system(despawn_ui_node_recursive.in_schedule(OnExit(AppState::GamePaused)));
+
         // in-game main
-        app
-            .add_system_set(SystemSet::on_update(AppState::Game(Playing))
-                .with_system(check_for_un_pause)
-            )
-            .add_system_set(SystemSet::on_enter(AppState::Game(Paused(InMain)))
-                .with_system(spawn_menu)
-            )
-            .add_system_set(SystemSet::on_update(AppState::Game(Paused(InMain)))
-                .with_system(button_coloring)
-                .with_system(button_handler_menu)
-                .with_system(check_for_un_pause)
-            )
-            .add_system_set(SystemSet::on_exit(AppState::Game(Paused(InMain)))
-                .with_system(despawn_ui_node_recursive)
-            );
+        // app
+        //     .add_system_set(SystemSet::on_update(AppState::Game(Playing))
+        //         .with_system(check_for_un_pause)
+        //     )
+        //     .add_system_set(SystemSet::on_enter(AppState::GamePaused)
+        //         .with_system(spawn_menu)
+        //     )
+        //     .add_system_set(SystemSet::on_update(AppState::GamePaused)
+        //         .with_system(button_coloring)
+        //         .with_system(button_handler_menu)
+        //         .with_system(check_for_un_pause)
+        //     )
+        //     .add_system_set(SystemSet::on_exit(AppState::GamePaused)
+        //         .with_system(despawn_ui_node_recursive)
+        //     );
     }
 }
 
@@ -41,14 +43,17 @@ struct GairunTitle;
 
 fn check_for_un_pause(
     mut keys: ResMut<Input<KeyCode>>,
-    mut app_state: ResMut<State<AppState>>,
+    mut app_state: ResMut<NextState<AppState>>,
 ) {
     if keys.just_pressed(KeyCode::Escape) {
-        if app_state.current() == &AppState::Game(Playing) {
-            app_state.push(AppState::Game(Paused(InMain))).unwrap();
+        let Some(state) = &app_state.0 else {
+            return;
+        };
+        if state == &AppState::GamePlaying {
+            app_state.set(AppState::GamePaused);
             keys.reset(KeyCode::Escape);
-        } else if app_state.current() == &AppState::Game(Paused(InMain)) {
-            app_state.pop().unwrap();
+        } else if state == &AppState::GamePaused {
+            app_state.set(AppState::GamePlaying);
             keys.reset(KeyCode::Escape);
         }
     }
@@ -78,17 +83,21 @@ fn spawn_menu(
         ButtonType::ToMain,
     );
     // title
-    let gairun_title = commands.spawn_bundle(ImageBundle {
+    let gairun_title = commands.spawn(ImageBundle {
         style: Style {
             flex_shrink: 2.,
-            margin: Rect {
+            margin: UiRect {
                 top: Val::Px(-50.),
                 bottom: Val::Px(-50.),
                 ..default()
             },
             ..default()
         },
-        image: UiImage(texture_assets.gairun_title.clone()),
+        image: UiImage {
+            texture: texture_assets.gairun_title.clone(),
+            flip_x: false,
+            flip_y: false,
+        },
         transform: Transform {
             scale: Vec3::new(0.5,0.5,0.5),
             ..default()
@@ -101,13 +110,13 @@ fn spawn_menu(
             flex_direction: FlexDirection::ColumnReverse,
             size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
             justify_content: JustifyContent::Center,
-            margin: Rect {
+            margin: UiRect {
                 bottom: Val::Px(40.),
                 ..default()
             },
             ..default()
         },
-        color: UiColor::from(Color::rgba(0.0, 0.0, 0.0, 0.5)),
+        background_color: BackgroundColor(Color::rgba(0.0, 0.0, 0.0, 0.5)),
         ..default()
     };
     let grouper = get_custom_ui_node(&mut commands, node_bundle, "InGameGrouper".to_string());
@@ -120,19 +129,19 @@ fn button_handler_menu(
         (&Interaction, &ButtonType),
         Changed<Interaction>
     >,
-    mut app_state: ResMut<State<AppState>>,
+    mut app_state: ResMut<NextState<AppState>>,
 ) {
     for (interaction, button_type) in q_interaction.iter() {
         if interaction == &Interaction::Clicked {
             match button_type {
                 ButtonType::Continue => {
-                    app_state.pop().unwrap();
+                    app_state.set(AppState::GamePlaying);
                 }
                 ButtonType::ToMain => {
-                    app_state.set(AppState::Menu(MainMenu)).unwrap();
+                    app_state.set(AppState::MenuMain);
                 }
                 _ => {
-                    app_state.set(AppState::Menu(MainMenu)).unwrap();
+                    app_state.set(AppState::MenuMain);
                 }
             }
         }
